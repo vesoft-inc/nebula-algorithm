@@ -15,7 +15,7 @@ import org.rocksdb.{
 import org.slf4j.LoggerFactory
 
 /**
-  *
+  * NebulaSSTWriter
   * @param path
   */
 class NebulaSSTWriter(path: String) extends Writer {

@@ -17,7 +17,7 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
 
 /**
-  *
+  * GraphProvider for Nebula Graph Service
   */
 class GraphProvider(addresses: List[HostAndPort]) extends AutoCloseable with Serializable {
   private[this] lazy val LOG = Logger.getLogger(this.getClass)

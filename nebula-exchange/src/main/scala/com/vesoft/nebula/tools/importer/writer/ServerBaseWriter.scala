@@ -45,7 +45,6 @@ abstract class ServerBaseWriter extends Writer {
       vertices.propertyNames,
       vertices.values
         .map { vertex =>
-          // TODO Check
           if (vertices.policy.isEmpty) {
             INSERT_VALUE_TEMPLATE.format(vertex.vertexID, vertex.propertyValues)
           } else {
@@ -70,7 +69,6 @@ abstract class ServerBaseWriter extends Writer {
       .map { edge =>
         (for (element <- edge.source.split(","))
           yield {
-            // TODO Check and Test
             val source = edges.sourcePolicy match {
               case Some(KeyPolicy.HASH) =>
                 ENDPOINT_TEMPLATE.format(KeyPolicy.HASH.toString, element)
