@@ -31,7 +31,7 @@ Nebula Exchange 2.0 依赖 Nebula java client。
 
 *2.  Nebula Exchange 2.0 支持Date、DateTime、Time类型数据的导入*
 
-*3.  配置文件参考 [application.conf](https://github.com/vesoft-inc/nebula-spark-utils/tree/main/nebula-exchange/src/main/resources)
+*3.  配置文件参考 [application.conf](https://github.com/vesoft-inc/nebula-spark-utils/tree/main/nebula-exchange/src/main/resources)*
 ## 贡献
 
 Nebula Exchange 是一个完全开源的项目，欢迎开源爱好者通过以下方式参与：
