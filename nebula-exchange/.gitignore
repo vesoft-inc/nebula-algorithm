@@ -33,5 +33,4 @@ target/
 spark-importer.ipr
 spark-importer.iws
 
-# mac
 .DS_Store
