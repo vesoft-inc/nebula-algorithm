@@ -15,15 +15,6 @@ import com.vesoft.nebula.tools.importer.config.{
   Type
 }
 import org.apache.log4j.Logger
-import org.apache.spark.sql.types.DataType
-import org.apache.spark.sql.types.DataTypes.{
-  BooleanType,
-  DoubleType,
-  FloatType,
-  IntegerType,
-  LongType,
-  StringType
-}
 import scala.collection.JavaConversions.seqAsJavaList
 import scala.collection.mutable
 
@@ -65,30 +56,36 @@ object NebulaUtils {
     sourceSchemaMap.toMap
   }
 
-  def getDataType(clazz: Class[_]): DataType = {
-    if (classOf[java.lang.Boolean] == clazz) return BooleanType
-    else if (classOf[java.lang.Long] == clazz || classOf[java.lang.Integer] == clazz)
-      return LongType
-    else if (classOf[java.lang.Double] == clazz || classOf[java.lang.Float] == clazz)
-      return DoubleType
-    StringType
-  }
-
-  def getDataFrameValue(value: String, dataType: DataType): Any = {
-    dataType match {
-      case LongType    => value.toLong
-      case IntegerType => value.toInt
-      case BooleanType => value.toBoolean
-      case DoubleType  => value.toDouble
-      case FloatType   => value.toFloat
-      case _           => value
-    }
-  }
-
   def isNumic(str: String): Boolean = {
     for (char <- str.toCharArray) {
       if (!Character.isDigit(char)) return false
     }
     true
+  }
+
+  def escapeUtil(str: String): String = {
+    var s = str
+    if (s.contains("\\")) {
+      s = s.replaceAll("\\\\", "\\\\\\\\")
+    }
+    if (s.contains("\t")) {
+      s = s.replaceAll("\t", "\\\\t")
+    }
+    if (s.contains("\n")) {
+      s = s.replaceAll("\n", "\\\\n")
+    }
+    if (s.contains("\"")) {
+      s = s.replaceAll("\"", "\\\\\"")
+    }
+    if (s.contains("\'")) {
+      s = s.replaceAll("\'", "\\\\'")
+    }
+    if (s.contains("\r")) {
+      s = s.replaceAll("\r", "\\\\r")
+    }
+    if (s.contains("\b")) {
+      s = s.replaceAll("\b", "\\\\b")
+    }
+    s
   }
 }

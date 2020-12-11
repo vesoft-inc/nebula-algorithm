@@ -23,7 +23,6 @@ import com.vesoft.nebula.tools.importer.{
 }
 import org.apache.log4j.Logger
 import com.vesoft.nebula.tools.importer.writer.{NebulaGraphClientWriter}
-import org.apache.commons.lang.StringEscapeUtils
 import org.apache.spark.sql.streaming.Trigger
 import org.apache.spark.sql.{DataFrame, Encoders}
 import org.apache.spark.util.LongAccumulator
@@ -105,11 +104,7 @@ class VerticesProcessor(data: DataFrame,
               // process string type vid
               if (isVidStringType) {
                 val value = row.get(index).toString
-                if (StringEscapeUtils.escapeJava(value).contains('\\')) {
-                  StringEscapeUtils.escapeJava(value).mkString("\"", "", "\"")
-                } else {
-                  value.mkString("\"", "", "\"")
-                }
+                NebulaUtils.escapeUtil(value).mkString("\"", "", "\"")
               } else {
                 // process int type vid
                 assert(NebulaUtils.isNumic(row.get(index).toString))
