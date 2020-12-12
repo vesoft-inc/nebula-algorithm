@@ -24,7 +24,6 @@ import com.vesoft.nebula.tools.importer.{
 }
 import org.apache.log4j.Logger
 import com.vesoft.nebula.tools.importer.writer.NebulaGraphClientWriter
-import org.apache.commons.lang.StringEscapeUtils
 import org.apache.spark.sql.streaming.Trigger
 import org.apache.spark.sql.{DataFrame, Encoders}
 import org.apache.spark.util.LongAccumulator
@@ -102,11 +101,9 @@ class EdgeProcessor(data: DataFrame,
           if (edgeConfig.sourcePolicy.isEmpty) {
             // process string type vid
             if (isVidStringType) {
-              if (StringEscapeUtils.escapeJava(sourceField).contains('\\')) {
-                sourceField = StringEscapeUtils.escapeJava(sourceField).mkString("\"", "", "\"")
-              } else {
-                sourceField = sourceField.mkString("\"", "", "\"")
-              }
+              sourceField = NebulaUtils.escapeUtil(sourceField).mkString("\"", "", "\"")
+            } else {
+              assert(NebulaUtils.isNumic(sourceField))
             }
           }
 
@@ -115,11 +112,9 @@ class EdgeProcessor(data: DataFrame,
           if (edgeConfig.targetPolicy.isEmpty) {
             // process string type vid
             if (isVidStringType) {
-              if (StringEscapeUtils.escapeJava(targetField).contains('\\')) {
-                targetField = StringEscapeUtils.escapeJava(targetField).mkString("\"", "", "\"")
-              } else {
-                targetField = targetField.mkString("\"", "", "\"")
-              }
+              targetField = NebulaUtils.escapeUtil(targetField).mkString("\"", "", "\"")
+            } else {
+              assert(NebulaUtils.isNumic(targetField))
             }
           }
 

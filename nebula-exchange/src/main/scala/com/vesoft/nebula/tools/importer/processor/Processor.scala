@@ -7,8 +7,7 @@
 package com.vesoft.nebula.tools.importer.processor
 
 import com.vesoft.nebula.meta.PropertyType
-import com.vesoft.nebula.tools.importer.utils.HDFSUtils
-import org.apache.commons.lang.StringEscapeUtils
+import com.vesoft.nebula.tools.importer.utils.{HDFSUtils, NebulaUtils}
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types.{IntegerType, LongType, StringType}
 
@@ -48,11 +47,7 @@ trait Processor extends Serializable {
 
     fieldTypeMap(field) match {
       case PropertyType.STRING => {
-        val result = if (StringEscapeUtils.escapeJava(row.getString(index)).contains('\\')) {
-          StringEscapeUtils.escapeJava(row.get(index).toString).mkString("\"", "", "\"")
-        } else {
-          row.get(index).toString.mkString("\"", "", "\"")
-        }
+        val result = NebulaUtils.escapeUtil(row.getString(index)).mkString("\"", "", "\"")
         if (toBytes) result.getBytes else result
       }
       case PropertyType.DATE     => "date(\"" + row.get(index) + "\")"
