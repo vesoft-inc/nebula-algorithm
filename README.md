@@ -1,6 +1,6 @@
 # nebula-spark-utils
 
-The nebula-spark-utils project holds all the Apache Spark&trade; related libraries and tools for Nebula Graph v2.x.
+The nebula-spark-utils repository holds all the Apache Spark&trade; related libraries and tools for Nebula Graph v2.x.
 
 For Nebula Graph v2.x, see [nebula-graph](https://github.com/vesoft-inc/nebula-graph).
 
