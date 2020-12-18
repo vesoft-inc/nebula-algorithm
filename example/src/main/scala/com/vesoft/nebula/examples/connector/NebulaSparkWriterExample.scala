@@ -72,14 +72,13 @@ object NebulaSparkWriterExample {
     val config =
       NebulaConnectionConfig
         .builder()
-        .withMetaAddress("192.168.8.172:45509")
-        .withGraphAddress("192.168.8.172:3799")
-        .withConenctionRetry(2)
+        .withMetaAddress("127.0.0.1:45509")
+        .withGraphAddress("127.0.0.1:3799")
         .build
     val nebulaWriteEdgeConfig: WriteNebulaEdgeConfig = WriteNebulaEdgeConfig
       .builder()
-      .withSpace("exchange")
-      .withEdge("friend1")
+      .withSpace("test")
+      .withEdge("friend")
       .withSrcIdField("src")
       .withDstIdField("dst")
       .withRankField("degree")
