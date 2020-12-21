@@ -47,7 +47,7 @@ trait Processor extends Serializable {
 
     fieldTypeMap(field) match {
       case PropertyType.STRING => {
-        val result = NebulaUtils.escapeUtil(row.getString(index)).mkString("\"", "", "\"")
+        val result = NebulaUtils.escapeUtil(row.get(index).toString).mkString("\"", "", "\"")
         if (toBytes) result.getBytes else result
       }
       case PropertyType.DATE     => "date(\"" + row.get(index) + "\")"
