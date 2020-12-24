@@ -36,9 +36,9 @@ For more details about Exchange, please refer to [Exchange 1.0](https://github.c
 
 ## New Features
 
-1. Supports to import VID of String type
-2. Supports to import data of Null, Date, DateTime, and Time types
-3. Supports to import data from other Hive sources than Hive on Spark
-4. Adds record and retry of the INSERT statement after failures during data import
+1. Supports importing vertex data with String type IDs.
+2. Supports importing data of the Null, Date, DateTime, and Time types.
+3. Supports importing data from other Hive sources besides Hive on Spark.
+4. Supports recording and retrying the INSERT statement after failures during data import.
 
 Refer to [application.conf](https://github.com/vesoft-inc/nebula-spark-utils/tree/main/nebula-exchange/src/main/resources) as an example to edit the configuration file.
