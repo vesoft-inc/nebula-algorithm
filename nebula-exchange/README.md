@@ -31,7 +31,7 @@ Exchange 2.0 depends on the latest Nebula Java Client 2.0。
     
 ## How to use
 
-For more detail about Exchange, please refer to Exchange 1.0.
+For more detail about Exchange, please refer to [Exchange 1.0](https://github.com/vesoft-inc/nebula-java/tree/v1.0/tools/exchange) .
 
 
 ## New Features
