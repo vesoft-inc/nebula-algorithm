@@ -27,18 +27,18 @@ Exchange 2.0 depends on the latest Nebula Java Client 2.0。
     $ mvn clean package -Dmaven.test.skip=true -Dgpg.skip -Dmaven.javadoc.skip=true
     ```
 
-    After the packaging, you can see the newly generated nebula-exchange-2.0.0.jar under this directory nebula-spark-utils/nebula-exchange/target/.
+    After the packaging, you can see the newly generated nebula-exchange-2.0.0.jar under the nebula-spark-utils/nebula-exchange/target/ directory.
     
 ## How to use
 
-For more detail about Exchange, please refer to [Exchange 1.0](https://github.com/vesoft-inc/nebula-java/tree/v1.0/tools/exchange) .
+For more details about Exchange, please refer to [Exchange 1.0](https://github.com/vesoft-inc/nebula-java/tree/v1.0/tools/exchange) .
 
 
 ## New Features
 
-1. Support to import VID of String type
-2. Support to import data of Null, Date, DateTime, and Time types
-3. Support to import data from other Hive sources than Hive on Spark
-4. Added record and retry of the INSERT statement failure during the import
+1. Supports to import VID of String type
+2. Supports to import data of Null, Date, DateTime, and Time types
+3. Supports to import data from other Hive sources than Hive on Spark
+4. Adds record and retry of the INSERT statement after failures during data import
 
-Refer to [application.conf](https://github.com/vesoft-inc/nebula-spark-utils/tree/main/nebula-exchange/src/main/resources) to see how to config the configuration file.
+Refer to [application.conf](https://github.com/vesoft-inc/nebula-spark-utils/tree/main/nebula-exchange/src/main/resources) as an example to edit the configuration file.
