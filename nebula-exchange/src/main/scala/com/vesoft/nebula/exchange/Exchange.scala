@@ -181,7 +181,7 @@ object Exchange {
     if (ErrorHandler.existError(configs.errorConfig.errorPath)) {
       val batchSuccess = spark.sparkContext.longAccumulator(s"batchSuccess.reimport")
       val batchFailure = spark.sparkContext.longAccumulator(s"batchFailure.reimport")
-      val data         = spark.read.text()
+      val data         = spark.read.text(configs.errorConfig.errorPath)
       val processor    = new ReloadProcessor(data, configs, batchSuccess, batchFailure)
       processor.process()
       LOG.info(s"batchSuccess.reimport: ${batchSuccess.value}")

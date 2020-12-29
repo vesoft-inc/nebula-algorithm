@@ -8,6 +8,7 @@ package com.vesoft.nebula.exchange.processor
 
 import com.vesoft.nebula.exchange.{ErrorHandler, GraphProvider}
 import com.vesoft.nebula.exchange.config.Configs
+import org.apache.spark.TaskContext
 import org.apache.spark.sql.{DataFrame, Row}
 import org.apache.spark.util.LongAccumulator
 
@@ -41,10 +42,11 @@ class ReloadProcessor(data: DataFrame,
       } else {
         batchSuccess.add(1)
       }
-      if (errorBuffer.nonEmpty) {
-        ErrorHandler.save(errorBuffer, s"${config.errorConfig.errorPath}/reload")
-        errorBuffer.clear()
-      }
     })
+    if (errorBuffer.nonEmpty) {
+      ErrorHandler.save(errorBuffer,
+                        s"${config.errorConfig.errorPath}/reload.${TaskContext.getPartitionId()}")
+      errorBuffer.clear()
+    }
   }
 }
