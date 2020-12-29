@@ -148,7 +148,7 @@ class NebulaGraphClientWriter(dataBaseConfigEntry: DataBaseConfigEntry,
       if (result.isSucceeded) {
         return null
       }
-      LOG.error(s"write vertex failed with statement $sentence. ${result.getErrorMessage}")
+      LOG.error(s"write vertex failed for ${result.getErrorMessage}")
     } else {
       LOG.error(s"write vertex failed because write speed is too fast")
     }
@@ -163,7 +163,7 @@ class NebulaGraphClientWriter(dataBaseConfigEntry: DataBaseConfigEntry,
       if (result.isSucceeded) {
         return null
       }
-      LOG.error(s"write edge failed with statement $sentence. ${result.getErrorMessage}")
+      LOG.error(s"write edge failed for ${result.getErrorMessage}")
     } else {
       LOG.error(s"write vertex failed because write speed is too fast")
     }

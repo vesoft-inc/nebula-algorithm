@@ -23,6 +23,7 @@ import com.vesoft.nebula.exchange.config.{
 import com.vesoft.nebula.exchange.utils.NebulaUtils
 import com.vesoft.nebula.exchange.writer.NebulaGraphClientWriter
 import org.apache.log4j.Logger
+import org.apache.spark.TaskContext
 import org.apache.spark.sql.streaming.Trigger
 import org.apache.spark.sql.{DataFrame, Encoders}
 import org.apache.spark.util.LongAccumulator
@@ -75,13 +76,13 @@ class VerticesProcessor(data: DataFrame,
         errorBuffer.append(failStatement)
         batchFailure.add(1)
       }
-
-      if (errorBuffer.nonEmpty) {
-        ErrorHandler.save(errorBuffer, s"${config.errorConfig.errorPath}/${tagConfig.name}")
-        errorBuffer.clear()
-      }
     }
-
+    if (errorBuffer.nonEmpty) {
+      ErrorHandler.save(
+        errorBuffer,
+        s"${config.errorConfig.errorPath}/${tagConfig.name}.${TaskContext.getPartitionId()}")
+      errorBuffer.clear()
+    }
     writer.close()
     graphProvider.close()
   }
