@@ -1,5 +1,5 @@
 # Nebula Exchange 2.0
- [中文版](https://github.com/vesoft-inc/nebula-spark-utils/blob/main/nebula-exchange/README-CN.md)
+ [中文版](https://github.com/vesoft-inc/nebula-spark-utils/blob/master/nebula-exchange/README-CN.md)
  
 Nebula Exchange (Exchange for short) is an Apache Spark application. It is used to migrate cluster data in bulk from Spark to Nebula Graph in a distributed environment. It supports migration of batch data and streaming data in various formats.
 
