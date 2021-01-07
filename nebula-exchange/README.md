@@ -31,6 +31,11 @@ Exchange 2.0 depends on the latest Nebula Java Client 2.0。
     
 ## How to use
 
+Import command:
+```
+$SPARK_HOME/bin/submit --class com.vesoft.nebula.exchange.Exchange --master local nebula-exchange-2.0.0.jar -c /path/to/application.conf
+```
+
 For more details about Exchange, please refer to [Exchange 1.0](https://github.com/vesoft-inc/nebula-java/tree/v1.0/tools/exchange) .
 
 
