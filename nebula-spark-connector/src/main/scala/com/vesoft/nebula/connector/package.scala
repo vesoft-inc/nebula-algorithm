@@ -147,7 +147,7 @@ package object connector {
 
     /**
       * read nebula vertex edge to graphx's vertex
-      * only support Long vId
+      * use hash() for String type vertex id.
       */
     def loadVerticesToGraphx(): RDD[NebulaGraphxVertex] = {
       val vertexDataset = loadVerticesToDF()
@@ -179,7 +179,7 @@ package object connector {
 
     /**
       * read nebula edge edge to graphx's edge
-      * only support edge with Long srcId and Long dstId
+      * use hash() for String type srcId and dstId.
       */
     def loadEdgesToGraphx(): RDD[NebulaGraphxEdge] = {
       val edgeDataset = loadEdgesToDF()

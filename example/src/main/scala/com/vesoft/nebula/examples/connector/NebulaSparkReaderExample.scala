@@ -29,8 +29,8 @@ object NebulaSparkReaderExample {
       .config(sparkConf)
       .getOrCreate()
 
-    // readVertex(spark)
-    // readEdges(spark)
+    readVertex(spark)
+    readEdges(spark)
     readVertexGraph(spark)
     readEdgeGraph(spark)
 
@@ -91,7 +91,7 @@ object NebulaSparkReaderExample {
     val config =
       NebulaConnectionConfig
         .builder()
-        .withMetaAddress("192.168.8.172:45509")
+        .withMetaAddress("127.0.0.1:45500")
         .withTimeout(6000)
         .withConenctionRetry(2)
         .build()
@@ -115,7 +115,7 @@ object NebulaSparkReaderExample {
     val config =
       NebulaConnectionConfig
         .builder()
-        .withMetaAddress("192.168.8.172:45509")
+        .withMetaAddress("127.0.0.1:45500")
         .withTimeout(6000)
         .withConenctionRetry(2)
         .build()
