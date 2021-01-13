@@ -17,7 +17,7 @@ Exchange 2.0 depends on the latest Nebula Java Client 2.0。
     $ mvn clean install -Dmaven.test.skip=true -Dgpg.skip -Dmaven.javadoc.skip=true  
     ```
 
-    After the installing, you can see the newly generated /com/vesoft/client/2.0.0-beta/client-2.0.0-beta.jar in your local Maven repository.
+    After the installing, you can see the newly generated /com/vesoft/client/2.0.0-rc1/client-2.0.0-rc1.jar in your local Maven repository.
 
 2. Package Exchange 2.0。
 
