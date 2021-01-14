@@ -21,14 +21,6 @@ class MetaProvider(addresses: List[Address]) extends AutoCloseable {
   val client      = new MetaClient(metaAddress)
   client.connect()
 
-  def getPartition(space: String): Map[Integer, List[HostAddress]] = {
-    client
-      .getPartsAlloc(space)
-      .asScala
-      .map(entry => entry._1 -> entry._2.asScala.toList)
-      .toMap
-  }
-
   def getPartitionNumber(space: String): Int = {
     client.getPartsAlloc(space).size()
   }
