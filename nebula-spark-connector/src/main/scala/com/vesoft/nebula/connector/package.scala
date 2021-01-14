@@ -169,7 +169,7 @@ package object connector {
           val props: ListBuffer[Any] = ListBuffer()
           for (i <- row.schema.fields.indices) {
             if (i != 0) {
-              props.append(NebulaUtils.resolveDataAndType(row, fields(i).dataType, i))
+              props.append(row.get(i))
             }
           }
           (vid, props.toList)
@@ -192,7 +192,7 @@ package object connector {
           val props: ListBuffer[Any] = ListBuffer()
           for (i <- row.schema.fields.indices) {
             if (i != 0 && i != 1 && i != 2) {
-              props.append(NebulaUtils.resolveDataAndType(row, fields(i).dataType, i))
+              props.append(row.get(i))
             }
           }
           val srcId = row.get(0).toString.getBytes()

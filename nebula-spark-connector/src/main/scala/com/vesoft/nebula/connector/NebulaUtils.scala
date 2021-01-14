@@ -16,6 +16,7 @@ import org.apache.spark.sql.types.{
   FloatType,
   IntegerType,
   LongType,
+  NullType,
   StringType,
   StructType,
   TimestampType
@@ -57,7 +58,7 @@ object NebulaUtils {
     throw new IllegalArgumentException(s"column $columnName does not exist in schema")
   }
 
-  type NebulaValueGetter = (Object, InternalRow, Int) => Unit
+  type NebulaValueGetter = (Any, InternalRow, Int) => Unit
 
   def makeGetters(schema: StructType): Array[NebulaValueGetter] = {
     schema.fields.map(field => makeGetter(field.dataType))
@@ -66,32 +67,20 @@ object NebulaUtils {
   private def makeGetter(dataType: DataType): NebulaValueGetter = {
     dataType match {
       case BooleanType =>
-        (prop: Object, row: InternalRow, pos: Int) =>
+        (prop: Any, row: InternalRow, pos: Int) =>
           row.setBoolean(pos, prop.asInstanceOf[Boolean])
       case TimestampType | LongType =>
-        (prop: Object, row: InternalRow, pos: Int) =>
+        (prop: Any, row: InternalRow, pos: Int) =>
           row.setLong(pos, prop.asInstanceOf[Long])
       case FloatType | DoubleType =>
-        (prop: Object, row: InternalRow, pos: Int) =>
+        (prop: Any, row: InternalRow, pos: Int) =>
           row.setDouble(pos, prop.asInstanceOf[Double])
       case IntegerType =>
-        (prop: Object, row: InternalRow, pos: Int) =>
+        (prop: Any, row: InternalRow, pos: Int) =>
           row.setInt(pos, prop.asInstanceOf[Int])
       case _ =>
-        (prop: Object, row: InternalRow, pos: Int) =>
+        (prop: Any, row: InternalRow, pos: Int) =>
           row.update(pos, UTF8String.fromString(String.valueOf(prop)))
-    }
-  }
-
-  def resolveDataAndType(row: Row, dataType: DataType, i: Int): Any = {
-    dataType match {
-      case LongType    => row.getLong(i)
-      case IntegerType => row.getInt(i)
-      case DoubleType  => row.getDouble(i)
-      case FloatType   => row.getFloat(i)
-      case BooleanType => row.getBoolean(i)
-      case StringType  => row.getString(i)
-      case _           => row.getString(i)
     }
   }
 

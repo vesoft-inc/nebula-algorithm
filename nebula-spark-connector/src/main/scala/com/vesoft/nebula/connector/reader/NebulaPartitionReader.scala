@@ -6,7 +6,7 @@
 
 package com.vesoft.nebula.connector.reader
 
-import com.vesoft.nebula.client.graph.data.HostAddress
+import com.vesoft.nebula.client.graph.data.{HostAddress, ValueWrapper}
 import com.vesoft.nebula.client.storage.StorageClient
 import com.vesoft.nebula.client.storage.data.{BaseTableRow, VertexTableRow}
 import com.vesoft.nebula.connector.NebulaUtils.NebulaValueGetter
@@ -66,13 +66,43 @@ abstract class NebulaPartitionReader extends InputPartitionReader[InternalRow] {
   }
 
   override def get(): InternalRow = {
-    val resultSet: Array[Object]          = dataIterator.next().getValues.toArray
+    val resultSet: Array[ValueWrapper] =
+      dataIterator.next().getValues.toArray.map(v => v.asInstanceOf[ValueWrapper])
     val getters: Array[NebulaValueGetter] = NebulaUtils.makeGetters(schema)
     val mutableRow                        = new SpecificInternalRow(schema.fields.map(x => x.dataType))
 
     for (i <- getters.indices) {
-      getters(i).apply(resultSet(i), mutableRow, i)
-      if (resultSet(i) == null) mutableRow.setNullAt(i)
+      val value: ValueWrapper = resultSet(i)
+      var resolved            = false
+      if (value.isNull) {
+        mutableRow.setNullAt(i)
+        resolved = true
+      }
+      if (value.isString) {
+        getters(i).apply(value.asString(), mutableRow, i)
+        resolved = true
+      }
+      if (value.isDate) {
+        getters(i).apply(value.asDate(), mutableRow, i)
+        resolved = true
+      }
+      if (value.isTime) {
+        getters(i).apply(value.asTime(), mutableRow, i)
+        resolved = true
+      }
+      if (value.isDateTime) {
+        getters(i).apply(value.asDateTime(), mutableRow, i)
+        resolved = true
+      }
+      if (value.isLong) {
+        getters(i).apply(value.asLong(), mutableRow, i)
+      }
+      if (value.isBoolean) {
+        getters(i).apply(value.asBoolean(), mutableRow, i)
+      }
+      if (value.isDouble) {
+        getters(i).apply(value.asDouble(), mutableRow, i)
+      }
     }
     mutableRow
   }
