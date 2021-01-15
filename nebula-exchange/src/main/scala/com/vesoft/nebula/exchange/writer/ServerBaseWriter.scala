@@ -58,7 +58,8 @@ abstract class ServerBaseWriter extends Writer {
                 INSERT_VALUE_TEMPLATE_WITH_POLICY
                   .format(KeyPolicy.UUID.toString, vertex.vertexID, vertex.propertyValues)
               case _ =>
-                throw new IllegalArgumentException("Not Support")
+                throw new IllegalArgumentException(
+                  s"invalidate vertex policy ${vertices.policy.get}")
             }
           }
         }
@@ -79,7 +80,8 @@ abstract class ServerBaseWriter extends Writer {
               case None =>
                 element
               case _ =>
-                throw new IllegalArgumentException(s"policy ${edges.sourcePolicy} is invalidate.")
+                throw new IllegalArgumentException(
+                  s"invalidate source policy ${edges.sourcePolicy.get}")
             }
 
             val target = edges.targetPolicy match {
@@ -90,7 +92,8 @@ abstract class ServerBaseWriter extends Writer {
               case None =>
                 edge.destination
               case _ =>
-                throw new IllegalArgumentException(s"policy ${edges.sourcePolicy} is invalidate.")
+                throw new IllegalArgumentException(
+                  s"invalidate target policy ${edges.targetPolicy.get}")
             }
 
             if (edge.ranking.isEmpty)
@@ -111,7 +114,7 @@ abstract class ServerBaseWriter extends Writer {
 }
 
 /**
-  *
+  * write data into Nebula Graph
   */
 class NebulaGraphClientWriter(dataBaseConfigEntry: DataBaseConfigEntry,
                               userConfigEntry: UserConfigEntry,

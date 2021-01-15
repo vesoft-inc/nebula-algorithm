@@ -197,18 +197,21 @@ class VerticesProcessor(data: DataFrame,
         .map { row =>
           val vertexID = {
             val index = row.schema.fieldIndex(tagConfig.vertexField)
+            val value = row.get(index).toString
             if (tagConfig.vertexPolicy.isEmpty) {
               // process string type vid
               if (isVidStringType) {
-                val value = row.get(index).toString
                 NebulaUtils.escapeUtil(value).mkString("\"", "", "\"")
               } else {
                 // process int type vid
-                assert(NebulaUtils.isNumic(row.get(index).toString))
-                row.get(index).toString
+                assert(NebulaUtils.isNumic(value),
+                       s"space vidType is int, but your vertex id $value is not numeric.")
+                value
               }
             } else {
-              row.get(index).toString
+              assert(!isVidStringType,
+                     "only int vidType can use policy, but your vidType is FIXED_STRING.")
+              value
             }
           }
 

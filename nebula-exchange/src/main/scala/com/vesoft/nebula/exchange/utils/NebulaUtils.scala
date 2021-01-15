@@ -40,16 +40,6 @@ object NebulaUtils {
     for (i <- nebulaFields.indices) {
       sourceSchemaMap.put(sourceFields.get(i), nebulaSchemaMap(nebulaFields.get(i)))
     }
-    // todo String vid and Int vid
-    if (dataType == Type.VERTEX) {
-      sourceSchemaMap.put(sourceConfig.asInstanceOf[TagConfigEntry].vertexField,
-                          PropertyType.STRING)
-    } else {
-      sourceSchemaMap.put(sourceConfig.asInstanceOf[EdgeConfigEntry].sourceField,
-                          PropertyType.STRING)
-      sourceSchemaMap.put(sourceConfig.asInstanceOf[EdgeConfigEntry].targetField,
-                          PropertyType.STRING)
-    }
     sourceSchemaMap.toMap
   }
 

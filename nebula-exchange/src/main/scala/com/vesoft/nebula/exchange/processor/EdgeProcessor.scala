@@ -221,8 +221,12 @@ class EdgeProcessor(data: DataFrame,
             if (isVidStringType) {
               sourceField = NebulaUtils.escapeUtil(sourceField).mkString("\"", "", "\"")
             } else {
-              assert(NebulaUtils.isNumic(sourceField))
+              assert(NebulaUtils.isNumic(sourceField),
+                     s"space vidType is int, but your srcId $sourceField is not numeric.")
             }
+          } else {
+            assert(!isVidStringType,
+                   "only int vidType can use policy, but your vidType is FIXED_STRING.")
           }
 
           val targetIndex = row.schema.fieldIndex(edgeConfig.targetField)
@@ -232,8 +236,12 @@ class EdgeProcessor(data: DataFrame,
             if (isVidStringType) {
               targetField = NebulaUtils.escapeUtil(targetField).mkString("\"", "", "\"")
             } else {
-              assert(NebulaUtils.isNumic(targetField))
+              assert(NebulaUtils.isNumic(targetField),
+                     s"space vidType is int, but your dstId $targetField is not numeric.")
             }
+          } else {
+            assert(!isVidStringType,
+                   "only int vidType can use policy, but your vidType is FIXED_STRING.")
           }
 
           val values = for {
