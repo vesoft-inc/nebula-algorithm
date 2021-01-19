@@ -179,9 +179,10 @@ class EdgeProcessor(data: DataFrame,
                 if (writer != null) {
                   writer.close()
                   val localFile = s"${fileBaseConfig.localPath}/$currentPart-$taskID.sst"
-                  HDFSUtils.upload(localFile,
-                                   s"${fileBaseConfig.remotePath}/$currentPart.sst",
-                                   namenode)
+                  HDFSUtils.upload(
+                    localFile,
+                    s"${fileBaseConfig.remotePath}/$currentPart/$currentPart-$taskID.sst",
+                    namenode)
                   Files.delete(Paths.get(localFile))
                 }
                 currentPart = part
@@ -195,9 +196,10 @@ class EdgeProcessor(data: DataFrame,
             if (writer != null) {
               writer.close()
               val localFile = s"${fileBaseConfig.localPath}/$currentPart-$taskID.sst"
-              HDFSUtils.upload(localFile,
-                               s"${fileBaseConfig.remotePath}/$currentPart.sst",
-                               namenode)
+              HDFSUtils.upload(
+                localFile,
+                s"${fileBaseConfig.remotePath}/$currentPart/$currentPart-$taskID.sst",
+                namenode)
               Files.delete(Paths.get(localFile))
             }
           }

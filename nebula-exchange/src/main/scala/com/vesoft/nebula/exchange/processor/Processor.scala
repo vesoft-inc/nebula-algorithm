@@ -65,7 +65,7 @@ trait Processor extends Serializable {
     fieldTypeMap(field) match {
       case PropertyType.UNKNOWN =>
         throw new IllegalArgumentException("date type in nebula is UNKNOWN.")
-      case PropertyType.STRING | PropertyType.FIXED_STRING => row.get(index).toString.getBytes
+      case PropertyType.STRING | PropertyType.FIXED_STRING => row.get(index).toString
       case PropertyType.BOOL                               => row.get(index).toString.toBoolean
       case PropertyType.DOUBLE                             => row.get(index).toString.toDouble
       case PropertyType.FLOAT                              => row.get(index).toString.toFloat
