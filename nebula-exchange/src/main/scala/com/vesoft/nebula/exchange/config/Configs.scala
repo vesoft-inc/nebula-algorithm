@@ -618,10 +618,20 @@ object Configs {
       case SinkCategory.CLIENT =>
         NebulaSinkConfigEntry(SinkCategory.CLIENT,
                               nebulaConfig.getStringList("address.graph").asScala.toList)
-      case SinkCategory.SST =>
+      case SinkCategory.SST => {
+        val fsNameNode = {
+          if (nebulaConfig.hasPath("path.hdfs.namenode"))
+            Option(nebulaConfig.getString("path.hdfs.namenode"))
+          else {
+            LOG.warn("Import mode is SST, hdfs namenode is not set.")
+            Option.empty
+          }
+        }
         FileBaseSinkConfigEntry(SinkCategory.SST,
                                 nebulaConfig.getString("path.local"),
-                                nebulaConfig.getString("path.remote"))
+                                nebulaConfig.getString("path.remote"),
+                                fsNameNode)
+      }
       case _ =>
         throw new IllegalArgumentException("Unsupported data sink")
     }

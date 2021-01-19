@@ -29,7 +29,6 @@
         <scala-xml.version>2.11.0-M4</scala-xml.version>
         <scopt.version>3.7.1</scopt.version>
         <nebula.version>2.0.0-rc1</nebula.version>
-        <nebula-utils.version>1.0.0-rc2</nebula-utils.version>
         <s2.version>1.0.0</s2.version>
         <neo.version>2.4.5-M1</neo.version>
         <gremlin.version>3.4.6</gremlin.version>
@@ -503,11 +502,6 @@
                     <groupId>commons-codec</groupId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.vesoft</groupId>
-            <artifactId>nebula-utils</artifactId>
-            <version>${nebula-utils.version}</version>
         </dependency>
         <dependency>
             <groupId>neo4j-contrib</groupId>

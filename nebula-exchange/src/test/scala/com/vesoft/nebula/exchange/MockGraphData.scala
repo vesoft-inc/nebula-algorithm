@@ -7,7 +7,6 @@
 package com.vesoft.nebula.exchange
 
 import com.typesafe.config.impl.ConfigImpl.fromAnyRef
-import com.vesoft.nebula.exchange.KeyPolicy
 import com.vesoft.nebula.exchange.config._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 

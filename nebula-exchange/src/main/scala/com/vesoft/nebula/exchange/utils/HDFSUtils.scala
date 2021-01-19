@@ -13,8 +13,13 @@ import scala.io.Source
 
 object HDFSUtils {
 
-  def getFileSystem(): FileSystem =
-    FileSystem.get(new Configuration())
+  def getFileSystem(namenode: String = null): FileSystem = {
+    val conf = new Configuration()
+    if (namenode != null) {
+      conf.set("fs.default.name", namenode)
+    }
+    FileSystem.get(conf)
+  }
 
   def list(path: String): List[String] = {
     val system = getFileSystem()
@@ -56,8 +61,8 @@ object HDFSUtils {
     }
   }
 
-  def upload(localPath: String, remotePath: String): Unit = {
-    val system = getFileSystem()
+  def upload(localPath: String, remotePath: String, namenode: String = null): Unit = {
+    val system = getFileSystem(namenode)
     try {
       system.copyFromLocalFile(new Path(localPath), new Path(remotePath))
     } finally {
