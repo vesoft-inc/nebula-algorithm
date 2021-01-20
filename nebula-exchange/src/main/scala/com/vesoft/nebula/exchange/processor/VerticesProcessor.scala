@@ -6,9 +6,16 @@
 
 package com.vesoft.nebula.exchange.processor
 
+import java.nio.file.{Files, Paths}
+import java.nio.{ByteBuffer, ByteOrder}
+
+import com.vesoft.nebula.client.graph.data.HostAddress
+import com.vesoft.nebula.client.meta.{MetaCache, MetaManager}
+import com.vesoft.nebula.encoder.{NebulaCodec, NebulaCodecImpl}
 import com.vesoft.nebula.exchange.{
   ErrorHandler,
   GraphProvider,
+  KeyPolicy,
   MetaProvider,
   Vertex,
   Vertices,
@@ -16,19 +23,22 @@ import com.vesoft.nebula.exchange.{
 }
 import com.vesoft.nebula.exchange.config.{
   Configs,
+  FileBaseSinkConfigEntry,
   SinkCategory,
   StreamingDataSourceConfigEntry,
   TagConfigEntry
 }
-import com.vesoft.nebula.exchange.utils.NebulaUtils
-import com.vesoft.nebula.exchange.writer.NebulaGraphClientWriter
+import com.vesoft.nebula.exchange.utils.{HDFSUtils, NebulaUtils}
+import com.vesoft.nebula.exchange.writer.{NebulaGraphClientWriter, NebulaSSTWriter}
+import org.apache.commons.codec.digest.MurmurHash2
 import org.apache.log4j.Logger
 import org.apache.spark.TaskContext
 import org.apache.spark.sql.streaming.Trigger
-import org.apache.spark.sql.{DataFrame, Encoders}
+import org.apache.spark.sql.{DataFrame, Encoders, Row}
 import org.apache.spark.util.LongAccumulator
 
-import scala.collection.mutable.ArrayBuffer
+import scala.collection.JavaConverters._
+import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 
 /**
   *
@@ -96,7 +106,93 @@ class VerticesProcessor(data: DataFrame,
     val fieldTypeMap    = NebulaUtils.getDataSourceFieldType(tagConfig, space, metaProvider)
     val isVidStringType = metaProvider.getVidType(space) == VidType.STRING
 
-    if (tagConfig.dataSinkConfigEntry.category == SinkCategory.SST) {} else {
+    if (tagConfig.dataSinkConfigEntry.category == SinkCategory.SST) {
+      val fileBaseConfig = tagConfig.dataSinkConfigEntry.asInstanceOf[FileBaseSinkConfigEntry]
+      val namenode       = fileBaseConfig.fsName.orNull
+
+      data
+        .mapPartitions { iter =>
+          val spaceName = config.databaseConfig.space
+          val tagName   = tagConfig.name
+          iter.map { row =>
+            val index: Int       = row.schema.fieldIndex(tagConfig.vertexField)
+            var vertexId: String = row.get(index).toString
+
+            if (tagConfig.vertexPolicy.isDefined) {
+              tagConfig.vertexPolicy.get match {
+                case KeyPolicy.HASH =>
+                  vertexId = MurmurHash2
+                    .hash64(vertexId.getBytes(), vertexId.getBytes().length, 0xc70f6907)
+                    .toString
+                case KeyPolicy.UUID =>
+                  throw new UnsupportedOperationException("do not support uuid yet")
+                case _ =>
+                  throw new IllegalArgumentException(
+                    s"policy ${tagConfig.vertexPolicy.get} is invalidate")
+              }
+            }
+
+            val hostAddrs: ListBuffer[HostAddress] = new ListBuffer[HostAddress]
+            for (addr <- address) {
+              hostAddrs.append(new HostAddress(addr.getHostText, addr.getPort))
+            }
+            val metaCache: MetaCache = MetaManager.getMetaManager(hostAddrs.asJava)
+            val codec                = new NebulaCodecImpl(metaCache)
+            val vertexKey            = codec.vertexKey(spaceName, vertexId, tagName)
+            val values = for {
+              property <- fieldKeys if property.trim.length != 0
+            } yield
+              extraValueForSST(row, property, fieldTypeMap)
+                .asInstanceOf[AnyRef]
+            val vertexValue = codec.encode(spaceName, tagName, nebulaKeys.asJava, values.asJava)
+            (vertexKey, vertexValue)
+          }
+        }(Encoders.tuple(Encoders.BINARY, Encoders.BINARY))
+        .toDF("key", "value")
+        .sortWithinPartitions("key")
+        .foreachPartition { iterator: Iterator[Row] =>
+          val taskID                  = TaskContext.get() taskAttemptId ()
+          var writer: NebulaSSTWriter = null
+          var currentPart             = -1
+          val localPath               = fileBaseConfig.localPath
+          val remotePath              = fileBaseConfig.remotePath
+          try {
+            iterator.foreach { vertex =>
+              val key   = vertex.getAs[Array[Byte]](0)
+              val value = vertex.getAs[Array[Byte]](1)
+              val part = ByteBuffer
+                .wrap(key, 0, 4)
+                .order(ByteOrder.LITTLE_ENDIAN)
+                .getInt >> 8
+
+              if (part != currentPart) {
+                if (writer != null) {
+                  writer.close()
+                  val localFile = s"$localPath/$currentPart-$taskID.sst"
+                  HDFSUtils.upload(localFile,
+                                   s"$remotePath/$currentPart/$currentPart-$taskID.sst",
+                                   namenode)
+                  Files.delete(Paths.get(localFile))
+                }
+                currentPart = part
+                val tmp = s"$localPath/$currentPart-$taskID.sst"
+                writer = new NebulaSSTWriter(tmp)
+                writer.prepare()
+              }
+              writer.write(key, value)
+            }
+          } finally {
+            if (writer != null) {
+              writer.close()
+              val localFile = s"$localPath/$currentPart-$taskID.sst"
+              HDFSUtils.upload(localFile,
+                               s"$remotePath/$currentPart/$currentPart-$taskID.sst",
+                               namenode)
+              Files.delete(Paths.get(localFile))
+            }
+          }
+        }
+    } else {
       val vertices = data
         .map { row =>
           val vertexID = {
@@ -118,7 +214,7 @@ class VerticesProcessor(data: DataFrame,
 
           val values = for {
             property <- fieldKeys if property.trim.length != 0
-          } yield extraValue(row, property, fieldTypeMap)
+          } yield extraValueForClient(row, property, fieldTypeMap)
           Vertex(vertexID, values)
         }(Encoders.kryo[Vertex])
 

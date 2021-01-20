@@ -6,6 +6,7 @@
 
 package com.vesoft.nebula.exchange.processor
 
+import com.vesoft.nebula.{Date, DateTime, Time}
 import com.vesoft.nebula.meta.PropertyType
 import com.vesoft.nebula.exchange.utils.{HDFSUtils, NebulaUtils}
 import org.apache.spark.sql.Row
@@ -37,10 +38,10 @@ trait Processor extends Serializable {
     * DataTime type: add datetime() function for attribute value.
     * eg: convert attribute value 2020-01-01T22:30:40 to datetime("2020-01-01T22:30:40")
     */
-  def extraValue(row: Row,
-                 field: String,
-                 fieldTypeMap: Map[String, Int],
-                 toBytes: Boolean = false): Any = {
+  def extraValueForClient(row: Row,
+                          field: String,
+                          fieldTypeMap: Map[String, Int],
+                          toBytes: Boolean = false): Any = {
     val index = row.schema.fieldIndex(field)
 
     if (row.isNullAt(index)) return null
@@ -54,6 +55,72 @@ trait Processor extends Serializable {
       case PropertyType.DATETIME => "datatime(\"" + row.get(index) + "\")"
       case PropertyType.TIME     => "time(\"" + row.get(index) + "\")"
       case _                     => row.get(index)
+    }
+  }
+
+  def extraValueForSST(row: Row, field: String, fieldTypeMap: Map[String, Int]): Any = {
+    val index = row.schema.fieldIndex(field)
+    if (row.isNullAt(index)) return null
+
+    fieldTypeMap(field) match {
+      case PropertyType.UNKNOWN =>
+        throw new IllegalArgumentException("date type in nebula is UNKNOWN.")
+      case PropertyType.STRING | PropertyType.FIXED_STRING => row.get(index).toString
+      case PropertyType.BOOL                               => row.get(index).toString.toBoolean
+      case PropertyType.DOUBLE                             => row.get(index).toString.toDouble
+      case PropertyType.FLOAT                              => row.get(index).toString.toFloat
+      case PropertyType.INT8                               => row.get(index).toString.toByte
+      case PropertyType.INT16                              => row.get(index).toString.toShort
+      case PropertyType.INT32                              => row.get(index).toString.toInt
+      case PropertyType.INT64 | PropertyType.VID           => row.get(index).toString.toLong
+      case PropertyType.TIME => {
+        val values = row.get(index).toString.split(":")
+        if (values.size < 3) {
+          throw new UnsupportedOperationException(
+            s"wrong format for time value: ${row.get(index)}, correct format is 12:00:00:0000")
+        }
+        new Time(values(0).toByte,
+                 values(1).toByte,
+                 values(2).toByte,
+                 if (values.length > 3) values(3).toInt else 0)
+      }
+      case PropertyType.DATE => {
+        val values = row.get(index).toString.split("-")
+        if (values.size < 3) {
+          throw new UnsupportedOperationException(
+            s"wrong format for date value: ${row.get(index)}, correct format is 2020-01-01")
+        }
+        new Date(values(0).toShort, values(1).toByte, values(2).toByte)
+      }
+      case PropertyType.DATETIME => {
+        val rowValue                     = row.get(index).toString
+        var dateTimeValue: Array[String] = null
+        if (rowValue.contains("T")) {
+          dateTimeValue = rowValue.split("T")
+        } else if (rowValue.trim.contains(" ")) {
+          dateTimeValue = rowValue.trim.split(" ")
+        } else {
+          throw new UnsupportedOperationException(
+            s"wrong format for datetime value: $rowValue, correct format is 2020-01-01T12:00:00:0000")
+        }
+
+        if (dateTimeValue.size < 2) {
+          throw new UnsupportedOperationException(
+            s"wrong format for datetime value: $rowValue, correct format is 2020-01-01T12:00:00:0000")
+        }
+
+        val dateValues = dateTimeValue(0).split("-")
+        val timeValues = dateTimeValue(1).split(":")
+
+        new DateTime(dateValues(0).toShort,
+                     dateValues(1).toByte,
+                     dateValues(2).toByte,
+                     timeValues(0).toByte,
+                     timeValues(2).toByte,
+                     timeValues(3).toByte,
+                     timeValues(4).toInt)
+      }
+
     }
   }
 
