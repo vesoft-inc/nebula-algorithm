@@ -78,6 +78,8 @@ abstract class ServerBaseWriter extends Writer {
                 ENDPOINT_TEMPLATE.format(KeyPolicy.UUID.toString, element)
               case None =>
                 element
+              case _ =>
+                throw new IllegalArgumentException(s"policy ${edges.sourcePolicy} is invalidate.")
             }
 
             val target = edges.targetPolicy match {
@@ -87,6 +89,8 @@ abstract class ServerBaseWriter extends Writer {
                 ENDPOINT_TEMPLATE.format(KeyPolicy.UUID.toString, edge.destination)
               case None =>
                 edge.destination
+              case _ =>
+                throw new IllegalArgumentException(s"policy ${edges.sourcePolicy} is invalidate.")
             }
 
             if (edge.ranking.isEmpty)

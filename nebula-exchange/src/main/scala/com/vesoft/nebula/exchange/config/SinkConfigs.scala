@@ -31,10 +31,11 @@ sealed trait DataSinkConfigEntry {
   */
 case class FileBaseSinkConfigEntry(override val category: SinkCategory.Value,
                                    localPath: String,
-                                   remotePath: String)
+                                   remotePath: String,
+                                   fsName: Option[String])
     extends DataSinkConfigEntry {
   override def toString: String = {
-    s"File sink: from ${localPath} to ${remotePath}"
+    s"File sink: from ${localPath} to ${fsName.get}${remotePath}"
   }
 }
 
