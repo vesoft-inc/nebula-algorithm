@@ -183,9 +183,10 @@ class EdgeProcessor(data: DataFrame,
                 if (writer != null) {
                   writer.close()
                   val localFile = s"${fileBaseConfig.localPath}/$currentPart-$taskID.sst"
-                  HDFSUtils.upload(localFile,
-                                   s"${fileBaseConfig.remotePath}/${currentPart}",
-                                   namenode)
+                  HDFSUtils.upload(
+                    localFile,
+                    s"${fileBaseConfig.remotePath}/${currentPart}/$currentPart-$taskID.sst",
+                    namenode)
                   Files.delete(Paths.get(localFile))
                 }
                 currentPart = part
@@ -199,7 +200,10 @@ class EdgeProcessor(data: DataFrame,
             if (writer != null) {
               writer.close()
               val localFile = s"${fileBaseConfig.localPath}/$currentPart-$taskID.sst"
-              HDFSUtils.upload(localFile, s"${fileBaseConfig.remotePath}/${currentPart}", namenode)
+              HDFSUtils.upload(
+                localFile,
+                s"${fileBaseConfig.remotePath}/${currentPart}/$currentPart-$taskID.sst",
+                namenode)
               Files.delete(Paths.get(localFile))
             }
           }
@@ -221,8 +225,12 @@ class EdgeProcessor(data: DataFrame,
             if (isVidStringType) {
               sourceField = NebulaUtils.escapeUtil(sourceField).mkString("\"", "", "\"")
             } else {
-              assert(NebulaUtils.isNumic(sourceField))
+              assert(NebulaUtils.isNumic(sourceField),
+                     s"space vidType is int, but your srcId $sourceField is not numeric.")
             }
+          } else {
+            assert(!isVidStringType,
+                   "only int vidType can use policy, but your vidType is FIXED_STRING.")
           }
 
           val targetIndex = row.schema.fieldIndex(edgeConfig.targetField)
@@ -232,8 +240,12 @@ class EdgeProcessor(data: DataFrame,
             if (isVidStringType) {
               targetField = NebulaUtils.escapeUtil(targetField).mkString("\"", "", "\"")
             } else {
-              assert(NebulaUtils.isNumic(targetField))
+              assert(NebulaUtils.isNumic(targetField),
+                     s"space vidType is int, but your dstId $targetField is not numeric.")
             }
+          } else {
+            assert(!isVidStringType,
+                   "only int vidType can use policy, but your vidType is FIXED_STRING.")
           }
 
           val values = for {
