@@ -173,7 +173,9 @@ class VerticesProcessor(data: DataFrame,
                 if (writer != null) {
                   writer.close()
                   val localFile = s"$localPath/$currentPart-$taskID.sst"
-                  HDFSUtils.upload(localFile, s"$remotePath/${currentPart}", namenode)
+                  HDFSUtils.upload(localFile,
+                                   s"$remotePath/${currentPart}/$currentPart-$taskID.sst",
+                                   namenode)
                   Files.delete(Paths.get(localFile))
                 }
                 currentPart = part
@@ -187,7 +189,9 @@ class VerticesProcessor(data: DataFrame,
             if (writer != null) {
               writer.close()
               val localFile = s"$localPath/$currentPart-$taskID.sst"
-              HDFSUtils.upload(localFile, s"$remotePath/${currentPart}", namenode)
+              HDFSUtils.upload(localFile,
+                               s"$remotePath/${currentPart}/$currentPart-$taskID.sst",
+                               namenode)
               Files.delete(Paths.get(localFile))
             }
           }
