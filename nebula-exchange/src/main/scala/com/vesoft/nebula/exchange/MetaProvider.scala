@@ -31,7 +31,7 @@ class MetaProvider(addresses: List[HostAndPort]) extends AutoCloseable with Seri
   private val metaClient = new MetaClient(address.asJava)
   metaClient.connect()
 
-  def getPartNumber(space: String): Unit = {
+  def getPartNumber(space: String): Int = {
     metaClient.getPartsAlloc(space).size()
   }
 

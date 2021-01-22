@@ -97,6 +97,7 @@ class EdgeProcessor(data: DataFrame,
     val metaProvider    = new MetaProvider(address)
     val fieldTypeMap    = NebulaUtils.getDataSourceFieldType(edgeConfig, space, metaProvider)
     val isVidStringType = metaProvider.getVidType(space) == VidType.STRING
+    val partitionNUm    = metaProvider.getPartNumber(space)
 
     if (edgeConfig.dataSinkConfigEntry.category == SinkCategory.SST) {
       val fileBaseConfig = edgeConfig.dataSinkConfigEntry.asInstanceOf[FileBaseSinkConfigEntry]
@@ -159,7 +160,7 @@ class EdgeProcessor(data: DataFrame,
               extraValueForSST(row, property, fieldTypeMap)
                 .asInstanceOf[AnyRef]
 
-            val edgeValue = codec.encode(spaceName, edgeName, nebulaKeys.asJava, values.asJava)
+            val edgeValue = codec.encodeEdge(spaceName, edgeName, nebulaKeys.asJava, values.asJava)
             (edgeKey, edgeValue)
           }
         }(Encoders.tuple(Encoders.BINARY, Encoders.BINARY))
@@ -173,16 +174,18 @@ class EdgeProcessor(data: DataFrame,
             iterator.foreach { vertex =>
               val key   = vertex.getAs[Array[Byte]](0)
               val value = vertex.getAs[Array[Byte]](1)
-              val part  = ByteBuffer.wrap(key, 0, 4).getInt >> 8
+              var part  = ByteBuffer.wrap(key, 0, 4).getInt >> 8
+              if (part <= 0) {
+                part = part + partitionNUm
+              }
 
               if (part != currentPart) {
                 if (writer != null) {
                   writer.close()
                   val localFile = s"${fileBaseConfig.localPath}/$currentPart-$taskID.sst"
-                  HDFSUtils.upload(
-                    localFile,
-                    s"${fileBaseConfig.remotePath}/$currentPart/$currentPart-$taskID.sst",
-                    namenode)
+                  HDFSUtils.upload(localFile,
+                                   s"${fileBaseConfig.remotePath}/${currentPart}",
+                                   namenode)
                   Files.delete(Paths.get(localFile))
                 }
                 currentPart = part
@@ -196,10 +199,7 @@ class EdgeProcessor(data: DataFrame,
             if (writer != null) {
               writer.close()
               val localFile = s"${fileBaseConfig.localPath}/$currentPart-$taskID.sst"
-              HDFSUtils.upload(
-                localFile,
-                s"${fileBaseConfig.remotePath}/$currentPart/$currentPart-$taskID.sst",
-                namenode)
+              HDFSUtils.upload(localFile, s"${fileBaseConfig.remotePath}/${currentPart}", namenode)
               Files.delete(Paths.get(localFile))
             }
           }
