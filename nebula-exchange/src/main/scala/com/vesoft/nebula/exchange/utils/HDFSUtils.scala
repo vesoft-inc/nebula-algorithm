@@ -17,6 +17,7 @@ object HDFSUtils {
     val conf = new Configuration()
     if (namenode != null) {
       conf.set("fs.default.name", namenode)
+      conf.set("fs.defaultFS", namenode)
     }
     FileSystem.get(conf)
   }
