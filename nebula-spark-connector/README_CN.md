@@ -40,13 +40,12 @@ Nebula Spark Connector 2.0 依赖 Nebula Java Client 2.0。
 
   将 DataFrame 作为点写入 Nebula Graph :
   ```
-    val config =
-      NebulaConnectionConfig
-        .builder()
-        .withMetaAddress("127.0.0.1:45500")
-        .withGraphAddress("127.0.0.1:3699")
-        .build()
-    val nebulaWriteVertexConfig: WriteNebulaVertexConfig = WriteNebulaVertexConfig
+    val config = NebulaConnectionConfig
+      .builder()
+      .withMetaAddress("127.0.0.1:45500")
+      .withGraphAddress("127.0.0.1:3699")
+      .build()
+    val nebulaWriteVertexConfig = WriteNebulaVertexConfig
       .builder()
       .withSpace("test")
       .withTag("person")
@@ -58,13 +57,12 @@ Nebula Spark Connector 2.0 依赖 Nebula Java Client 2.0。
   ```
   读取 Nebula Graph 的点数据: 
   ```
-    val config =
-      NebulaConnectionConfig
-        .builder()
-        .withMetaAddress("127.0.0.1:45500")
-        .withConenctionRetry(2)
-        .build()
-    val nebulaReadVertexConfig: ReadNebulaConfig = ReadNebulaConfig
+    val config = NebulaConnectionConfig
+      .builder()
+      .withMetaAddress("127.0.0.1:45500")
+      .withConenctionRetry(2)
+      .build()
+    val nebulaReadVertexConfig = ReadNebulaConfig
       .builder()
       .withSpace("exchange")
       .withLabel("person")
@@ -75,6 +73,40 @@ Nebula Spark Connector 2.0 依赖 Nebula Java Client 2.0。
       .build()
     val vertex = spark.read.nebula(config, nebulaReadVertexConfig).loadVerticesToDF()
   ```
+
+  读取 Nebula Graph 的点边数据构造 Graphx 的图：
+  ```
+    val config = NebulaConnectionConfig
+      .builder()
+      .withMetaAddress("127.0.0.1:45500")
+      .withConenctionRetry(2)
+      .build()
+    val nebulaReadVertexConfig = ReadNebulaConfig
+      .builder()
+      .withSpace("exchange")
+      .withLabel("person")
+      .withNoColumn(false)
+      .withReturnCols(List("birthday"))
+      .withLimit(10)
+      .withPartitionNum(10)
+      .build()
+
+    val nebulaReadEdgeConfig = ReadNebulaConfig
+      .builder()
+      .withSpace("exchange")
+      .withLabel("knows1")
+      .withNoColumn(false)
+      .withReturnCols(List("timep"))
+      .withLimit(10)
+      .withPartitionNum(10)
+      .build()
+
+    val vertex = spark.read.nebula(config, nebulaReadVertexConfig).loadVerticesToGraphx()
+    val edgeRDD = spark.read.nebula(config, nebulaReadEdgeConfig).loadEdgesToGraphx()
+    val graph = Graph(vertexRDD, edgeRDD)
+  ```
+  得到 Graphx 的 Graph 之后，可以根据 [Nebula-Spark-Algorithm](https://github.com/vesoft-inc/nebula-java/tree/v1.0/tools/nebula-algorithm) 的示例在 Graphx 框架中进行算法开发。
+
 更多使用示例请参考 [Example](https://github.com/vesoft-inc/nebula-spark-utils/tree/master/example/src/main/scala/com/vesoft/nebula/examples/connector) 。
 
 ## 贡献
