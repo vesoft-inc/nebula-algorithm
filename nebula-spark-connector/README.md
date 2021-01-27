@@ -17,7 +17,7 @@ Nebula Spark Connector 2.0 depends on the latest Nebula Java Client 2.0.
     $ mvn clean install -Dmaven.test.skip=true -Dgpg.skip -Dmaven.javadoc.skip=true  
     ```
 
-    After the installing, you can see the newly generated /com/vesoft/client/2.0.0-rc1/client-2.0.0-rc1.jar in your local Maven repository.
+    After the installation, you can see the newly generated /com/vesoft/client/2.0.0-rc1/client-2.0.0-rc1.jar in your local Maven repository.
 
 2. Package Nebula Spark Connector 2.0.
 
@@ -30,15 +30,15 @@ Nebula Spark Connector 2.0 depends on the latest Nebula Java Client 2.0.
     After the packaging, you can see the newly generated nebula-spark-connector-2.0.0.jar under the nebula-spark-utils/nebula-spark-connector/target/ directory.
 
 ## New Features 
-* Supports more connection configurations, such as timeout, connectionRetry, executionRetry
-* Supports more data configurations, such as if vertexId also as property, if srcId, dstId and rank also as properties
-* Spark Reader Supports non-property reading, all-property reading, specific-properties reading
-* Spark Reader Supports reading Nebula Graph's data to Graphx's VertexRD and EdgeRDD, and supports non-Long type vertexId
+* Supports more connection configurations, such as timeout, connectionRetry, and executionRetry.
+* Supports more data configurations, such as if vertexId also as property, if srcId, dstId and rank also as properties.
+* Spark Reader Supports non-property reading, all-property reading, specific-properties reading.
+* Spark Reader Supports reading Nebula Graph's data to Graphx's VertexRD and EdgeRDD, and supports non-Long type vertexId.
 * Nebula Spark Connector 2.0 uniformly uses SparkSQL's DataSourceV2 for data source expansion.
 
 ## How to Use
 
-  Write DataFrame into Nebula Graph as Vertex:
+  Write DataFrame into Nebula Graph as Vertices:
   ```
     val config = NebulaConnectionConfig
       .builder()
@@ -55,7 +55,7 @@ Nebula Spark Connector 2.0 depends on the latest Nebula Java Client 2.0.
       .build()
     df.write.nebula(config, nebulaWriteVertexConfig).writeVertices()
   ```
-  Read vertex data from Nebula Graph: 
+  Read vertices from Nebula Graph: 
   ```
     val config = NebulaConnectionConfig
       .builder()
@@ -74,7 +74,7 @@ Nebula Spark Connector 2.0 depends on the latest Nebula Java Client 2.0.
     val vertex = spark.read.nebula(config, nebulaReadVertexConfig).loadVerticesToDF()
   ```
 
-  读取 Nebula Graph 的点边数据构造 Graphx 的图：
+  Read vertices and edges from Nebula Graph to construct Graphx's graph:
   ```
     val config = NebulaConnectionConfig
       .builder()
@@ -105,12 +105,12 @@ Nebula Spark Connector 2.0 depends on the latest Nebula Java Client 2.0.
   ```
   After getting Graphx's Graph, you can develop graph algorithms in Graphx like [Nebula-Spark-Algorithm](https://github.com/vesoft-inc/nebula-java/tree/v1.0/tools/nebula-algorithm).
 
-For more use details please refer to [Example](https://github.com/vesoft-inc/nebula-spark-utils/tree/master/example/src/main/scala/com/vesoft/nebula/examples/connector).
+For more information on usage, please refer to [Example](https://github.com/vesoft-inc/nebula-spark-utils/tree/master/example/src/main/scala/com/vesoft/nebula/examples/connector).
 
 ## How to Contribute
 
 Nebula Spark Connector 2.0 is a completely opensource project, opensource enthusiasts are welcome to participate in the following ways:
 
-- Go to [Nebula Graph Forum](https://discuss.nebula-graph.com.cn/ "go to“Nebula Graph Forum") to participate in issue discussions, such as answering questions, providing ideas, or reporting unsolvable problems;
-- write or improve documents;
-- submit code to add new features or fix bugs
+- Go to [Nebula Graph Forum](https://discuss.nebula-graph.com.cn/ "go to“Nebula Graph Forum") to participate in issue discussions, such as answering questions, providing ideas, or reporting unsolvable problems.
+- Write or improve documents.
+- Submit code to add new features or fix bugs.
