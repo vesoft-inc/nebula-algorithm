@@ -28,6 +28,13 @@ Nebula Spark Connector 2.0 依赖 Nebula Java Client 2.0。
 
     编译打包完成后，可以在 nebula-spark-utils/nebula-spark-connector/target/ 目录下看到 nebula-spark-connector-2.0.0.jar 文件。
 
+## 特性
+* 提供了更多连接配置项，如超时时间、连接重试次数、执行重试次数
+* 提供了更多数据配置项，如写入数据时是否将 vertexId 同时作为属性写入、是否将 srcId、dstId、rank 等同时作为属性写入
+* Spark Reader 支持无属性读取，支持全属性读取
+* Spark Reader 支持将 Nebula Graph 数据读取成 Graphx 的 VertexRD 和 EdgeRDD，支持非 Long 型 vertexId
+* Nebula Spark Connector 2.0 统一了 SparkSQL 的扩展数据源，统一采用 DataSourceV2 进行 Nebula Graph 数据扩展
+
 ## 使用说明
 
   将 DataFrame 作为点写入 Nebula Graph :
@@ -48,7 +55,26 @@ Nebula Spark Connector 2.0 依赖 Nebula Java Client 2.0。
       .build()
     df.write.nebula(config, nebulaWriteVertexConfig).writeVertices()
   ```
-
+  读取 Nebula Graph 的点数据: 
+  ```
+    val config =
+      NebulaConnectionConfig
+        .builder()
+        .withMetaAddress("127.0.0.1:45500")
+        .withConenctionRetry(2)
+        .build()
+    val nebulaReadVertexConfig: ReadNebulaConfig = ReadNebulaConfig
+      .builder()
+      .withSpace("exchange")
+      .withLabel("person")
+      .withNoColumn(false)
+      .withReturnCols(List("birthday"))
+      .withLimit(10)
+      .withPartitionNum(10)
+      .build()
+    val vertex = spark.read.nebula(config, nebulaReadVertexConfig).loadVerticesToDF()
+  ```
+更多使用示例请参考 [Example](https://github.com/vesoft-inc/nebula-spark-utils/tree/master/example/src/main/scala/com/vesoft/nebula/examples/connector) 。
 ## 贡献
 
 Nebula Spark Connector 2.0 是一个完全开源的项目，欢迎开源爱好者通过以下方式参与：

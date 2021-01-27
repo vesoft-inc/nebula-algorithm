@@ -142,7 +142,11 @@ class NebulaOptions(@transient val parameters: CaseInsensitiveMap[String])(
   }
 
   def getReturnCols: List[String] = {
-    returnCols.split(",").toList
+    if (returnCols.trim.isEmpty) {
+      List()
+    } else {
+      returnCols.split(",").toList
+    }
   }
 
   def getMetaAddress: List[Address] = {
