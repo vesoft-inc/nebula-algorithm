@@ -22,7 +22,7 @@ import org.scalatest.funsuite.AnyFunSuite
 
 import scala.collection.mutable.ListBuffer
 
-class NebulaExecutorSuit extends AnyFunSuite with BeforeAndAfterAll {
+class NebulaExecutorSuite extends AnyFunSuite with BeforeAndAfterAll {
   var schema: StructType = _
   var row: InternalRow   = _
 

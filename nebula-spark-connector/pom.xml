@@ -18,8 +18,9 @@
         <nebula.version>2.0.0-rc1</nebula.version>
         <compiler.source.version>1.8</compiler.source.version>
         <compiler.target.version>1.8</compiler.target.version>
-        <junit.version>4.13.1</junit.version>
         <scalatest.version>3.2.3</scalatest.version>
+        <junit.version>4.13.1</junit.version>
+        <codec.version>1.13</codec.version>
     </properties>
 
     <dependencies>
@@ -42,6 +43,11 @@
             <groupId>com.vesoft</groupId>
             <artifactId>client</artifactId>
             <version>${nebula.version}</version>
+        </dependency>
+        <dependency>
+            <artifactId>commons-codec</artifactId>
+            <groupId>commons-codec</groupId>
+            <version>${codec.version}</version>
         </dependency>
         <!-- scalatest -->
         <dependency>

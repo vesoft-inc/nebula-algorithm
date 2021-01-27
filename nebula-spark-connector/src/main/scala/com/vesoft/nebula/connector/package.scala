@@ -6,7 +6,9 @@
 
 package com.vesoft.nebula.connector
 
+import org.apache.commons.codec.digest.MurmurHash2
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.types.{LongType, StringType}
 import org.apache.spark.sql.{
   DataFrame,
   DataFrameReader,
@@ -16,6 +18,7 @@ import org.apache.spark.sql.{
   Row,
   SaveMode
 }
+
 import scala.collection.mutable.ListBuffer
 
 package object connector {
@@ -144,45 +147,70 @@ package object connector {
 
     /**
       * read nebula vertex edge to graphx's vertex
+      * use hash() for String type vertex id.
       */
     def loadVerticesToGraphx(): RDD[NebulaGraphxVertex] = {
       val vertexDataset = loadVerticesToDF()
       implicit val encoder: Encoder[NebulaGraphxVertex] =
         Encoders.bean[NebulaGraphxVertex](classOf[NebulaGraphxVertex])
+
+      val fields = vertexDataset.schema.fields
       vertexDataset
         .map(row => {
-          val fields                 = row.schema.fields
-          val vertexId               = row.get(0).toString.toLong
+          val vertexId = row.get(0)
+          val vid: Long = if (row.schema.fields(0).dataType == LongType) {
+            vertexId.toString.toLong
+          } else {
+            MurmurHash2.hash64(vertexId.toString.getBytes(),
+                               vertexId.toString.getBytes().length,
+                               0xc70f6907)
+          }
+
           val props: ListBuffer[Any] = ListBuffer()
           for (i <- row.schema.fields.indices) {
             if (i != 0) {
-              props.append(NebulaUtils.resolveDataAndType(row, fields(i).dataType, i))
+              props.append(row.get(i))
             }
           }
-          (vertexId, props.toList)
+          (vid, props.toList)
         })(encoder)
         .rdd
     }
 
     /**
       * read nebula edge edge to graphx's edge
+      * use hash() for String type srcId and dstId.
       */
     def loadEdgesToGraphx(): RDD[NebulaGraphxEdge] = {
       val edgeDataset = loadEdgesToDF()
       implicit val encoder: Encoder[NebulaGraphxEdge] =
         Encoders.bean[NebulaGraphxEdge](classOf[NebulaGraphxEdge])
+
+      val fields = edgeDataset.schema.fields
       edgeDataset
         .map(row => {
-          val cols                   = row.schema.fields
           val props: ListBuffer[Any] = ListBuffer()
           for (i <- row.schema.fields.indices) {
             if (i != 0 && i != 1 && i != 2) {
-              props.append(NebulaUtils.resolveDataAndType(row, cols(i).dataType, i))
+              props.append(row.get(i))
             }
           }
+          val srcId = row.get(0).toString.getBytes()
+          val dstId = row.get(1).toString.getBytes()
+          val edgeSrc = if (row.schema.fields(0).dataType == LongType) {
+            srcId.toString.toLong
+          } else {
+            MurmurHash2.hash64(srcId, srcId.length, 0xc70f6907)
+          }
+          val edgeDst = if (row.schema.fields(0).dataType == LongType) {
+            dstId.toString.toLong
+          } else {
+            MurmurHash2.hash64(dstId, dstId.length, 0xc70f6907)
+          }
+
           val edgeProp = (row.get(2).toString.toLong, props.toList)
           org.apache.spark.graphx
-            .Edge(row.get(0).toString.toLong, row.get(1).toString.toLong, edgeProp)
+            .Edge(edgeSrc, edgeDst, edgeProp)
         })(encoder)
         .rdd
     }
@@ -196,10 +224,6 @@ package object connector {
 
     var connectionConfig: NebulaConnectionConfig = _
     var writeNebulaConfig: WriteNebulaConfig     = _
-
-    def test(): NebulaDataFrameWriter = {
-      this
-    }
 
     /**
       * config nebula connection

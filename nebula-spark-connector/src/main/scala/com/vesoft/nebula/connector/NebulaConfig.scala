@@ -473,10 +473,15 @@ object ReadNebulaConfig {
       assert(partitionNum > 0, s"config partitionNum must be positive, your partitionNum is $limit")
       if (noColumn && returnCols.nonEmpty) {
         LOG.warn(
-          s"noColumn is true, returnCols will be invalidate and your result will not contain cols")
+          s"noColumn is true, returnCols will be invalidate "
+            + s"and your result will not contain property for $label")
+      }
+      if (!noColumn && returnCols.isEmpty) {
+        LOG.warn(s"returnCols is empty and your result will contain all properties for $label")
       }
       LOG.info(
-        s"NebulaReadConfig={space=$space,label=$label,returnCols=$returnCols,noColumn=$noColumn,partitionNum=$partitionNum}")
+        s"NebulaReadConfig={space=$space,label=$label,returnCols=${returnCols.toList},"
+          + s"noColumn=$noColumn,partitionNum=$partitionNum}")
     }
   }
 

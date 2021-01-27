@@ -25,9 +25,15 @@ import scala.collection.JavaConverters._
 abstract class NebulaSourceReader(nebulaOptions: NebulaOptions) extends DataSourceReader {
   private val LOG = LoggerFactory.getLogger(this.getClass)
 
-  protected var datasetSchema: StructType = _
+  private var datasetSchema: StructType = _
 
-  override def readSchema(): StructType = getSchema(nebulaOptions)
+  override def readSchema(): StructType = {
+    datasetSchema = getSchema(nebulaOptions)
+    LOG.info(s"dataset's schema: $datasetSchema")
+    datasetSchema
+  }
+
+  protected def getSchema: StructType = getSchema(nebulaOptions)
 
   /**
     * return the dataset's schema. Schema includes configured cols in returnCols or includes all properties in nebula.
@@ -51,11 +57,11 @@ abstract class NebulaSourceReader(nebulaOptions: NebulaOptions) extends DataSour
       fields.append(DataTypes.createStructField("_rank", DataTypes.LongType, false))
     }
 
+    var dataSchema: StructType = null
     // read no column
     if (noColumn) {
-      datasetSchema = new StructType(fields.toArray)
-      LOG.info(s"dataset's schema: $datasetSchema")
-      return datasetSchema
+      dataSchema = new StructType(fields.toArray)
+      return dataSchema
     }
     // get tag schema or edge schema
     val schema = if (isVertex) {
@@ -82,9 +88,8 @@ abstract class NebulaSourceReader(nebulaOptions: NebulaOptions) extends DataSour
             .createStructField(col, NebulaUtils.getColDataType(schemaCols.toList, col), true))
       }
     }
-    datasetSchema = new StructType(fields.toArray)
-    LOG.info(s"dataset's schema: $datasetSchema")
-    datasetSchema
+    dataSchema = new StructType(fields.toArray)
+    dataSchema
   }
 }
 
@@ -95,11 +100,10 @@ class NebulaDataSourceVertexReader(nebulaOptions: NebulaOptions)
     extends NebulaSourceReader(nebulaOptions) {
 
   override def planInputPartitions(): util.List[InputPartition[InternalRow]] = {
-
     val partitionNum = nebulaOptions.partitionNums.toInt
     val partitions = for (index <- 1 to partitionNum)
       yield {
-        new NebulaVertexPartition(index, nebulaOptions, datasetSchema)
+        new NebulaVertexPartition(index, nebulaOptions, getSchema)
       }
     partitions.map(_.asInstanceOf[InputPartition[InternalRow]]).asJava
   }
@@ -114,7 +118,7 @@ class NebulaDataSourceEdgeReader(nebulaOptions: NebulaOptions)
   override def planInputPartitions(): util.List[InputPartition[InternalRow]] = {
     val partitionNum = nebulaOptions.partitionNums.toInt
     val partitions = for (index <- 1 to partitionNum)
-      yield new NebulaEdgePartition(index, nebulaOptions, datasetSchema)
+      yield new NebulaEdgePartition(index, nebulaOptions, getSchema)
 
     partitions.map(_.asInstanceOf[InputPartition[InternalRow]]).asJava
   }

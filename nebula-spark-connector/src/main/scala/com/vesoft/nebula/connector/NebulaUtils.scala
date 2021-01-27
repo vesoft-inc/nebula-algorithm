@@ -8,6 +8,7 @@ package com.vesoft.nebula.connector
 
 import com.vesoft.nebula.meta.{ColumnDef, ColumnTypeDef, PropertyType}
 import org.apache.spark.sql.Row
+import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.types.{
   BooleanType,
   DataType,
@@ -15,9 +16,12 @@ import org.apache.spark.sql.types.{
   FloatType,
   IntegerType,
   LongType,
+  NullType,
   StringType,
+  StructType,
   TimestampType
 }
+import org.apache.spark.unsafe.types.UTF8String
 import org.slf4j.LoggerFactory
 
 object NebulaUtils {
@@ -34,13 +38,14 @@ object NebulaUtils {
     columnTypeDef.getType match {
       case PropertyType.VID | PropertyType.INT8 | PropertyType.INT16 | PropertyType.INT32 |
           PropertyType.INT64 =>
-        return LongType
-      case PropertyType.BOOL                                             => BooleanType
-      case PropertyType.FLOAT | PropertyType.DOUBLE                      => DoubleType
-      case PropertyType.FIXED_STRING | PropertyType.STRING               => StringType
-      case PropertyType.TIMESTAMP                                        => TimestampType
-      case PropertyType.DATE | PropertyType.TIME | PropertyType.DATETIME => StringType
-      case PropertyType.UNKNOWN                                          => throw new IllegalArgumentException("unsupported data type")
+        LongType
+      case PropertyType.BOOL                        => BooleanType
+      case PropertyType.FLOAT | PropertyType.DOUBLE => DoubleType
+      case PropertyType.TIMESTAMP                   => TimestampType
+      case PropertyType.FIXED_STRING | PropertyType.STRING | PropertyType.DATE | PropertyType.TIME |
+          PropertyType.DATETIME =>
+        StringType
+      case PropertyType.UNKNOWN => throw new IllegalArgumentException("unsupported data type")
     }
   }
 
@@ -53,43 +58,29 @@ object NebulaUtils {
     throw new IllegalArgumentException(s"column $columnName does not exist in schema")
   }
 
-  //type NebulaValueGetter = (Property, InternalRow, Int) => Unit
+  type NebulaValueGetter = (Any, InternalRow, Int) => Unit
 
-//  def makeGetters(schema: StructType): Array[NebulaValueGetter] =
-//    schema.fields.map(field => makeGetter(field.dataType, field.metadata))
-//
-//  private def makeGetter(dataType: DataType, metadata: Metadata): NebulaValueGetter = {
-//    dataType match {
-//      case BooleanType =>
-//        (prop: Property, row: InternalRow, pos: Int) =>
-//          row.setBoolean(pos, prop.getValueAsBool)
-//      case LongType =>
-//        (prop: Property, row: InternalRow, pos: Int) =>
-//          row.setLong(pos, prop.getValueAsLong)
-//      case DoubleType =>
-//        (prop: Property, row: InternalRow, pos: Int) =>
-//          row.setDouble(pos, prop.getValueAsDouble)
-//      case FloatType =>
-//        (prop: Property, row: InternalRow, pos: Int) =>
-//          row.setFloat(pos, prop.getValueAsFloat)
-//      case IntegerType =>
-//        (prop: Property, row: InternalRow, pos: Int) =>
-//          row.setInt(pos, prop.getValueAsInt)
-//      case _ =>
-//        (prop: Property, row: InternalRow, pos: Int) =>
-//          row.update(pos, UTF8String.fromString(prop.getValue.toString))
-//    }
-//  }
+  def makeGetters(schema: StructType): Array[NebulaValueGetter] = {
+    schema.fields.map(field => makeGetter(field.dataType))
+  }
 
-  def resolveDataAndType(row: Row, dataType: DataType, i: Int): Any = {
+  private def makeGetter(dataType: DataType): NebulaValueGetter = {
     dataType match {
-      case LongType    => row.getLong(i)
-      case IntegerType => row.getInt(i)
-      case DoubleType  => row.getDouble(i)
-      case FloatType   => row.getFloat(i)
-      case BooleanType => row.getBoolean(i)
-      case StringType  => row.getString(i)
-      case _           => row.getString(i)
+      case BooleanType =>
+        (prop: Any, row: InternalRow, pos: Int) =>
+          row.setBoolean(pos, prop.asInstanceOf[Boolean])
+      case TimestampType | LongType =>
+        (prop: Any, row: InternalRow, pos: Int) =>
+          row.setLong(pos, prop.asInstanceOf[Long])
+      case FloatType | DoubleType =>
+        (prop: Any, row: InternalRow, pos: Int) =>
+          row.setDouble(pos, prop.asInstanceOf[Double])
+      case IntegerType =>
+        (prop: Any, row: InternalRow, pos: Int) =>
+          row.setInt(pos, prop.asInstanceOf[Int])
+      case _ =>
+        (prop: Any, row: InternalRow, pos: Int) =>
+          row.update(pos, UTF8String.fromString(String.valueOf(prop)))
     }
   }
 

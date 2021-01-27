@@ -9,7 +9,7 @@ package com.vesoft.nebula.connector
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.funsuite.AnyFunSuite
 
-class NebulaConfigSuit extends AnyFunSuite with BeforeAndAfterAll {
+class NebulaConfigSuite extends AnyFunSuite with BeforeAndAfterAll {
 
   test("test NebulaConnectionConfig") {
     try {
