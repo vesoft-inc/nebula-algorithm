@@ -105,6 +105,7 @@ class VerticesProcessor(data: DataFrame,
     val metaProvider    = new MetaProvider(address)
     val fieldTypeMap    = NebulaUtils.getDataSourceFieldType(tagConfig, space, metaProvider)
     val isVidStringType = metaProvider.getVidType(space) == VidType.STRING
+    val partitionNum    = metaProvider.getPartNumber(space)
 
     if (tagConfig.dataSinkConfigEntry.category == SinkCategory.SST) {
       val fileBaseConfig = tagConfig.dataSinkConfigEntry.asInstanceOf[FileBaseSinkConfigEntry]
@@ -144,14 +145,14 @@ class VerticesProcessor(data: DataFrame,
             } yield
               extraValueForSST(row, property, fieldTypeMap)
                 .asInstanceOf[AnyRef]
-            val vertexValue = codec.encode(spaceName, tagName, nebulaKeys.asJava, values.asJava)
+            val vertexValue = codec.encodeTag(spaceName, tagName, nebulaKeys.asJava, values.asJava)
             (vertexKey, vertexValue)
           }
         }(Encoders.tuple(Encoders.BINARY, Encoders.BINARY))
         .toDF("key", "value")
         .sortWithinPartitions("key")
         .foreachPartition { iterator: Iterator[Row] =>
-          val taskID                  = TaskContext.get() taskAttemptId ()
+          val taskID                  = TaskContext.get().taskAttemptId()
           var writer: NebulaSSTWriter = null
           var currentPart             = -1
           val localPath               = fileBaseConfig.localPath
@@ -160,17 +161,20 @@ class VerticesProcessor(data: DataFrame,
             iterator.foreach { vertex =>
               val key   = vertex.getAs[Array[Byte]](0)
               val value = vertex.getAs[Array[Byte]](1)
-              val part = ByteBuffer
+              var part = ByteBuffer
                 .wrap(key, 0, 4)
                 .order(ByteOrder.LITTLE_ENDIAN)
                 .getInt >> 8
+              if (part <= 0) {
+                part = part + partitionNum
+              }
 
               if (part != currentPart) {
                 if (writer != null) {
                   writer.close()
                   val localFile = s"$localPath/$currentPart-$taskID.sst"
                   HDFSUtils.upload(localFile,
-                                   s"$remotePath/$currentPart/$currentPart-$taskID.sst",
+                                   s"$remotePath/${currentPart}/$currentPart-$taskID.sst",
                                    namenode)
                   Files.delete(Paths.get(localFile))
                 }
@@ -186,7 +190,7 @@ class VerticesProcessor(data: DataFrame,
               writer.close()
               val localFile = s"$localPath/$currentPart-$taskID.sst"
               HDFSUtils.upload(localFile,
-                               s"$remotePath/$currentPart/$currentPart-$taskID.sst",
+                               s"$remotePath/${currentPart}/$currentPart-$taskID.sst",
                                namenode)
               Files.delete(Paths.get(localFile))
             }
@@ -197,18 +201,21 @@ class VerticesProcessor(data: DataFrame,
         .map { row =>
           val vertexID = {
             val index = row.schema.fieldIndex(tagConfig.vertexField)
+            val value = row.get(index).toString
             if (tagConfig.vertexPolicy.isEmpty) {
               // process string type vid
               if (isVidStringType) {
-                val value = row.get(index).toString
                 NebulaUtils.escapeUtil(value).mkString("\"", "", "\"")
               } else {
                 // process int type vid
-                assert(NebulaUtils.isNumic(row.get(index).toString))
-                row.get(index).toString
+                assert(NebulaUtils.isNumic(value),
+                       s"space vidType is int, but your vertex id $value is not numeric.")
+                value
               }
             } else {
-              row.get(index).toString
+              assert(!isVidStringType,
+                     "only int vidType can use policy, but your vidType is FIXED_STRING.")
+              value
             }
           }
 

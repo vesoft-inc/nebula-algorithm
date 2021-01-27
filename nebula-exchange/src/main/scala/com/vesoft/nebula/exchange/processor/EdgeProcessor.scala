@@ -97,6 +97,7 @@ class EdgeProcessor(data: DataFrame,
     val metaProvider    = new MetaProvider(address)
     val fieldTypeMap    = NebulaUtils.getDataSourceFieldType(edgeConfig, space, metaProvider)
     val isVidStringType = metaProvider.getVidType(space) == VidType.STRING
+    val partitionNUm    = metaProvider.getPartNumber(space)
 
     if (edgeConfig.dataSinkConfigEntry.category == SinkCategory.SST) {
       val fileBaseConfig = edgeConfig.dataSinkConfigEntry.asInstanceOf[FileBaseSinkConfigEntry]
@@ -159,7 +160,7 @@ class EdgeProcessor(data: DataFrame,
               extraValueForSST(row, property, fieldTypeMap)
                 .asInstanceOf[AnyRef]
 
-            val edgeValue = codec.encode(spaceName, edgeName, nebulaKeys.asJava, values.asJava)
+            val edgeValue = codec.encodeEdge(spaceName, edgeName, nebulaKeys.asJava, values.asJava)
             (edgeKey, edgeValue)
           }
         }(Encoders.tuple(Encoders.BINARY, Encoders.BINARY))
@@ -173,7 +174,10 @@ class EdgeProcessor(data: DataFrame,
             iterator.foreach { vertex =>
               val key   = vertex.getAs[Array[Byte]](0)
               val value = vertex.getAs[Array[Byte]](1)
-              val part  = ByteBuffer.wrap(key, 0, 4).getInt >> 8
+              var part  = ByteBuffer.wrap(key, 0, 4).getInt >> 8
+              if (part <= 0) {
+                part = part + partitionNUm
+              }
 
               if (part != currentPart) {
                 if (writer != null) {
@@ -181,7 +185,7 @@ class EdgeProcessor(data: DataFrame,
                   val localFile = s"${fileBaseConfig.localPath}/$currentPart-$taskID.sst"
                   HDFSUtils.upload(
                     localFile,
-                    s"${fileBaseConfig.remotePath}/$currentPart/$currentPart-$taskID.sst",
+                    s"${fileBaseConfig.remotePath}/${currentPart}/$currentPart-$taskID.sst",
                     namenode)
                   Files.delete(Paths.get(localFile))
                 }
@@ -198,7 +202,7 @@ class EdgeProcessor(data: DataFrame,
               val localFile = s"${fileBaseConfig.localPath}/$currentPart-$taskID.sst"
               HDFSUtils.upload(
                 localFile,
-                s"${fileBaseConfig.remotePath}/$currentPart/$currentPart-$taskID.sst",
+                s"${fileBaseConfig.remotePath}/${currentPart}/$currentPart-$taskID.sst",
                 namenode)
               Files.delete(Paths.get(localFile))
             }
@@ -221,8 +225,12 @@ class EdgeProcessor(data: DataFrame,
             if (isVidStringType) {
               sourceField = NebulaUtils.escapeUtil(sourceField).mkString("\"", "", "\"")
             } else {
-              assert(NebulaUtils.isNumic(sourceField))
+              assert(NebulaUtils.isNumic(sourceField),
+                     s"space vidType is int, but your srcId $sourceField is not numeric.")
             }
+          } else {
+            assert(!isVidStringType,
+                   "only int vidType can use policy, but your vidType is FIXED_STRING.")
           }
 
           val targetIndex = row.schema.fieldIndex(edgeConfig.targetField)
@@ -232,8 +240,12 @@ class EdgeProcessor(data: DataFrame,
             if (isVidStringType) {
               targetField = NebulaUtils.escapeUtil(targetField).mkString("\"", "", "\"")
             } else {
-              assert(NebulaUtils.isNumic(targetField))
+              assert(NebulaUtils.isNumic(targetField),
+                     s"space vidType is int, but your dstId $targetField is not numeric.")
             }
+          } else {
+            assert(!isVidStringType,
+                   "only int vidType can use policy, but your vidType is FIXED_STRING.")
           }
 
           val values = for {
