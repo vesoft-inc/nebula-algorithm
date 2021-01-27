@@ -6,7 +6,7 @@
 
 package com.vesoft.nebula.exchange.processor
 
-import java.nio.ByteBuffer
+import java.nio.{ByteBuffer, ByteOrder}
 import java.nio.file.{Files, Paths}
 
 import com.google.common.geometry.{S2CellId, S2LatLng}
@@ -97,7 +97,7 @@ class EdgeProcessor(data: DataFrame,
     val metaProvider    = new MetaProvider(address)
     val fieldTypeMap    = NebulaUtils.getDataSourceFieldType(edgeConfig, space, metaProvider)
     val isVidStringType = metaProvider.getVidType(space) == VidType.STRING
-    val partitionNUm    = metaProvider.getPartNumber(space)
+    val partitionNum    = metaProvider.getPartNumber(space)
 
     if (edgeConfig.dataSinkConfigEntry.category == SinkCategory.SST) {
       val fileBaseConfig = edgeConfig.dataSinkConfigEntry.asInstanceOf[FileBaseSinkConfigEntry]
@@ -174,9 +174,12 @@ class EdgeProcessor(data: DataFrame,
             iterator.foreach { vertex =>
               val key   = vertex.getAs[Array[Byte]](0)
               val value = vertex.getAs[Array[Byte]](1)
-              var part  = ByteBuffer.wrap(key, 0, 4).getInt >> 8
+              var part = ByteBuffer
+                .wrap(key, 0, 4)
+                .order(ByteOrder.LITTLE_ENDIAN)
+                .getInt >> 8
               if (part <= 0) {
-                part = part + partitionNUm
+                part = part + partitionNum
               }
 
               if (part != currentPart) {
