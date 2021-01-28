@@ -29,11 +29,11 @@ Nebula Spark Connector 2.0 depends on the latest Nebula Java Client 2.0.
 
     After the packaging, you can see the newly generated nebula-spark-connector-2.0.0.jar under the nebula-spark-utils/nebula-spark-connector/target/ directory.
 
-## New Features 
+## New Features (Compared to Nebula Spark Connector 1.0)
 * Supports more connection configurations, such as timeout, connectionRetry, and executionRetry.
-* Supports more data configurations, such as if vertexId also as property, if srcId, dstId and rank also as properties.
-* Spark Reader Supports non-property reading, all-property reading, specific-properties reading.
-* Spark Reader Supports reading Nebula Graph's data to Graphx's VertexRD and EdgeRDD, and supports non-Long type vertexId.
+* Supports more data configurations, such as whether vertexId can be written as vertex's property, whether srcId, dstId and rank can be written as edge's properties.
+* Spark Reader Supports non-property, all-property, and specific-properties read.
+* Spark Reader Supports reading data from Nebula Graph to Graphx as VertexRD and EdgeRDD, it also supports String type vertexId.
 * Nebula Spark Connector 2.0 uniformly uses SparkSQL's DataSourceV2 for data source expansion.
 
 ## How to Use
