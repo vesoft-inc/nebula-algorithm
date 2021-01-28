@@ -111,6 +111,6 @@ For more information on usage, please refer to [Example](https://github.com/veso
 
 Nebula Spark Connector 2.0 is a completely opensource project, opensource enthusiasts are welcome to participate in the following ways:
 
-- Go to [Nebula Graph Forum](https://discuss.nebula-graph.com.cn/ "go to“Nebula Graph Forum") to participate in issue discussions, such as answering questions, providing ideas, or reporting unsolvable problems.
+- Go to [Nebula Graph Forum](https://discuss.nebula-graph.com.cn/ "go to“Nebula Graph Forum") to discuss with other users. You can raise your own questions, help others' problems, share your thoughts.
 - Write or improve documents.
 - Submit code to add new features or fix bugs.
