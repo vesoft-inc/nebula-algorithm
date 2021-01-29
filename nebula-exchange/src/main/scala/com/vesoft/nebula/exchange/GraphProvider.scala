@@ -28,7 +28,8 @@ class GraphProvider(addresses: List[HostAndPort]) extends AutoCloseable with Ser
   for (addr <- addresses) {
     address.append(new HostAddress(addr.getHostText, addr.getPort))
   }
-  pool.init(address.asJava, nebulaPoolConfig)
+  val rand_addr = scala.util.Random.shuffle(address)
+  pool.init(rand_addr.asJava, nebulaPoolConfig)
 
   def getGraphClient(userConfigEntry: UserConfigEntry): Session = {
     pool.getSession(userConfigEntry.user, userConfigEntry.password, true);
