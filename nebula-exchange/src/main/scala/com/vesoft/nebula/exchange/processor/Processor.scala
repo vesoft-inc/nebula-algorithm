@@ -54,7 +54,15 @@ trait Processor extends Serializable {
       case PropertyType.DATE     => "date(\"" + row.get(index) + "\")"
       case PropertyType.DATETIME => "datatime(\"" + row.get(index) + "\")"
       case PropertyType.TIME     => "time(\"" + row.get(index) + "\")"
-      case _                     => row.get(index)
+      case PropertyType.TIMESTAMP => {
+        val value = row.get(index).toString
+        if (NebulaUtils.isNumic(value)) {
+          value
+        } else {
+          "timestamp(\"" + row.get(index) + "\")"
+        }
+      }
+      case _ => row.get(index)
     }
   }
 

@@ -140,7 +140,14 @@ object NebulaExecutor {
       case PropertyType.DATE     => "date(\"" + propValue + "\")"
       case PropertyType.DATETIME => "datatime(\"" + propValue + "\")"
       case PropertyType.TIME     => "time(\"" + propValue + "\")"
-      case _                     => propValue
+      case PropertyType.TIMESTAMP => {
+        if (NebulaUtils.isNumic(propValue.toString)) {
+          propValue
+        } else {
+          "timestamp(\"" + propValue + "\")"
+        }
+      }
+      case _ => propValue
     }
   }
 
