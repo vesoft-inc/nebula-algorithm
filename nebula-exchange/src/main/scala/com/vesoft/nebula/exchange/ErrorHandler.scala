@@ -22,7 +22,7 @@ object ErrorHandler {
       }
     } finally {
       errors.close()
-      fileSystem.close()
+//      fileSystem.close()
     }
   }
 

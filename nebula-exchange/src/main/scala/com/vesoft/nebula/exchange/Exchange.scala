@@ -40,7 +40,7 @@ import com.vesoft.nebula.exchange.reader.PulsarReader
 import org.apache.log4j.Logger
 import org.apache.spark.SparkConf
 
-final case class Argument(config: File = new File("application.conf"),
+final case class Argument(config: String = "application.conf",
                           hive: Boolean = false,
                           directly: Boolean = false,
                           dry: Boolean = false,
@@ -64,7 +64,7 @@ object Exchange {
         sys.exit(-1)
     }
 
-    val configs = Configs.parse(c.config)
+    val configs = Configs.parse(new File(c.config))
     LOG.info(s"Config ${configs}")
 
     val session = SparkSession

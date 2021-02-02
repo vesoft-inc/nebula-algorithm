@@ -69,6 +69,7 @@ class EdgeProcessor(data: DataFrame,
 
     writer.prepare()
     // batch write tags
+    val startTime = System.currentTimeMillis
     iterator.grouped(edgeConfig.batch).foreach { edge =>
       val edges         = Edges(nebulaKeys, edge.toList, edgeConfig.sourcePolicy, edgeConfig.targetPolicy)
       val failStatement = writer.writeEdges(edges)
@@ -85,6 +86,7 @@ class EdgeProcessor(data: DataFrame,
         s"${config.errorConfig.errorPath}/${edgeConfig.name}.${TaskContext.getPartitionId}")
       errorBuffer.clear()
     }
+    LOG.info(s"edge part-costTime>>>>>>>>>>>>>>>>>${TaskContext.getPartitionId()}-${System.currentTimeMillis() - startTime}")
     writer.close()
     graphProvider.close()
   }
