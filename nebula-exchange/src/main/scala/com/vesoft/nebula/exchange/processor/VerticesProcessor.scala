@@ -77,6 +77,7 @@ class VerticesProcessor(data: DataFrame,
 
     writer.prepare()
     // batch write tags
+    val startTime = System.currentTimeMillis
     iterator.grouped(tagConfig.batch).foreach { vertex =>
       val vertices      = Vertices(nebulaKeys, vertex.toList, tagConfig.vertexPolicy)
       val failStatement = writer.writeVertices(vertices)
@@ -93,6 +94,7 @@ class VerticesProcessor(data: DataFrame,
         s"${config.errorConfig.errorPath}/${tagConfig.name}.${TaskContext.getPartitionId()}")
       errorBuffer.clear()
     }
+    LOG.info(s"spark partition for vertex cost time>>>>>>>>>>>>>>>>>${TaskContext.getPartitionId()}-${System.currentTimeMillis() - startTime}")
     writer.close()
     graphProvider.close()
   }
