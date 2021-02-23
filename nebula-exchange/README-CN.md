@@ -7,19 +7,7 @@ Exchange 2.0 仅支持 Nebula Graph 2.x。如果您正在使用 Nebula Graph v1.
 
 ## 如何编译
 
-Exchange 2.0 依赖 Nebula Java Client 2.0。
-
-1. 编译打包 Nebula Java Client 2.0。
-
-    ```bash
-    $ git clone https://github.com/vesoft-inc/nebula-java.git
-    $ cd nebula-java
-    $ mvn clean install -Dmaven.test.skip=true -Dgpg.skip -Dmaven.javadoc.skip=true  
-    ```
-
-    打包结束后，在本地 Maven Repository 仓库中可以看到生成的 /com/vesoft/client/2.0.0-rc1/client-2.0.0-rc1.jar。
-
-2. 编译打包 Exchange 2.0。
+1. 编译打包 Exchange 2.0。
 
     ```bash
     $ git clone https://github.com/vesoft-inc/nebula-spark-utils.git

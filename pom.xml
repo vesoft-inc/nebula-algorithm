@@ -15,7 +15,7 @@
 
     <!-- More Project Information -->
     <name>nebula-spark</name>
-    <description>Nebula Spark Tools</description>
+    <description>Nebula Spark Utils</description>
     <url>https://github.com/vesoft-inc/nebula-spark-utils</url>
     <scm>
         <connection>scm:git:https://github.com/vesoft-inc/nebula</connection>

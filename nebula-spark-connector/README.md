@@ -7,19 +7,7 @@ Nebula Spark Connector 2.0 only supports Nebula Graph 2.x. If you are using Nebu
 
 ## How to Compile
 
-Nebula Spark Connector 2.0 depends on the latest Nebula Java Client 2.0.
-
-1. Install Nebula Java Client 2.0.
-
-    ```bash
-    $ git clone https://github.com/vesoft-inc/nebula-java.git
-    $ cd nebula-java
-    $ mvn clean install -Dmaven.test.skip=true -Dgpg.skip -Dmaven.javadoc.skip=true  
-    ```
-
-    After the installation, you can see the newly generated /com/vesoft/client/2.0.0-rc1/client-2.0.0-rc1.jar in your local Maven repository.
-
-2. Package Nebula Spark Connector 2.0.
+1. Package Nebula Spark Connector 2.0.
 
     ```bash
     $ git clone https://github.com/vesoft-inc/nebula-spark-utils.git
