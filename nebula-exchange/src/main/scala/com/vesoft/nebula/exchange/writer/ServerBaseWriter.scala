@@ -149,7 +149,6 @@ class NebulaGraphClientWriter(dataBaseConfigEntry: DataBaseConfigEntry,
 
   override def writeVertices(vertices: Vertices): String = {
     val sentence = toExecuteSentence(config.name, vertices)
-    LOG.info(sentence)
     if (rateLimiter.tryAcquire(rateConfig.timeout, TimeUnit.MILLISECONDS)) {
       val result = graphProvider.submit(session, sentence)
       if (result.isSucceeded) {
@@ -159,12 +158,12 @@ class NebulaGraphClientWriter(dataBaseConfigEntry: DataBaseConfigEntry,
     } else {
       LOG.error(s"write vertex failed because write speed is too fast")
     }
+    LOG.info(sentence)
     sentence
   }
 
   override def writeEdges(edges: Edges): String = {
     val sentence = toExecuteSentence(config.name, edges)
-    LOG.info(sentence)
     if (rateLimiter.tryAcquire(rateConfig.timeout, TimeUnit.MILLISECONDS)) {
       val result = graphProvider.submit(session, sentence)
       if (result.isSucceeded) {
@@ -174,6 +173,7 @@ class NebulaGraphClientWriter(dataBaseConfigEntry: DataBaseConfigEntry,
     } else {
       LOG.error(s"write vertex failed because write speed is too fast")
     }
+    LOG.info(sentence)
     sentence
   }
 

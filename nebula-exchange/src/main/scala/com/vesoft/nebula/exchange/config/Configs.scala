@@ -721,11 +721,11 @@ object Configs {
     val parser = new scopt.OptionParser[Argument](programName) {
       head(programName, "2.0.0")
 
-      opt[File]('c', "config")
+      opt[String]('c', "config")
         .required()
-        .valueName("<file>")
+        .valueName("fileName")
         .action((x, c) => c.copy(config = x))
-        .text("config file")
+        .text("config fileName")
 
       opt[Unit]('h', "hive")
         .action((_, c) => c.copy(hive = true))
