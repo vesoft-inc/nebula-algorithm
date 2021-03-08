@@ -6,7 +6,7 @@
 
 package com.vesoft.nebula.exchange.processor
 
-import com.vesoft.nebula.{Date, DateTime, Time}
+import com.vesoft.nebula.{Date, DateTime, NullType, Time, Value}
 import com.vesoft.nebula.meta.PropertyType
 import com.vesoft.nebula.exchange.utils.{HDFSUtils, NebulaUtils}
 import org.apache.spark.sql.Row
@@ -68,7 +68,11 @@ trait Processor extends Serializable {
 
   def extraValueForSST(row: Row, field: String, fieldTypeMap: Map[String, Int]): Any = {
     val index = row.schema.fieldIndex(field)
-    if (row.isNullAt(index)) return null
+    if (row.isNullAt(index)) {
+      val nullVal = new Value()
+      nullVal.setNVal(NullType.__NULL__)
+      return nullVal
+    }
 
     fieldTypeMap(field) match {
       case PropertyType.UNKNOWN =>
