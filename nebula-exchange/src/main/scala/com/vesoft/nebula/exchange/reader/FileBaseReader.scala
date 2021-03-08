@@ -82,7 +82,6 @@ class CSVReader(override val session: SparkSession, csvConfig: FileBaseSourceCon
     session.read
       .option("delimiter", csvConfig.separator.get)
       .option("header", csvConfig.header.get)
-      .option("inferSchema", true)
       .csv(path)
   }
 }

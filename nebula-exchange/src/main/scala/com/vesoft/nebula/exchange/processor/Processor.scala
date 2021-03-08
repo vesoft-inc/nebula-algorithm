@@ -128,7 +128,9 @@ trait Processor extends Serializable {
                      timeValues(3).toByte,
                      timeValues(4).toInt)
       }
-
+      case PropertyType.TIMESTAMP => {
+        row.get(index).toString.toLong
+      }
     }
   }
 

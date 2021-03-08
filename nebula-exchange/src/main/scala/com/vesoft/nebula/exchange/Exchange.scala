@@ -13,12 +13,14 @@ import com.vesoft.nebula.exchange.config.{
   Configs,
   DataSourceConfigEntry,
   FileBaseSourceConfigEntry,
+  HBaseSourceConfigEntry,
   HiveSourceConfigEntry,
   JanusGraphSourceConfigEntry,
   KafkaSourceConfigEntry,
   MySQLSourceConfigEntry,
   Neo4JSourceConfigEntry,
   PulsarSourceConfigEntry,
+  SinkCategory,
   SourceCategory
 }
 import com.vesoft.nebula.exchange.processor.{EdgeProcessor, VerticesProcessor}
@@ -34,7 +36,6 @@ import com.vesoft.nebula.exchange.reader.{
   ORCReader,
   ParquetReader
 }
-import com.vesoft.nebula.exchange.config.HBaseSourceConfigEntry
 import com.vesoft.nebula.exchange.processor.ReloadProcessor
 import com.vesoft.nebula.exchange.reader.PulsarReader
 import org.apache.log4j.Logger
@@ -137,8 +138,10 @@ object Exchange {
             batchSuccess,
             batchFailure)
           processor.process()
-          LOG.info(s"batchSuccess.${tagConfig.name}: ${batchSuccess.value}")
-          LOG.info(s"batchFailure.${tagConfig.name}: ${batchFailure.value}")
+          if (tagConfig.dataSinkConfigEntry.category == SinkCategory.CLIENT) {
+            LOG.info(s"batchSuccess.${tagConfig.name}: ${batchSuccess.value}")
+            LOG.info(s"batchFailure.${tagConfig.name}: ${batchFailure.value}")
+          }
         }
       }
     } else {
@@ -169,8 +172,10 @@ object Exchange {
             batchFailure
           )
           processor.process()
-          LOG.info(s"batchSuccess.${edgeConfig.name}: ${batchSuccess.value}")
-          LOG.info(s"batchFailure.${edgeConfig.name}: ${batchFailure.value}")
+          if (edgeConfig.dataSinkConfigEntry.category == SinkCategory.CLIENT) {
+            LOG.info(s"batchSuccess.${edgeConfig.name}: ${batchSuccess.value}")
+            LOG.info(s"batchFailure.${edgeConfig.name}: ${batchFailure.value}")
+          }
         }
       }
     } else {
