@@ -86,8 +86,9 @@ class EdgeProcessor(data: DataFrame,
         s"${config.errorConfig.errorPath}/${edgeConfig.name}.${TaskContext.getPartitionId}")
       errorBuffer.clear()
     }
-    LOG.info(s"spark partition for edge cost time>>>>>>>>>>>>>>>>>${TaskContext
-      .getPartitionId()}-${System.currentTimeMillis() - startTime}")
+    LOG.info(
+      s"spark partition for edge cost time:" +
+        s"${TaskContext.getPartitionId()}-${System.currentTimeMillis() - startTime}")
     writer.close()
     graphProvider.close()
   }
