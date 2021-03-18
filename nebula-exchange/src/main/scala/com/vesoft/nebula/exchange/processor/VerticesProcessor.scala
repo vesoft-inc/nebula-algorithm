@@ -114,11 +114,14 @@ class VerticesProcessor(data: DataFrame,
     if (tagConfig.dataSinkConfigEntry.category == SinkCategory.SST) {
       val fileBaseConfig = tagConfig.dataSinkConfigEntry.asInstanceOf[FileBaseSinkConfigEntry]
       val namenode       = fileBaseConfig.fsName.orNull
+      val spaceName      = config.databaseConfig.space
+      val tagName        = tagConfig.name
+
+      val spaceVidLen = metaProvider.getSpaceVidLen(space)
+      val tagItem     = metaProvider.getTagId(space, tagName)
 
       data
         .mapPartitions { iter =>
-          val spaceName = config.databaseConfig.space
-          val tagName   = tagConfig.name
           iter.map { row =>
             val index: Int       = row.schema.fieldIndex(tagConfig.vertexField)
             var vertexId: String = row.get(index).toString
@@ -141,15 +144,18 @@ class VerticesProcessor(data: DataFrame,
             for (addr <- address) {
               hostAddrs.append(new HostAddress(addr.getHostText, addr.getPort))
             }
-            val metaCache: MetaCache = MetaManager.getMetaManager(hostAddrs.asJava)
-            val codec                = new NebulaCodecImpl(metaCache)
-            val vertexKey            = codec.vertexKey(spaceName, vertexId, tagName)
+
+            val partitionId = NebulaUtils.getPartitionId(spaceName, vertexId, partitionNum)
+
+            val codec = new NebulaCodecImpl()
+            val vertexKey =
+              codec.vertexKey(spaceVidLen, partitionId, vertexId.getBytes, tagItem.getTag_id)
             val values = for {
               property <- fieldKeys if property.trim.length != 0
             } yield
               extraValueForSST(row, property, fieldTypeMap)
                 .asInstanceOf[AnyRef]
-            val vertexValue = codec.encodeTag(spaceName, tagName, nebulaKeys.asJava, values.asJava)
+            val vertexValue = codec.encodeTag(tagItem, nebulaKeys.asJava, values.asJava)
             (vertexKey, vertexValue)
           }
         }(Encoders.tuple(Encoders.BINARY, Encoders.BINARY))
