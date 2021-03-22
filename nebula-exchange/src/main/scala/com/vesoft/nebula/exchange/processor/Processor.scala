@@ -113,26 +113,40 @@ trait Processor extends Serializable {
           dateTimeValue = rowValue.trim.split(" ")
         } else {
           throw new UnsupportedOperationException(
-            s"wrong format for datetime value: $rowValue, correct format is 2020-01-01T12:00:00:0000")
+            s"wrong format for datetime value: $rowValue, " +
+              s"correct format is 2020-01-01T12:00:00:0000 or 2020-01-01 12:00:00:0000")
         }
 
         if (dateTimeValue.size < 2) {
           throw new UnsupportedOperationException(
-            s"wrong format for datetime value: $rowValue, correct format is 2020-01-01T12:00:00:0000")
+            s"wrong format for datetime value: $rowValue, " +
+              s"correct format is 2020-01-01T12:00:00:0000 or 2020-01-01 12:00:00:0000")
         }
 
         val dateValues = dateTimeValue(0).split("-")
         val timeValues = dateTimeValue(1).split(":")
 
+        if (dateValues.size < 3 || timeValues.size < 3) {
+          throw new UnsupportedOperationException(
+            s"wrong format for datetime value: $rowValue, " +
+              s"correct format is 2020-01-01T12:00:00:0000 or 2020-01-01 12:00:00")
+        }
+
+        val microsec: Int = if (timeValues.size == 4) timeValues(3).toInt else 0
         new DateTime(dateValues(0).toShort,
                      dateValues(1).toByte,
                      dateValues(2).toByte,
                      timeValues(0).toByte,
+                     timeValues(1).toByte,
                      timeValues(2).toByte,
-                     timeValues(3).toByte,
-                     timeValues(4).toInt)
+                     microsec)
       }
       case PropertyType.TIMESTAMP => {
+        val value = row.get(index).toString
+        if (!NebulaUtils.isNumic(value)) {
+          throw new IllegalArgumentException(
+            s"timestamp only support long type, your value is ${value}")
+        }
         row.get(index).toString.toLong
       }
     }

@@ -186,7 +186,7 @@ class EdgeProcessor(data: DataFrame,
         }(Encoders.tuple(Encoders.BINARY, Encoders.BINARY, Encoders.BINARY))
         .flatMap(line => {
           List((line._1, line._3), (line._2, line._3))
-        })(Encoders.BINARY, Encoders.BINARY)
+        })(Encoders.tuple(Encoders.BINARY, Encoders.BINARY))
         .toDF("key", "value")
         .sortWithinPartitions("key")
         .foreachPartition { iterator: Iterator[Row] =>
