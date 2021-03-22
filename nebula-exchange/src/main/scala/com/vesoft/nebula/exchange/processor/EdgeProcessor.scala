@@ -110,7 +110,7 @@ class EdgeProcessor(data: DataFrame,
       val edgeName       = edgeConfig.name
 
       val spaceVidLen = metaProvider.getSpaceVidLen(space)
-      val edgeItem    = metaProvider.getEdgeType(space, edgeName)
+      val edgeItem    = metaProvider.getEdgeItem(space, edgeName)
 
       data
         .mapPartitions { iter =>
@@ -161,7 +161,7 @@ class EdgeProcessor(data: DataFrame,
 
             val partitionId = NebulaUtils.getPartitionId(spaceName, srcId, partitionNum)
             val codec       = new NebulaCodecImpl()
-            val positiceEdgeKey = codec.edgeKeyByDefaultVer(spaceVidLen,
+            val positiveEdgeKey = codec.edgeKeyByDefaultVer(spaceVidLen,
                                                             partitionId,
                                                             srcId.getBytes,
                                                             edgeItem.getEdge_type,
@@ -181,7 +181,7 @@ class EdgeProcessor(data: DataFrame,
                 .asInstanceOf[AnyRef]
 
             val edgeValue = codec.encodeEdge(edgeItem, nebulaKeys.asJava, values.asJava)
-            (positiceEdgeKey, reverseEdgeKey, edgeValue)
+            (positiveEdgeKey, reverseEdgeKey, edgeValue)
           }
         }(Encoders.tuple(Encoders.BINARY, Encoders.BINARY, Encoders.BINARY))
         .flatMap(line => {

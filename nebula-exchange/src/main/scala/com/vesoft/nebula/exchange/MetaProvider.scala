@@ -89,7 +89,7 @@ class MetaProvider(addresses: List[HostAndPort]) extends AutoCloseable with Seri
     spaceItem.getProperties.getVid_type.getType_length
   }
 
-  def getTagId(space: String, tag: String): TagItem = {
+  def getTagItem(space: String, tag: String): TagItem = {
     val tagItemList = metaClient.getTags(space).asScala
     for (tagItem: TagItem <- tagItemList) {
       if (new String(tagItem.tag_name).equals(tag)) {
@@ -99,7 +99,7 @@ class MetaProvider(addresses: List[HostAndPort]) extends AutoCloseable with Seri
     throw new IllegalArgumentException(s"tag ${space}.${tag} does not exist.")
   }
 
-  def getEdgeType(space: String, edge: String): EdgeItem = {
+  def getEdgeItem(space: String, edge: String): EdgeItem = {
     val edgeItemList = metaClient.getEdges(space).asScala
     for (edgeItem: EdgeItem <- edgeItemList) {
       if (new String(edgeItem.edge_name).equals(edge)) {

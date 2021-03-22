@@ -118,7 +118,7 @@ class VerticesProcessor(data: DataFrame,
       val tagName        = tagConfig.name
 
       val spaceVidLen = metaProvider.getSpaceVidLen(space)
-      val tagItem     = metaProvider.getTagId(space, tagName)
+      val tagItem     = metaProvider.getTagItem(space, tagName)
 
       data
         .mapPartitions { iter =>
