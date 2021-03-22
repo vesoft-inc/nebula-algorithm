@@ -25,7 +25,7 @@ Exchange 2.0 仅支持 Nebula Graph 2.x。如果您正在使用 Nebula Graph v1.
 
 *1. Nebula Graph 2.0 暂时只支持 String 类型的 VID，请勿配置点 ID 或者边的 src_id、dst_id 的 policy。*
 
-*2. Exchange 2.0 新增 null、Date、DateTime、Time 类型数据的导入。*
+*2. Exchange 2.0 新增 null、Date、DateTime、Time 类型数据的导入（ DateTime 是 UTC 时区，非 Local time）。*
 
 *3. Exchange 2.0 支持 Hive on Spark 以外的 Hive 数据源，需在配置文件中配置 Hive 源，具体配置示例参考 [server_application.conf](https://github.com/vesoft-inc/nebula-spark-utils/blob/main/nebula-exchange/src/main/resources/server_application.conf) 中 Hive 的配置。*
 

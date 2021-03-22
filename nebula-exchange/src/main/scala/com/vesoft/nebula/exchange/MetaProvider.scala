@@ -10,7 +10,7 @@ import com.google.common.net.HostAndPort
 import com.vesoft.nebula.client.graph.data.HostAddress
 import com.vesoft.nebula.client.meta.MetaClient
 import com.vesoft.nebula.exchange.config.Type
-import com.vesoft.nebula.meta.PropertyType
+import com.vesoft.nebula.meta.{EdgeItem, PropertyType, TagItem}
 import org.apache.log4j.Logger
 
 import scala.collection.JavaConverters._
@@ -79,6 +79,34 @@ class MetaProvider(addresses: List[HostAndPort]) extends AutoCloseable with Seri
       }
     }
     null
+  }
+
+  def getSpaceVidLen(space: String): Int = {
+    val spaceItem = metaClient.getSpace(space);
+    if (spaceItem == null) {
+      throw new IllegalArgumentException(s"space $space does not exist.")
+    }
+    spaceItem.getProperties.getVid_type.getType_length
+  }
+
+  def getTagItem(space: String, tag: String): TagItem = {
+    val tagItemList = metaClient.getTags(space).asScala
+    for (tagItem: TagItem <- tagItemList) {
+      if (new String(tagItem.tag_name).equals(tag)) {
+        return tagItem
+      }
+    }
+    throw new IllegalArgumentException(s"tag ${space}.${tag} does not exist.")
+  }
+
+  def getEdgeItem(space: String, edge: String): EdgeItem = {
+    val edgeItemList = metaClient.getEdges(space).asScala
+    for (edgeItem: EdgeItem <- edgeItemList) {
+      if (new String(edgeItem.edge_name).equals(edge)) {
+        return edgeItem
+      }
+    }
+    throw new IllegalArgumentException(s"edge ${space}.${edge} does not exist.")
   }
 
   override def close(): Unit = {

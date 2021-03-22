@@ -30,7 +30,7 @@ For more details about Exchange, please refer to [Exchange 1.0](https://github.c
 ## New Features
 
 1. Supports importing vertex data with String type IDs.
-2. Supports importing data of the Null, Date, DateTime, and Time types.
+2. Supports importing data of the Null, Date, DateTime, and Time types(DateTime uses UTC, not local time).
 3. Supports importing data from other Hive sources besides Hive on Spark.
 4. Supports recording and retrying the INSERT statement after failures during data import.
 

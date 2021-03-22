@@ -106,11 +106,14 @@ class EdgeProcessor(data: DataFrame,
     if (edgeConfig.dataSinkConfigEntry.category == SinkCategory.SST) {
       val fileBaseConfig = edgeConfig.dataSinkConfigEntry.asInstanceOf[FileBaseSinkConfigEntry]
       val namenode       = fileBaseConfig.fsName.orNull
+      val spaceName      = config.databaseConfig.space
+      val edgeName       = edgeConfig.name
+
+      val spaceVidLen = metaProvider.getSpaceVidLen(space)
+      val edgeItem    = metaProvider.getEdgeItem(space, edgeName)
 
       data
         .mapPartitions { iter =>
-          val spaceName = config.databaseConfig.space
-          val edgeName  = edgeConfig.name
           iter.map { row =>
             val srcIndex: Int = row.schema.fieldIndex(edgeConfig.sourceField)
             var srcId: String = row.get(srcIndex).toString
@@ -155,19 +158,35 @@ class EdgeProcessor(data: DataFrame,
             for (addr <- address) {
               hostAddrs.append(new HostAddress(addr.getHostText, addr.getPort))
             }
-            val metaCache: MetaCache = MetaManager.getMetaManager(hostAddrs.asJava)
-            val codec                = new NebulaCodecImpl(metaCache)
-            val edgeKey              = codec.edgeKey(spaceName, srcId, edgeName, ranking, dstId)
+
+            val partitionId = NebulaUtils.getPartitionId(spaceName, srcId, partitionNum)
+            val codec       = new NebulaCodecImpl()
+            val positiveEdgeKey = codec.edgeKeyByDefaultVer(spaceVidLen,
+                                                            partitionId,
+                                                            srcId.getBytes,
+                                                            edgeItem.getEdge_type,
+                                                            ranking,
+                                                            dstId.getBytes)
+            val reverseEdgeKey = codec.edgeKeyByDefaultVer(spaceVidLen,
+                                                           partitionId,
+                                                           dstId.getBytes,
+                                                           -edgeItem.getEdge_type,
+                                                           ranking,
+                                                           srcId.getBytes)
+
             val values = for {
               property <- fieldKeys if property.trim.length != 0
             } yield
               extraValueForSST(row, property, fieldTypeMap)
                 .asInstanceOf[AnyRef]
 
-            val edgeValue = codec.encodeEdge(spaceName, edgeName, nebulaKeys.asJava, values.asJava)
-            (edgeKey, edgeValue)
+            val edgeValue = codec.encodeEdge(edgeItem, nebulaKeys.asJava, values.asJava)
+            (positiveEdgeKey, reverseEdgeKey, edgeValue)
           }
-        }(Encoders.tuple(Encoders.BINARY, Encoders.BINARY))
+        }(Encoders.tuple(Encoders.BINARY, Encoders.BINARY, Encoders.BINARY))
+        .flatMap(line => {
+          List((line._1, line._3), (line._2, line._3))
+        })(Encoders.tuple(Encoders.BINARY, Encoders.BINARY))
         .toDF("key", "value")
         .sortWithinPartitions("key")
         .foreachPartition { iterator: Iterator[Row] =>

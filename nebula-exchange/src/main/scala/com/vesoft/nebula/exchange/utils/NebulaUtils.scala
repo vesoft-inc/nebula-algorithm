@@ -10,6 +10,7 @@ import com.vesoft.nebula.exchange.MetaProvider
 import com.vesoft.nebula.meta.PropertyType
 import com.vesoft.nebula.exchange.MetaProvider
 import com.vesoft.nebula.exchange.config.{EdgeConfigEntry, SchemaConfigEntry, TagConfigEntry, Type}
+import org.apache.commons.codec.digest.MurmurHash2
 import org.apache.log4j.Logger
 
 import scala.collection.JavaConversions.seqAsJavaList
@@ -74,5 +75,11 @@ object NebulaUtils {
       s = s.replaceAll("\b", "\\\\b")
     }
     s
+  }
+
+  def getPartitionId(spaceName: String, id: String, partitionSize: Int): Int = {
+    val hash      = MurmurHash2.hash64(id.getBytes, id.length, 0xc70f6907)
+    val hashValue = java.lang.Long.parseUnsignedLong(java.lang.Long.toUnsignedString(hash))
+    (Math.floorMod(hashValue, partitionSize) + 1).toInt
   }
 }
