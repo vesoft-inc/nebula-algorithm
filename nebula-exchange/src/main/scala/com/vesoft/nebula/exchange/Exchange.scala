@@ -84,7 +84,7 @@ object Exchange {
     // config hive for sparkSession
     if (c.hive) {
       if (configs.hiveConfigEntry.isEmpty) {
-        LOG.warn("you don't config hive source, so using hive tied with spark.")
+        LOG.info("you don't config hive source, so using hive tied with spark.")
       } else {
         val hiveConfig = configs.hiveConfigEntry.get
         sparkConf.set("spark.sql.warehouse.dir", hiveConfig.waredir)
@@ -94,10 +94,12 @@ object Exchange {
           .set("javax.jdo.option.ConnectionUserName", hiveConfig.connectionUserName)
           .set("javax.jdo.option.ConnectionPassword", hiveConfig.connectionPassWord)
       }
-      session.config(sparkConf)
+    }
+
+    session.config(sparkConf)
+
+    if (c.hive) {
       session.enableHiveSupport()
-    } else {
-      session.config(sparkConf)
     }
 
     val spark = session.getOrCreate()
