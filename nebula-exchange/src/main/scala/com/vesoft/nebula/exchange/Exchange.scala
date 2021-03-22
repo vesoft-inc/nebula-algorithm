@@ -94,7 +94,10 @@ object Exchange {
           .set("javax.jdo.option.ConnectionUserName", hiveConfig.connectionUserName)
           .set("javax.jdo.option.ConnectionPassword", hiveConfig.connectionPassWord)
       }
+      session.config(sparkConf)
       session.enableHiveSupport()
+    } else {
+      session.config(sparkConf)
     }
 
     val spark = session.getOrCreate()
