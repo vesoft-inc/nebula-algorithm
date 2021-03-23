@@ -21,7 +21,7 @@ Exchange 2.0 only supports Nebula Graph 2.x. If you want to import data for Nebu
 
 Import command:
 ```
-$SPARK_HOME/bin/submit --class com.vesoft.nebula.exchange.Exchange --master local nebula-exchange-2.0.0.jar -c /path/to/application.conf
+$SPARK_HOME/bin/spark-submit --class com.vesoft.nebula.exchange.Exchange --master local nebula-exchange-2.0.0.jar -c /path/to/application.conf
 ```
 
 For more details about Exchange, please refer to [Exchange 1.0](https://github.com/vesoft-inc/nebula-java/tree/v1.0/tools/exchange) .
@@ -29,7 +29,7 @@ For more details about Exchange, please refer to [Exchange 1.0](https://github.c
 
 ## New Features
 
-1. Supports importing vertex data with String type IDs.
+1. Supports importing vertex data with String and Integer type IDs.
 2. Supports importing data of the Null, Date, DateTime, and Time types(DateTime uses UTC, not local time).
 3. Supports importing data from other Hive sources besides Hive on Spark.
 4. Supports recording and retrying the INSERT statement after failures during data import.
