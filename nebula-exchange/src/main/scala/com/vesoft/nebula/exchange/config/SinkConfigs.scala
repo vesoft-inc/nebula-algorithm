@@ -8,7 +8,6 @@ package com.vesoft.nebula.exchange.config
 
 /**
   * SinkCategory is used to expression the writer's type.
-  * SST is not supported yet.
   */
 object SinkCategory extends Enumeration {
   type Type = Value
