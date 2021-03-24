@@ -23,7 +23,7 @@ Exchange 2.0 仅支持 Nebula Graph 2.x。如果您正在使用 Nebula Graph v1.
 
 特性 & 注意事项：
 
-*1. Nebula Graph 2.0 暂时只支持 String 类型的 VID，请勿配置点 ID 或者边的 src_id、dst_id 的 policy。*
+*1. Nebula Graph 2.0 支持 String 类型和 Integer 类型的点 id 。*
 
 *2. Exchange 2.0 新增 null、Date、DateTime、Time 类型数据的导入（ DateTime 是 UTC 时区，非 Local time）。*
 
@@ -35,7 +35,7 @@ Exchange 2.0 仅支持 Nebula Graph 2.x。如果您正在使用 Nebula Graph v1.
 
 *6. Exchange 2.0 的导入命令：*
 ```
-$SPARK_HOME/bin/submit --class com.vesoft.nebula.exchange.Exchange --master local nebula-exchange-2.0.0.jar -c /path/to/application.conf
+$SPARK_HOME/bin/spark-submit --class com.vesoft.nebula.exchange.Exchange --master local nebula-exchange-2.0.0.jar -c /path/to/application.conf
 ```
 ## 贡献
 
