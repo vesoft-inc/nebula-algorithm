@@ -5,18 +5,20 @@ Nebula Exchange 2.0（简称为 Exchange 2.0）是一款 Apache Spark&trade; 应
 
 Exchange 2.0 仅支持 Nebula Graph 2.x。如果您正在使用 Nebula Graph v1.x，请使用 [Nebula Exchange v1.0](https://github.com/vesoft-inc/nebula-java/tree/v1.0/tools/exchange) 。
 
-## 如何编译
+## 如何获取
 
 1. 编译打包 Exchange 2.0。
 
     ```bash
-    $ git clone https://github.com/vesoft-inc/nebula-spark-utils.git
+    $ git clone -b v2.0.0 https://github.com/vesoft-inc/nebula-spark-utils.git
     $ cd nebula-spark-utils/nebula-exchange
     $ mvn clean package -Dmaven.test.skip=true -Dgpg.skip -Dmaven.javadoc.skip=true
     ```
 
     编译打包完成后，可以在 nebula-spark-utils/nebula-exchange/target/ 目录下看到 nebula-exchange-2.0.0.jar 文件。
-
+2. 在 Maven 远程仓库下载
+    
+    https://repo1.maven.org/maven2/com/vesoft/nebula-exchange/2.0.0/
 ## 使用说明
 
 关于 Exchange 2.0 的详细使用说明，请参考 Exchange 1.0 的使用文档[《Nebula Exchange 用户手册》](https://docs.nebula-graph.com.cn/nebula-exchange/about-exchange/ex-ug-what-is-exchange/ "点击前往 Nebula Graph 网站")。
