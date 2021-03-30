@@ -211,6 +211,8 @@ class VerticesProcessor(data: DataFrame,
         .map { row =>
           val vertexID = {
             val index = row.schema.fieldIndex(tagConfig.vertexField)
+            assert(index >= 0 && row.get(index) != null,
+                   s"vertexId must exist and cannot be null, your row data is $row")
             val value = row.get(index).toString
             if (tagConfig.vertexPolicy.isEmpty) {
               // process string type vid

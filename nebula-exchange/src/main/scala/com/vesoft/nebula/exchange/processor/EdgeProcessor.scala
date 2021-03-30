@@ -239,6 +239,8 @@ class EdgeProcessor(data: DataFrame,
         .map { row =>
           var sourceField = if (!edgeConfig.isGeo) {
             val sourceIndex = row.schema.fieldIndex(edgeConfig.sourceField)
+            assert(sourceIndex >= 0 && row.get(sourceIndex) != null,
+                   s"source vertexId must exist and cannot be null, your row data is $row")
             row.get(sourceIndex).toString
           } else {
             val lat = row.getDouble(row.schema.fieldIndex(edgeConfig.latitude.get))
@@ -260,6 +262,8 @@ class EdgeProcessor(data: DataFrame,
           }
 
           val targetIndex = row.schema.fieldIndex(edgeConfig.targetField)
+          assert(targetIndex >= 0 && row.get(targetIndex) != null,
+                 s"target vertexId must exist and cannot be null, your row data is $row")
           var targetField = row.get(targetIndex).toString
           if (edgeConfig.targetPolicy.isEmpty) {
             // process string type vid
