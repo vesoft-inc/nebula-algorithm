@@ -11,7 +11,6 @@ import java.nio.file.{Files, Paths}
 
 import com.google.common.geometry.{S2CellId, S2LatLng}
 import com.vesoft.nebula.client.graph.data.HostAddress
-import com.vesoft.nebula.client.meta.{MetaCache, MetaManager}
 import com.vesoft.nebula.encoder.NebulaCodecImpl
 import com.vesoft.nebula.exchange.config.{
   Configs,
@@ -106,9 +105,9 @@ class EdgeProcessor(data: DataFrame,
     if (edgeConfig.dataSinkConfigEntry.category == SinkCategory.SST) {
       val fileBaseConfig = edgeConfig.dataSinkConfigEntry.asInstanceOf[FileBaseSinkConfigEntry]
       val namenode       = fileBaseConfig.fsName.orNull
-      val spaceName      = config.databaseConfig.space
       val edgeName       = edgeConfig.name
 
+      val vidType     = metaProvider.getVidType(space)
       val spaceVidLen = metaProvider.getSpaceVidLen(space)
       val edgeItem    = metaProvider.getEdgeItem(space, edgeName)
 
@@ -159,20 +158,44 @@ class EdgeProcessor(data: DataFrame,
               hostAddrs.append(new HostAddress(addr.getHostText, addr.getPort))
             }
 
-            val partitionId = NebulaUtils.getPartitionId(spaceName, srcId, partitionNum)
+            val partitionId = NebulaUtils.getPartitionId(srcId, partitionNum, vidType)
             val codec       = new NebulaCodecImpl()
+
+            import java.nio.ByteBuffer
+            val order = ByteOrder.nativeOrder
+            val srcBytes = if (vidType == VidType.INT) {
+              val bytes = ByteBuffer.allocate(8).putLong(srcId.toLong).array
+              if (order == ByteOrder.LITTLE_ENDIAN) {
+                return bytes.reverse
+              } else {
+                return bytes
+              }
+            } else {
+              srcId.getBytes()
+            }
+
+            val dstBytes = if (vidType == VidType.INT) {
+              val bytes = ByteBuffer.allocate(8).putLong(dstId.toLong).array
+              if (order == ByteOrder.LITTLE_ENDIAN) {
+                return bytes.reverse
+              } else {
+                return bytes
+              }
+            } else {
+              dstId.getBytes()
+            }
             val positiveEdgeKey = codec.edgeKeyByDefaultVer(spaceVidLen,
                                                             partitionId,
-                                                            srcId.getBytes,
+                                                            srcBytes,
                                                             edgeItem.getEdge_type,
                                                             ranking,
-                                                            dstId.getBytes)
+                                                            dstBytes)
             val reverseEdgeKey = codec.edgeKeyByDefaultVer(spaceVidLen,
                                                            partitionId,
-                                                           dstId.getBytes,
+                                                           dstBytes,
                                                            -edgeItem.getEdge_type,
                                                            ranking,
-                                                           srcId.getBytes)
+                                                           srcBytes)
 
             val values = for {
               property <- fieldKeys if property.trim.length != 0
