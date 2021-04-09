@@ -47,7 +47,7 @@ trait Processor extends Serializable {
     if (row.isNullAt(index)) return null
 
     fieldTypeMap(field) match {
-      case PropertyType.STRING => {
+      case PropertyType.STRING | PropertyType.FIXED_STRING => {
         val result = NebulaUtils.escapeUtil(row.get(index).toString).mkString("\"", "", "\"")
         if (toBytes) result.getBytes else result
       }
