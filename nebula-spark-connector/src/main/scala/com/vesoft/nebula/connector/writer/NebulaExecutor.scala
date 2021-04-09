@@ -135,7 +135,7 @@ object NebulaExecutor {
 
     val fieldName = schema.fields(index).name
     fieldTypeMap(fieldName).toInt match {
-      case PropertyType.STRING =>
+      case PropertyType.STRING | PropertyType.FIXED_STRING =>
         NebulaUtils.escapeUtil(propValue.toString).mkString("\"", "", "\"")
       case PropertyType.DATE     => "date(\"" + propValue + "\")"
       case PropertyType.DATETIME => "datatime(\"" + propValue + "\")"
