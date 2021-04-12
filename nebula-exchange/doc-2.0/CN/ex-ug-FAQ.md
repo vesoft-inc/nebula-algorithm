@@ -31,7 +31,7 @@
 
 ### Exchange导入Hive数据时报错`Exception in thread "main" org.apache.spark.sql.AnalysisException: Table or view not found`
 
-检查table和database是否正确，在spark-sql中执行用户配置的exec语句，验证exec语句的正确性。
+检查提交exchange任务的命令中是否遗漏参数`-h`，检查table和database是否正确，在spark-sql中执行用户配置的exec语句，验证exec语句的正确性。
 
 ### 运行时报错`com.facebook.thrift.protocol.TProtocolException: Expected protocol id xxx`
 
