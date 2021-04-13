@@ -149,13 +149,11 @@ class VerticesProcessor(data: DataFrame,
 
             import java.nio.ByteBuffer
             val vidBytes = if (vidType == VidType.INT) {
-              val bytes = ByteBuffer.allocate(8).putLong(vertexId.toLong).array
-              val order = ByteOrder.nativeOrder
-              if (order == ByteOrder.LITTLE_ENDIAN) {
-                return bytes.reverse
-              } else {
-                return bytes
-              }
+              ByteBuffer
+                .allocate(8)
+                .order(ByteOrder.nativeOrder)
+                .putLong(vertexId.toLong)
+                .array
             } else {
               vertexId.getBytes()
             }
@@ -184,7 +182,7 @@ class VerticesProcessor(data: DataFrame,
               val value = vertex.getAs[Array[Byte]](1)
               var part = ByteBuffer
                 .wrap(key, 0, 4)
-                .order(ByteOrder.LITTLE_ENDIAN)
+                .order(ByteOrder.nativeOrder)
                 .getInt >> 8
               if (part <= 0) {
                 part = part + partitionNum

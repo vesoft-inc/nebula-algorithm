@@ -164,23 +164,21 @@ class EdgeProcessor(data: DataFrame,
             import java.nio.ByteBuffer
             val order = ByteOrder.nativeOrder
             val srcBytes = if (vidType == VidType.INT) {
-              val bytes = ByteBuffer.allocate(8).putLong(srcId.toLong).array
-              if (order == ByteOrder.LITTLE_ENDIAN) {
-                return bytes.reverse
-              } else {
-                return bytes
-              }
+              ByteBuffer
+                .allocate(8)
+                .order(ByteOrder.nativeOrder)
+                .putLong(srcId.toLong)
+                .array
             } else {
               srcId.getBytes()
             }
 
             val dstBytes = if (vidType == VidType.INT) {
-              val bytes = ByteBuffer.allocate(8).putLong(dstId.toLong).array
-              if (order == ByteOrder.LITTLE_ENDIAN) {
-                return bytes.reverse
-              } else {
-                return bytes
-              }
+              ByteBuffer
+                .allocate(8)
+                .order(ByteOrder.nativeOrder)
+                .putLong(dstId.toLong)
+                .array
             } else {
               dstId.getBytes()
             }
@@ -222,7 +220,7 @@ class EdgeProcessor(data: DataFrame,
               val value = vertex.getAs[Array[Byte]](1)
               var part = ByteBuffer
                 .wrap(key, 0, 4)
-                .order(ByteOrder.LITTLE_ENDIAN)
+                .order(ByteOrder.nativeOrder)
                 .getInt >> 8
               if (part <= 0) {
                 part = part + partitionNum
