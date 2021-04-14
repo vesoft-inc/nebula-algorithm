@@ -13,6 +13,7 @@ import com.google.common.net.HostAndPort
 import com.vesoft.nebula.exchange.KeyPolicy
 import com.typesafe.config.{Config, ConfigFactory}
 import com.vesoft.nebula.exchange.Argument
+import com.vesoft.nebula.exchange.utils.NebulaUtils
 import org.apache.log4j.Logger
 
 import scala.collection.JavaConverters._
@@ -280,7 +281,7 @@ object Configs {
 
         val tagName = tagConfig.getString("name")
         val fields  = tagConfig.getStringList("fields").asScala.toList
-        val nebulaFields = if (tagConfig.hasPath("nebula.fields")) {
+        var nebulaFields = if (tagConfig.hasPath("nebula.fields")) {
           tagConfig.getStringList("nebula.fields").asScala.toList
         } else {
           fields
@@ -348,11 +349,12 @@ object Configs {
 
         val edgeName = edgeConfig.getString("name")
         val fields   = edgeConfig.getStringList("fields").asScala.toList
-        val nebulaFields = if (edgeConfig.hasPath("nebula.fields")) {
+        var nebulaFields = if (edgeConfig.hasPath("nebula.fields")) {
           edgeConfig.getStringList("nebula.fields").asScala.toList
         } else {
           fields
         }
+
         val isGeo = !edgeConfig.hasPath("source") &&
           edgeConfig.hasPath("latitude") &&
           edgeConfig.hasPath("longitude")

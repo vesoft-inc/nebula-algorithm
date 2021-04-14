@@ -7,13 +7,13 @@
 package com.vesoft.nebula.exchange.utils
 
 import com.vesoft.nebula.exchange.{MetaProvider, VidType}
-import com.vesoft.nebula.exchange.MetaProvider
-import com.vesoft.nebula.exchange.config.{EdgeConfigEntry, SchemaConfigEntry, TagConfigEntry, Type}
+import com.vesoft.nebula.exchange.config.{SchemaConfigEntry, Type}
 import org.apache.commons.codec.digest.MurmurHash2
 import org.apache.log4j.Logger
 
 import scala.collection.JavaConversions.seqAsJavaList
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
 object NebulaUtils {
   private[this] val LOG = Logger.getLogger(this.getClass)
@@ -84,5 +84,17 @@ object NebulaUtils {
       java.lang.Long.parseUnsignedLong(java.lang.Long.toUnsignedString(hash))
     }
     (Math.floorMod(hashValue, partitionSize) + 1).toInt
+  }
+
+  def escapePropName(nebulaFields: List[String]): List[String] = {
+    val propNames: ListBuffer[String] = new ListBuffer[String]
+    for (key <- nebulaFields) {
+      val sb = new StringBuilder()
+      sb.append("`")
+      sb.append(key)
+      sb.append("`")
+      propNames.append(sb.toString())
+    }
+    propNames.toList
   }
 }
