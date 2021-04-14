@@ -281,7 +281,7 @@ object Configs {
 
         val tagName = tagConfig.getString("name")
         val fields  = tagConfig.getStringList("fields").asScala.toList
-        var nebulaFields = if (tagConfig.hasPath("nebula.fields")) {
+        val nebulaFields = if (tagConfig.hasPath("nebula.fields")) {
           tagConfig.getStringList("nebula.fields").asScala.toList
         } else {
           fields
@@ -349,7 +349,7 @@ object Configs {
 
         val edgeName = edgeConfig.getString("name")
         val fields   = edgeConfig.getStringList("fields").asScala.toList
-        var nebulaFields = if (edgeConfig.hasPath("nebula.fields")) {
+        val nebulaFields = if (edgeConfig.hasPath("nebula.fields")) {
           edgeConfig.getStringList("nebula.fields").asScala.toList
         } else {
           fields
