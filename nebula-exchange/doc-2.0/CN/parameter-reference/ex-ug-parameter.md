@@ -44,8 +44,8 @@
 
 |参数|数据类型|默认值|是否必须|说明|
 |:---|:---|:---|:---|:---|
-|`nebula.address.graph`|list\[string\]|`["127.0.0.1:9699"]`|是|Graph服务的地址，包括IP和端口，多个地址用英文逗号（,）分隔。格式为`["ip1:port1","ip2:port2","ip3:port3"]`。|
-|`nebula.address.meta`|int|`["127.0.0.1:9559"]`|是|Meta服务的地址，包括IP和端口，多个地址用英文逗号（,）分隔。格式为`["ip1:port1","ip2:port2","ip3:port3"]`。|
+|`nebula.address.graph`|list\[string\]|`["127.0.0.1:9669"]`|是|Graph服务的地址，包括IP和端口，多个地址用英文逗号（,）分隔。格式为`["ip1:port1","ip2:port2","ip3:port3"]`。|
+|`nebula.address.meta`|int|`["127.0.0.1:9559"]`|是|所有Meta服务的地址，包括IP和端口，多个地址用英文逗号（,）分隔。格式为`["ip1:port1","ip2:port2","ip3:port3"]`。|
 |`nebula.user`|string|-|是|拥有Nebula Graph写权限的用户名。|
 |`nebula.pswd`|string|-|是|用户名对应的密码。|
 |`nebula.space`|string|-|是|需要导入数据的的图空间名称。|

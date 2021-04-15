@@ -118,7 +118,7 @@
   # Nebula Graph相关配置
   nebula: {
     address:{
-      # 指定Graph服务和Meta服务的IP地址和端口。
+      # 指定Graph服务和所有Meta服务的IP地址和端口。
       # 如果有多台服务器，地址之间用英文逗号（,）分隔。
       # 格式: "ip1:port","ip2:port","ip3:port"
       graph:["127.0.0.1:9669"]

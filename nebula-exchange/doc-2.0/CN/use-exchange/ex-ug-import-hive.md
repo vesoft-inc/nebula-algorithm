@@ -6,27 +6,27 @@
 
 本文以[basketballplayer数据集](https://docs-cn.oss-cn-hangzhou.aliyuncs.com/dataset/dataset.zip?OSSAccessKeyId=LTAI4G4N4Fb7BSVf3shExmvs&Expires=1618468205&Signature=3EK4fUbjEFM9YigBaSA3BSguh1U%3D)为例。
 
-在本示例中，该数据集已经存入HIVE中名为`mooc`的数据库中，以`player`、`team`、`follow`和`serve`四个表存储了所有点和边的信息。以下为各个表的结构。
+在本示例中，该数据集已经存入HIVE中名为`basketball`的数据库中，以`player`、`team`、`follow`和`serve`四个表存储了所有点和边的信息。以下为各个表的结构。
 
 ```sql
-scala> sql("describe mooc.player").show
+scala> sql("describe basketball.player").show
 +--------+---------+-------+
 |col_name|data_type|comment|
 +--------+---------+-------+
-|playerid|   bigint|   null|
+|playerid|   string|   null|
 |     age|   bigint|   null|
 |    name|   string|   null|
 +--------+---------+-------+
 
-scala> sql("describe mooc.team").show
+scala> sql("describe basketball.team").show
 +----------+---------+-------+
 |  col_name|data_type|comment|
 +----------+---------+-------+
-|    teamid|   bigint|   null|
+|    teamid|   string|   null|
 |      name|   string|   null|
 +----------+---------+-------+
 
-scala> sql("describe mooc.follow").show
+scala> sql("describe basketball.follow").show
 +----------+---------+-------+
 |  col_name|data_type|comment|
 +----------+---------+-------+
@@ -35,7 +35,7 @@ scala> sql("describe mooc.follow").show
 |    degree|   bigint|   null|
 +----------+---------+-------+
 
-scala> sql("describe mooc.serve").show
+scala> sql("describe basketball.serve").show
 +----------+---------+-------+
 |  col_name|data_type|comment|
 +----------+---------+-------+
@@ -129,13 +129,13 @@ scala> sql("describe mooc.serve").show
 启动spark-shell环境后，依次运行以下语句，确认Spark能读取HIVE中的数据。
 
 ```sql
-scala> sql("select playerid, age, name from mooc.player").show
-scala> sql("select teamid, name from mooc.team").show
-scala> sql("select src_player, dst_player, degree from mooc.follow").show
-scala> sql("select playerid, teamid, start_year, end_year from mooc.serve").show
+scala> sql("select playerid, age, name from basketball.player").show
+scala> sql("select teamid, name from basketball.team").show
+scala> sql("select src_player, dst_player, degree from basketball.follow").show
+scala> sql("select playerid, teamid, start_year, end_year from basketball.serve").show
 ```
 
-以下为表`mooc.player`中读出的结果。
+以下为表`basketball.player`中读出的结果。
 
 ```mysql
 +---------+----+-----------------+
@@ -182,10 +182,10 @@ scala> sql("select playerid, teamid, start_year, end_year from mooc.serve").show
   # Nebula Graph相关配置
   nebula: {
     address:{
-      # 以下为Nebula Graph的Graph服务和Meta服务所在机器的IP地址及端口。
+      # 以下为Nebula Graph的Graph服务和所有Meta服务所在机器的IP地址及端口。
       # 如果有多个地址，格式为 "ip1:port","ip2:port","ip3:port"。
       # 不同地址之间以英文逗号 (,) 隔开。
-      graph:["127.0.0.1:9699"]
+      graph:["127.0.0.1:9669"]
       meta:["127.0.0.1:9559"]
     }
     # 填写的账号必须拥有Nebula Graph相应图空间的写数据权限。
@@ -222,8 +222,8 @@ scala> sql("select playerid, teamid, start_year, end_year from mooc.serve").show
         sink: client
       }
 
-      # 设置读取数据库mooc中player表数据的SQL语句
-      exec: "select playerid, age, name from mooc.player"
+      # 设置读取数据库basketball中player表数据的SQL语句
+      exec: "select playerid, age, name from basketball.player"
 
       # 在fields里指定player表中的列名称，其对应的value会作为Nebula Graph中指定属性。
       # fields和nebula.fields里的配置必须一一对应。
@@ -248,7 +248,7 @@ scala> sql("select playerid, teamid, start_year, end_year from mooc.serve").show
         source: hive
         sink: client
       }
-      exec: "select teamid, name from mooc.team"
+      exec: "select teamid, name from basketball.team"
       fields: [name]
       nebula.fields: [name]
       vertex: {
@@ -276,8 +276,8 @@ scala> sql("select playerid, teamid, start_year, end_year from mooc.serve").show
         sink: client
       }
 
-      # 设置读取数据库mooc中follow表数据的SQL语句。
-      exec: "select src_player, dst_player, degree from mooc.follow"
+      # 设置读取数据库basketball中follow表数据的SQL语句。
+      exec: "select src_player, dst_player, degree from basketball.follow"
 
       # 在fields里指定follow表中的列名称，其对应的value会作为Nebula Graph中指定属性。
       # fields和nebula.fields里的配置必须一一对应。
@@ -309,7 +309,7 @@ scala> sql("select playerid, teamid, start_year, end_year from mooc.serve").show
         source: hive
         sink: client
       }
-      exec: "select playerid, teamid, start_year, end_year from mooc.serve"
+      exec: "select playerid, teamid, start_year, end_year from basketball.serve"
       fields: [start_year,end_year]
       nebula.fields: [start_year,end_year]
       source: {
