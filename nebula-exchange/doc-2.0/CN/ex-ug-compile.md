@@ -82,4 +82,4 @@
 
 > **说明**：`.jar`文件版本号会因Nebula Java Client的发布版本而变化。您可以在[Releases页面](https://github.com/vesoft-inc/nebula-java/releases)查看最新版本。
 
-迁移数据时，您可以参考配置文件`target/classes/application.conf`、`target/classes/server_application.conf`和`target/classes/stream_application.conf`。
+迁移数据时，您可以参考配置文件`target/classes/application.conf`。

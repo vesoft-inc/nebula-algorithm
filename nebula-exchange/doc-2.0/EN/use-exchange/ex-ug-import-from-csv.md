@@ -31,7 +31,7 @@ The practice is done in macOS. Here is the environment information:
 
 To import data from CSV files on HDFS with Exchange v2.x, do a check of these:
 
-- Exchange v2.x is compiled. For more information, see [Compile Exchange v2.x](../ex-ug-compile.md). Exchange 2.0.0 is used in this example.
+- Exchange v2.x is compiled. For more information, see [Compile Exchange v2.x](../ex-ug-compile.md). Exchange 2.0 is used in this example.
 
 - Spark is installed.
 
@@ -79,13 +79,13 @@ Analyze the data in the CSV files and follow these steps to create a schema in N
     CREATE EDGE action (actionId int, duration double, label bool, feature0 double, feature1 double, feature2 double, feature3 double);
     ```
 
-For more information, see [Quick Start of Nebula Graph Database](../../2.quick-start/4.nebula-graph-crud.md).
+For more information, see [Quick Start of Nebula Graph Database](https://docs.nebula-graph.io/2.0/2.quick-start/1.quick-start-workflow/).
 
 ### Step 2. Prepare CSV files
 
 Do a check of these:
 
-1. The CSV files are processed to meet the requirements of the schema. For more information, see  [Quick Start of Nebula Graph Studio](../../nebula-studio/quick-start/st-ug-prepare-csv.md).
+1. The CSV files are processed to meet the requirements of the schema.
     >**NOTE**: Exchange supports importing CSV files with or without headers.
 
 2. The CSV files must be stored in HDFS and get the file storage path.
@@ -287,15 +287,7 @@ After compiling of Exchange, copy the `target/classes/application.conf` file and
 }
 ```
 
-### Step 4. (Optional) Verify the configuration
-
-After the configuration, run the import command with the `-D` parameter to verify the configuration file. For more information about the parameters, see [Import command parameters](../parameter-reference/ex-ug-para-import-command.md).
-
-```bash
-$SPARK_HOME/bin/spark-submit --master "local" --class com.vesoft.nebula.exchange.Exchange /path/to/nebula-exchange-2.0.0.jar -c /path/to/conf/csv_application.conf -D
-```
-
-### Step 5. Import data into Nebula Graph
+### Step 4. Import data into Nebula Graph
 
 When the configuration is ready, run this command to import data from CSV files into Nebula Graph. For more information about the parameters, see [Import command parameters](../parameter-reference/ex-ug-para-import-command.md).
 
@@ -303,7 +295,7 @@ When the configuration is ready, run this command to import data from CSV files 
 $SPARK_HOME/bin/spark-submit --master "local" --class com.vesoft.nebula.exchange.Exchange /path/to/nebula-exchange-2.0.0.jar -c /path/to/conf/csv_application.conf 
 ```
 
-### Step 6. (Optional) Verify data in Nebula Graph
+### Step 5. (Optional) Verify data in Nebula Graph
 
 You can use a Nebula Graph client, such as Nebula Graph Studio, to verify the imported data. For example, in Nebula Graph Studio, run this statement.
 
@@ -315,6 +307,6 @@ If the queried destination vertices return, the data are imported into Nebula Gr
 
 You can run the [`SHOW STATS`](../../3.ngql-guide/7.general-query-statements/6.show/14.show-stats.md) statement to count the data.
 
-### Step 7. (Optional) Create and rebuild indexes in Nebula Graph
+### Step 6. (Optional) Create and rebuild indexes in Nebula Graph
 
 After the data is imported, you can create and rebuild indexes in Nebula Graph. For more information, see [nGQL User Guide](../../3.ngql-guide/14.native-index-statements/1.create-native-index.md).

@@ -1,4 +1,30 @@
-# 常见问题FAQ
+# FAQ
+
+**What version of Nebula Graph does Exchange v2.x support?**
+
+Read [Limitations](ex-ug-limitations.md) to get the latest information about supported Nebula Graph versions.
+
+**What are the differences between Exchange v1.x and Exchange v2.x?**
+
+Compared with Exchange v1.x, Exchange v2.x has these new features:
+
+- Importing vertex data with String type IDs.
+- Importing data of the Null, Date, DateTime, and Time types.
+- Importing data from other Hive sources besides Hive on Spark.
+- Recording and retrying the INSERT statement after failures during data import.
+
+For more information, see [Exchange README](https://github.com/vesoft-inc/nebula-spark-utils/tree/master/nebula-exchange).
+
+**What is the difference between Exchange and Spark Writer?**
+
+Both are Spark applications, and Exchange is based on Spark Writer. Both of them are designed for the migration of data into a Nebula Graph cluster in a distributed environment, but the later maintenance work will focus on Exchange. Compared with Spark Writer, Exchange has the following improvements:
+
+- Supporting more data sources, such as MySQL, Neo4j, HIVE, HBase, Kafka, and Pulsar.
+
+- Some problems with Spark Writer were fixed. For example, by default Spark reads source data from HDFS as strings, which is probably different from your graph schema defined in Nebula Graph. Exchange supports automatically matching and converting data types. With it, when a non-string data type is defined in Nebula Graph, Exchange converts the strings into data of the required data type.
+
+<!---
+TODO:doc
 
 ## 编译问题
 
@@ -93,3 +119,5 @@ Exchange是在Spark Writer基础上开发的Spark应用程序，二者均适用�
 - 支持更丰富的数据源，如MySQL、Neo4j、Hive、HBase、Kafka、Pulsar等。
 
 - 修复了Spark Writer的部分问题。例如Spark读取HDFS里的数据时，默认读取到的源数据均为String类型，可能与Nebula Graph定义的Schema不同，所以Exchange增加了数据类型的自动匹配和类型转换，当Nebula Graph定义的Schema中数据类型为非String类型（如double）时，Exchange会将String类型的源数据转换为对应的类型（如double）。
+
+--->
