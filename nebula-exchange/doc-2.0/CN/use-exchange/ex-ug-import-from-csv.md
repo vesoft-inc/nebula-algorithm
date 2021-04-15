@@ -6,7 +6,7 @@
 
 ## 数据集
 
-本文以basketballplayer数据集为例。您可以从[nebula-web-docker](https://github.com/vesoft-inc/nebula-web-docker/tree/master/example/mooc-actions "点击前往 GitHub")仓库中下载。
+本文以[basketballplayer数据集](https://docs-cn.oss-cn-hangzhou.aliyuncs.com/dataset/dataset.zip?OSSAccessKeyId=LTAI4G4N4Fb7BSVf3shExmvs&Expires=1618468205&Signature=3EK4fUbjEFM9YigBaSA3BSguh1U%3D)为例。
 
 ## 环境配置
 

@@ -10,6 +10,8 @@
 
 - Nebula Graph相关配置
 
+- HIVE配置（仅HIVE）
+
 - 点配置
 
 - 边配置
@@ -46,6 +48,15 @@
 |`nebula.rate.limit`|int|`1024`|否|导入数据时令牌桶的令牌数量限制。|
 |`nebula.rate.timeout`|int|`1000`|否|令牌桶中拿取令牌的超时时间，单位：毫秒。|
 
+## HIVE配置
+
+|参数|数据类型|默认值|是否必须|说明|
+|:---|:---|:---|:---|:---|
+|`hive.waredir`|string|-|是|HDFS中的warehouse路径。用双引号括起路径，以`hdfs://`开头。|
+|`hive.connectionURL`|string|-|是|JDBC连接的URL。例如`"jdbc:mysql://127.0.0.1:3306/hive_spark?characterEncoding=UTF-8"`。|
+|`hive.connectionDriverName`|string|`"com.mysql.jdbc.Driver"`|是|驱动名称。|
+|`hive.connectionUserName`|list\[string\]|-|是|连接的用户名。|
+|`hive.connectionPassword`|list\[string\]|-|是|用户名对应的密码。|
 ## 点配置
 
 对于不同的数据源，点的配置也有所不同，有很多通用参数，也有部分特有参数，配置时需要配置通用参数和不同数据源的特有参数。
