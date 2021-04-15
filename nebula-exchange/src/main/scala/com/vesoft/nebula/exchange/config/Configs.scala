@@ -13,6 +13,7 @@ import com.google.common.net.HostAndPort
 import com.vesoft.nebula.exchange.KeyPolicy
 import com.typesafe.config.{Config, ConfigFactory}
 import com.vesoft.nebula.exchange.Argument
+import com.vesoft.nebula.exchange.utils.NebulaUtils
 import org.apache.log4j.Logger
 
 import scala.collection.JavaConverters._
@@ -353,6 +354,7 @@ object Configs {
         } else {
           fields
         }
+
         val isGeo = !edgeConfig.hasPath("source") &&
           edgeConfig.hasPath("latitude") &&
           edgeConfig.hasPath("longitude")

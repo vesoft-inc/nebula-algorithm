@@ -14,7 +14,7 @@
 
     <properties>
         <spark.version>2.4.4</spark.version>
-        <nebula.version>2.0.0-rc1.20210129</nebula.version>
+        <nebula.version>2.0.0</nebula.version>
         <compiler.source.version>1.8</compiler.source.version>
         <compiler.target.version>1.8</compiler.target.version>
         <scalatest.version>3.2.3</scalatest.version>

@@ -6,15 +6,14 @@
 
 package com.vesoft.nebula.exchange.utils
 
-import com.vesoft.nebula.exchange.MetaProvider
-import com.vesoft.nebula.meta.PropertyType
-import com.vesoft.nebula.exchange.MetaProvider
-import com.vesoft.nebula.exchange.config.{EdgeConfigEntry, SchemaConfigEntry, TagConfigEntry, Type}
+import com.vesoft.nebula.exchange.{MetaProvider, VidType}
+import com.vesoft.nebula.exchange.config.{SchemaConfigEntry, Type}
 import org.apache.commons.codec.digest.MurmurHash2
 import org.apache.log4j.Logger
 
 import scala.collection.JavaConversions.seqAsJavaList
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
 object NebulaUtils {
   private[this] val LOG = Logger.getLogger(this.getClass)
@@ -77,9 +76,25 @@ object NebulaUtils {
     s
   }
 
-  def getPartitionId(spaceName: String, id: String, partitionSize: Int): Int = {
-    val hash      = MurmurHash2.hash64(id.getBytes, id.length, 0xc70f6907)
-    val hashValue = java.lang.Long.parseUnsignedLong(java.lang.Long.toUnsignedString(hash))
+  def getPartitionId(id: String, partitionSize: Int, vidType: VidType.Value): Int = {
+    val hashValue = if (vidType == VidType.INT) {
+      java.lang.Long.parseUnsignedLong(id)
+    } else {
+      val hash = MurmurHash2.hash64(id.getBytes, id.length, 0xc70f6907)
+      java.lang.Long.parseUnsignedLong(java.lang.Long.toUnsignedString(hash))
+    }
     (Math.floorMod(hashValue, partitionSize) + 1).toInt
+  }
+
+  def escapePropName(nebulaFields: List[String]): List[String] = {
+    val propNames: ListBuffer[String] = new ListBuffer[String]
+    for (key <- nebulaFields) {
+      val sb = new StringBuilder()
+      sb.append("`")
+      sb.append(key)
+      sb.append("`")
+      propNames.append(sb.toString())
+    }
+    propNames.toList
   }
 }
