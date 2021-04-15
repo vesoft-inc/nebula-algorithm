@@ -10,7 +10,7 @@
 
 - Nebula Graph相关配置
 
-- HIVE配置（仅HIVE）
+- HIVE配置（可选）
 
 - 点配置
 
@@ -27,6 +27,18 @@
 |`spark.driver.maxResultSize`|string|`1G`|否|单个Spark操作（例如collect）时，所有分区的序列化结果的总大小限制（字节为单位）。最小值为1M，0表示无限制。|
 |`spark.executor.memory`|string|`1G`|否|Spark驱动程序使用的内存量，可以指定单位，例如512M、1G。|
 |`spark.cores.max`|int|`16`|否|当驱动程序以“粗粒度”共享模式在独立部署集群或Mesos集群上运行时，跨集群（而非从每台计算机）请求应用程序的最大CPU核数。如果未设置，则值为Spark的独立集群管理器上的`spark.deploy.defaultCores`或Mesos上的infinite（所有可用的内核）。|
+
+## HIVE配置（可选）
+
+如果Spark和HIVE部署在不同集群，才需要配置连接HIVE的参数，否则请忽略这些配置。
+
+|参数|数据类型|默认值|是否必须|说明|
+|:---|:---|:---|:---|:---|
+|`hive.waredir`|string|-|是|HDFS中的warehouse路径。用双引号括起路径，以`hdfs://`开头。|
+|`hive.connectionURL`|string|-|是|JDBC连接的URL。例如`"jdbc:mysql://127.0.0.1:3306/hive_spark?characterEncoding=UTF-8"`。|
+|`hive.connectionDriverName`|string|`"com.mysql.jdbc.Driver"`|是|驱动名称。|
+|`hive.connectionUserName`|list\[string\]|-|是|连接的用户名。|
+|`hive.connectionPassword`|list\[string\]|-|是|用户名对应的密码。|
 
 ## Nebula Graph相关配置
 
@@ -48,15 +60,6 @@
 |`nebula.rate.limit`|int|`1024`|否|导入数据时令牌桶的令牌数量限制。|
 |`nebula.rate.timeout`|int|`1000`|否|令牌桶中拿取令牌的超时时间，单位：毫秒。|
 
-## HIVE配置
-
-|参数|数据类型|默认值|是否必须|说明|
-|:---|:---|:---|:---|:---|
-|`hive.waredir`|string|-|是|HDFS中的warehouse路径。用双引号括起路径，以`hdfs://`开头。|
-|`hive.connectionURL`|string|-|是|JDBC连接的URL。例如`"jdbc:mysql://127.0.0.1:3306/hive_spark?characterEncoding=UTF-8"`。|
-|`hive.connectionDriverName`|string|`"com.mysql.jdbc.Driver"`|是|驱动名称。|
-|`hive.connectionUserName`|list\[string\]|-|是|连接的用户名。|
-|`hive.connectionPassword`|list\[string\]|-|是|用户名对应的密码。|
 ## 点配置
 
 对于不同的数据源，点的配置也有所不同，有很多通用参数，也有部分特有参数，配置时需要配置通用参数和不同数据源的特有参数。

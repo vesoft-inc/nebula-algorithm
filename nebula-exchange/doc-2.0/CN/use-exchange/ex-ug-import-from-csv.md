@@ -55,17 +55,17 @@
     | 边类型（Edge Type） | `follow` | `degree int` |
     | 边类型（Edge Type） | `serve` | `start_year int, end_year int` |
 
-2. 在Nebula Graph中创建一个图空间**csv**，并创建一个Schema，如下所示。
+2. 在Nebula Graph中创建一个图空间**basketballplayer**，并创建一个Schema，如下所示。
 
     ```ngql
     ## 创建图空间
-    nebula> CREATE SPACE csv \
+    nebula> CREATE SPACE basketballplayer \
             (partition_num = 10, \
             replica_factor = 1, \
             vid_type = FIXED_STRING(30));
     
-    ## 选择图空间csv
-    nebula> USE csv;
+    ## 选择图空间basketballplayer
+    nebula> USE basketballplayer;
     
     ## 创建标签player
     nebula> CREATE TAG player(name string, age int);
@@ -93,7 +93,7 @@
 
 ### 步骤 3：修改配置文件
 
-编译Exchange后，复制`target/classes/application.conf`文件设置CSV数据源相关的配置。在本示例中，复制的文件名为`csv_application.conf`。以下仅详细说明点和边数据的配置信息，未使用的配置项已被注释，但是提供了配置说明。Spark和Nebula Graph相关配置，请参见[Spark参数](../parameter-reference/ex-ug-paras-spark.md)和 [Nebula Graph参数](../parameter-reference/ex-ug-paras-nebulagraph.md)。
+编译Exchange后，复制`target/classes/application.conf`文件设置CSV数据源相关的配置。在本示例中，复制的文件名为`csv_application.conf`。各个配置项的详细说明请参见[配置说明](../parameter-reference/ex-ug-parameter.md)。
 
 ```conf
 {
@@ -362,7 +362,7 @@
 
 ### 步骤 4：向Nebula Graph导入数据
 
-运行如下命令将CSV文件数据导入到Nebula Graph中。关于参数的说明，参考[导入命令参数](../parameter-reference/ex-ug-para-import-command.md)。
+运行如下命令将CSV文件数据导入到Nebula Graph中。关于参数的说明，请参见[导入命令参数](../parameter-reference/ex-ug-para-import-command.md)。
 
 ```bash
 <spark_install_path>/bin/spark-submit --master "local" --class com.vesoft.nebula.tools.importer.Exchange <nebula-exchange-2.0.0.jar_path> -c <csv_application.conf_path> 

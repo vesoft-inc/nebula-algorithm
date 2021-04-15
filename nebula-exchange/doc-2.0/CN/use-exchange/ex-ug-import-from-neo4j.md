@@ -1,5 +1,4 @@
-
-# 导入 Neo4j 数据
+# 导入Neo4j数据
 
 您可以使用 Exchange 将 Neo4j 数据离线批量导入 Nebula Graph 数据库。
 
