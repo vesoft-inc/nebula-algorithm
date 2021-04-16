@@ -28,7 +28,7 @@ Exchange读取Neo4j数据时需要完成以下工作：
 
 ### 环境配置
 
-以下为本示例中的环境配置信息：
+本文示例在MacOS下完成，以下是相关的环境配置信息：
 
 - 硬件规格：
   - CPU：Intel(R) Xeon(R) CPU E5-2697 v3 @ 2.60GHz
@@ -63,7 +63,7 @@ Exchange读取Neo4j数据时需要完成以下工作：
 
 ### 步骤 1：在Nebula Graph中创建Schema
 
-分析CSV文件中的数据，按以下步骤在Nebula Graph中创建Schema：
+分析数据，按以下步骤在Nebula Graph中创建Schema：
 
 1. 确认Schema要素。Nebula Graph中的Schema要素如下表所示。
 
@@ -107,7 +107,7 @@ Exchange读取Neo4j数据时需要完成以下工作：
 
 ### 步骤 3：修改配置文件
 
-编译Exchange后，复制`target/classes/application.conf`文件设置CSV数据源相关的配置。在本示例中，复制的文件名为`neo4j_application.conf`。各个配置项的详细说明请参见[配置说明](../parameter-reference/ex-ug-parameter.md)。
+编译Exchange后，复制`target/classes/application.conf`文件设置数据源相关的配置。在本示例中，复制的文件名为`neo4j_application.conf`。各个配置项的详细说明请参见[配置说明](../parameter-reference/ex-ug-parameter.md)。
 
 ```conf
 {
@@ -293,7 +293,7 @@ Nebula Graph在创建点和边时会将ID作为唯一主键，如果主键已存
 
 ### 步骤 4：向Nebula Graph导入数据
 
-运行如下命令将CSV文件数据导入到Nebula Graph中。关于参数的说明，请参见[导入命令参数](../parameter-reference/ex-ug-para-import-command.md)。
+运行如下命令将文件数据导入到Nebula Graph中。关于参数的说明，请参见[导入命令参数](../parameter-reference/ex-ug-para-import-command.md)。
 
 ```bash
 <spark_install_path>/bin/spark-submit --master "local" --class com.vesoft.nebula.tools.importer.Exchange <nebula-exchange-2.0.0.jar_path> -c <neo4j_application.conf_path> 

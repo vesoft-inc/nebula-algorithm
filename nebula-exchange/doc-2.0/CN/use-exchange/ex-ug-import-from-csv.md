@@ -178,7 +178,10 @@
       # vertex的值必须与上述fields或者csv.fields中的列名保持一致。
       # 目前，Nebula Graph 2.0.0仅支持字符串或整数类型的VID。
       # 不要使用vertex.policy映射。
-      vertex: _c0
+      vertex: {
+        field:_c0
+        # policy:hash
+      }
 
       # 指定的分隔符。默认值为英文逗号（,）。
       separator: ","
@@ -222,7 +225,10 @@
       # vertex的值必须与上述fields或者csv.fields中的列名保持一致。
       # 目前，Nebula Graph 2.0.0仅支持字符串或整数类型的VID。
       # 不要使用vertex.policy映射。
-      vertex: _c0
+      vertex: {
+        field:_c0
+        # policy:hash
+      }
 
       # 指定的分隔符。默认值为英文逗号（,）。
       separator: ","
@@ -271,8 +277,12 @@
       # vertex的值必须与上述fields或者csv.fields中的列名保持一致。
       # 目前，Nebula Graph 2.0.0仅支持字符串或整数类型的VID。
       # 不要使用vertex.policy映射。
-      source: _c0
-      target: _c1
+      source: {
+        field: _c0
+      }
+      target: {
+        field: _c1
+      }
 
       # 指定的分隔符。默认值为英文逗号（,）。
       separator: ","
@@ -319,8 +329,12 @@
       # vertex的值必须与上述fields或者csv.fields中的列名保持一致。
       # 目前，Nebula Graph 2.0.0仅支持字符串或整数类型的VID。
       # 不要使用vertex.policy映射。
-      source: _c0
-      target: _c1
+      source: {
+        field: _c0
+      }
+      target: {
+        field: _c1
+      }
 
       # 指定的分隔符。默认值为英文逗号（,）。
       separator: ","

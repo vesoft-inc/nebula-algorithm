@@ -50,7 +50,7 @@ scala> sql("describe basketball.serve").show
 
 ## 环境配置
 
-本文示例在 MacOS 下完成，以下是相关的环境配置信息：
+本文示例在MacOS下完成，以下是相关的环境配置信息：
 
 - 硬件规格：
   - CPU：1.7 GHz Quad-Core Intel Core i7
@@ -86,7 +86,7 @@ scala> sql("describe basketball.serve").show
 
 ### 步骤 1：在Nebula Graph中创建Schema
 
-按以下步骤在Nebula Graph中创建Schema：
+分析数据，按以下步骤在Nebula Graph中创建Schema：
 
 1. 确认Schema要素。Nebula Graph中的Schema要素如下表所示。
 
