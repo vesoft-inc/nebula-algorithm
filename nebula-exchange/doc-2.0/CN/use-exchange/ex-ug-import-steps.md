@@ -4,7 +4,7 @@
 
 ## 前提条件
 
-- 已经[安装部署Nebula Graph](https://docs.nebula-graph.com.cn/2.0/#dba)并获取如下信息：
+- 已经[安装部署Nebula Graph](https://docs.nebula-graph.com.cn/2.0/4.deployment-and-installation/2.compile-and-install-nebula-graph/2.install-nebula-graph-by-rpm-or-deb/)并获取如下信息：
 
   - Graph服务和Meta服务的的IP地址和端口。
 

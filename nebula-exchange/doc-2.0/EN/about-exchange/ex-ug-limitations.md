@@ -29,4 +29,4 @@ In these scenarios, Hadoop Distributed File System (HDFS) must be deployed:
 
 - Importing data from HDFS to Nebula Graph
 
-- Importing SST files into Nebula Graph
+- Generate SST files

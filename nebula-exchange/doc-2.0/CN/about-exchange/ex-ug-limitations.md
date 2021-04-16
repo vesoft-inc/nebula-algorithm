@@ -4,7 +4,14 @@
 
 ## Nebula Graph版本
 
-Exchange 2.0仅支持Nebula Graph 2.0.0。如果您正在使用Nebula Graph 1.x，请使用[Nebula Exchange 1.x](https://github.com/vesoft-inc/nebula-java/tree/v1.0/tools "Click to go to GitHub")。
+Exchange client版本（即jar包版本）和Nebula Graph的版本对应关系如下。
+|Exchange client版本|Nebula Graph版本|
+|:---|:---|
+|2.0.0|2.0.0|
+
+jar包有两种获取方式：[自行编译](../ex-ug-compile.md)或者从maven仓库下载。
+
+如果您正在使用Nebula Graph 1.x，请使用[Nebula Exchange 1.x](https://github.com/vesoft-inc/nebula-java/tree/v1.0/tools "Click to go to GitHub")。
 
 ## 使用环境
 
@@ -28,4 +35,4 @@ Exchange 2.0 支持以下操作系统：
 在以下使用场景，还需要部署Hadoop Distributed File System (HDFS)：
 
 - 迁移HDFS的数据
-- 迁移SST文件的数据
+- 生成SST文件

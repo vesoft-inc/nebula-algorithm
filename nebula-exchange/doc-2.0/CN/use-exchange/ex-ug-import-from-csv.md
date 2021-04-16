@@ -26,7 +26,7 @@
 
 开始导入数据之前，您需要确认以下信息：
 
-- 已经[安装部署Nebula Graph](https://docs.nebula-graph.com.cn/2.0/#dba)并获取如下信息：
+- 已经[安装部署Nebula Graph](https://docs.nebula-graph.com.cn/2.0/4.deployment-and-installation/2.compile-and-install-nebula-graph/2.install-nebula-graph-by-rpm-or-deb/)并获取如下信息：
 
   - Graph服务和Meta服务的的IP地址和端口。
 
@@ -55,7 +55,7 @@
     | 边类型（Edge Type） | `follow` | `degree int` |
     | 边类型（Edge Type） | `serve` | `start_year int, end_year int` |
 
-2. 在Nebula Graph中创建一个图空间**basketballplayer**，并创建一个Schema，如下所示。
+2. 使用Nebula Console创建一个图空间**basketballplayer**，并创建一个Schema，如下所示。
 
     ```ngql
     ## 创建图空间
@@ -176,12 +176,8 @@
 
       # 指定一个列作为VID的源。
       # vertex的值必须与上述fields或者csv.fields中的列名保持一致。
-      # 目前，Nebula Graph 2.0.0仅支持字符串类型的VID。
-      # 不要使用vertex.policy映射。例如：
-      # vertex: {
-      #  field: _c0,
-      #  policy: "hash"
-      # }
+      # 目前，Nebula Graph 2.0.0仅支持字符串或整数类型的VID。
+      # 不要使用vertex.policy映射。
       vertex: _c0
 
       # 指定的分隔符。默认值为英文逗号（,）。
@@ -191,7 +187,7 @@
       # 如果CSV文件没有表头，请将header设置为false。默认值为false。
       header: false
 
-      # 指定单次写入Nebula Graph的最大点数量。
+      # 指定单批次写入Nebula Graph的最大点数量。
       batch: 256
 
       # 指定Spark分片数量。
@@ -224,12 +220,8 @@
 
       # 指定一个列作为VID的源。
       # vertex的值必须与上述fields或者csv.fields中的列名保持一致。
-      # 目前，Nebula Graph 2.0.0仅支持字符串类型的VID。
-      # 不要使用vertex.policy映射。例如：
-      # vertex: {
-      #  field: _c0,
-      #  policy: "hash"
-      # }
+      # 目前，Nebula Graph 2.0.0仅支持字符串或整数类型的VID。
+      # 不要使用vertex.policy映射。
       vertex: _c0
 
       # 指定的分隔符。默认值为英文逗号（,）。
@@ -239,7 +231,7 @@
       # 如果CSV文件没有表头，请将header设置为false。默认值为false。
       header: false
 
-      # 指定单次写入Nebula Graph的最大点数量。
+      # 指定单批次写入Nebula Graph的最大点数量。
       batch: 256
 
       # 指定Spark分片数量。
@@ -247,7 +239,7 @@
     }
 
 
-    # 如果需要添加更多标签，请参考前面的配置进行添加。
+    # 如果需要添加更多点，请参考前面的配置进行添加。
   ]
   # 处理边
   edges: [
@@ -277,12 +269,8 @@
 
       # 指定一个列作为起始点和目的点的源。
       # vertex的值必须与上述fields或者csv.fields中的列名保持一致。
-      # 目前，Nebula Graph 2.0.0仅支持字符串类型的VID。
-      # 不要使用vertex.policy映射。例如：
-      # vertex: {
-      #  field: _c1,
-      #  policy: "hash"
-      # }
+      # 目前，Nebula Graph 2.0.0仅支持字符串或整数类型的VID。
+      # 不要使用vertex.policy映射。
       source: _c0
       target: _c1
 
@@ -296,7 +284,7 @@
       # 如果CSV文件没有表头，请将header设置为false。默认值为false。
       header: false
 
-      # 指定单次写入Nebula Graph的最大点数量。
+      # 指定单批次写入Nebula Graph的最大边数量。
       batch: 256
 
       # 指定Spark分片数量。
@@ -329,12 +317,8 @@
 
       # 指定一个列作为起始点和目的点的源。
       # vertex的值必须与上述fields或者csv.fields中的列名保持一致。
-      # 目前，Nebula Graph 2.0.0仅支持字符串类型的VID。
-      # 不要使用vertex.policy映射。例如：
-      # vertex: {
-      #  field: _c1,
-      #  policy: "hash"
-      # }
+      # 目前，Nebula Graph 2.0.0仅支持字符串或整数类型的VID。
+      # 不要使用vertex.policy映射。
       source: _c0
       target: _c1
 
@@ -348,7 +332,7 @@
       # 如果CSV文件没有表头，请将header设置为false。默认值为false。
       header: false
 
-      # 指定单次写入Nebula Graph的最大点数量。
+      # 指定单批次写入Nebula Graph的最大边数量。
       batch: 256
 
       # 指定Spark分片数量。
@@ -356,7 +340,7 @@
     }
 
   ]
-  # 如果需要添加更多边类型，请参考前面的配置进行添加。
+  # 如果需要添加更多边，请参考前面的配置进行添加。
 }
 ```
 
@@ -367,6 +351,8 @@
 ```bash
 <spark_install_path>/bin/spark-submit --master "local" --class com.vesoft.nebula.tools.importer.Exchange <nebula-exchange-2.0.0.jar_path> -c <csv_application.conf_path> 
 ```
+
+>**说明**：jar包有两种获取方式：[自行编译](../ex-ug-compile.md)或者从maven仓库下载。
 
 示例：
 

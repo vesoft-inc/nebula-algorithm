@@ -1,6 +1,6 @@
 # 配置说明
 
-本文介绍使用Nebula Exchange时如何修改配置文件`application.conf`。
+本文介绍使用Nebula Exchange时如何修改配置文件[`application.conf`](https://github.com/vesoft-inc/nebula-spark-utils/blob/master/nebula-exchange/src/main/resources/application.conf)。
 
 修改配置文件之前，建议您根据数据源复制并修改文件名称，便于区分。例如数据源为CSV文件，可以复制为`csv_application.conf`。
 
@@ -8,9 +8,9 @@
 
 - Spark相关配置
 
-- Nebula Graph相关配置
-
 - HIVE配置（可选）
+
+- Nebula Graph相关配置
 
 - 点配置
 
@@ -34,7 +34,7 @@
 
 |参数|数据类型|默认值|是否必须|说明|
 |:---|:---|:---|:---|:---|
-|`hive.waredir`|string|-|是|HDFS中的warehouse路径。用双引号括起路径，以`hdfs://`开头。|
+|`hive.warehouse`|string|-|是|HDFS中的warehouse路径。用双引号括起路径，以`hdfs://`开头。|
 |`hive.connectionURL`|string|-|是|JDBC连接的URL。例如`"jdbc:mysql://127.0.0.1:3306/hive_spark?characterEncoding=UTF-8"`。|
 |`hive.connectionDriverName`|string|`"com.mysql.jdbc.Driver"`|是|驱动名称。|
 |`hive.connectionUserName`|list\[string\]|-|是|连接的用户名。|
@@ -44,8 +44,8 @@
 
 |参数|数据类型|默认值|是否必须|说明|
 |:---|:---|:---|:---|:---|
-|`nebula.address.graph`|list\[string\]|`["127.0.0.1:9669"]`|是|Graph服务的地址，包括IP和端口，多个地址用英文逗号（,）分隔。格式为`["ip1:port1","ip2:port2","ip3:port3"]`。|
-|`nebula.address.meta`|int|`["127.0.0.1:9559"]`|是|所有Meta服务的地址，包括IP和端口，多个地址用英文逗号（,）分隔。格式为`["ip1:port1","ip2:port2","ip3:port3"]`。|
+|`nebula.address.graph`|list\[string\]|`["127.0.0.1:9669"]`|是|所有Graph服务的地址，包括IP和端口，多个地址用英文逗号（,）分隔。格式为`["ip1:port1","ip2:port2","ip3:port3"]`。|
+|`nebula.address.meta`|list\[string\]|`["127.0.0.1:9559"]`|是|所有Meta服务的地址，包括IP和端口，多个地址用英文逗号（,）分隔。格式为`["ip1:port1","ip2:port2","ip3:port3"]`。|
 |`nebula.user`|string|-|是|拥有Nebula Graph写权限的用户名。|
 |`nebula.pswd`|string|-|是|用户名对应的密码。|
 |`nebula.space`|string|-|是|需要导入数据的的图空间名称。|
@@ -56,7 +56,7 @@
 |`nebula.connection.retry`|int|`3`|否|Thrift连接重试次数。|
 |`nebula.execution.retry`|int|`3`|否|nGQL语句执行重试次数。|
 |`nebula.error.max`|int|`32`|否|导入过程中的最大失败次数。当失败次数达到最大值时，提交的Spark作业将自动停止。|
-|`nebula.error.output`|string|`/tmp/errors`|否|输出错误信息的日志路径。您可以在这个文件里查看发生的所有错误信息。|
+|`nebula.error.output`|string|`/tmp/errors`|否|输出错误日志的路径。错误日志保存执行失败的nGQL语句。|
 |`nebula.rate.limit`|int|`1024`|否|导入数据时令牌桶的令牌数量限制。|
 |`nebula.rate.timeout`|int|`1000`|否|令牌桶中拿取令牌的超时时间，单位：毫秒。|
 
@@ -71,10 +71,10 @@
 |`tags.name`|string|-|是|Nebula Graph中定义的标签名称。|
 |`tags.type.source`|string|-|是|指定数据源。例如`csv`。|
 |`tags.type.sink`|string|`client`|是|指定导入方式，可选值为`client`和`SST`（暂不支持）。|
-|`tags.fields`|list\[string\]|-|是|属性对应的列的表头。如果没有表头，用`[_c0, _c1, _c2]`的形式表示第一列、第二列、第三列，以此类推；如果有表头，使用实际的列名。|
+|`tags.fields`|list\[string\]|-|是|属性对应的列的表头或列名。如果有表头或列名，请直接使用该名称。如果CSV文件没有表头，用`[_c0, _c1, _c2]`的形式表示第一列、第二列、第三列，以此类推。|
 |`tags.nebula.fields`|list\[string\]|-|是|Nebula Graph中定义的属性名称，顺序必须和`tags.fields`一一对应。例如`[_c1, _c2]`对应`[name, age]`，表示第二列为属性name的值，第三列为属性age的值。|
-|`tags.vertex.field`|string|-|是|点ID的列。例如`_c0`表示第一列的值作为点ID。|
-|`tags.batch`|int|`256`|是|单次写入Nebula Graph的最大点数量。|
+|`tags.vertex.field`|string|-|是|点ID的列。例如CSV文件没有表头时，可以用`_c0`表示第一列的值作为点ID。|
+|`tags.batch`|int|`256`|是|单批次写入Nebula Graph的最大点数量。|
 |`tags.partition`|int|`32`|是|Spark分片数量。|
 
 ### Parquet/JSON/ORC源特有参数
@@ -146,10 +146,10 @@
 |`edges.name`| string|-|是|Nebula Graph中定义的边类型名称。|
 |`edges.type.source`|string|-|是|指定数据源。例如`csv`。|
 |`edges.type.sink`|string|`client`|是|指定导入方式，可选值为`client`和`SST`（暂不支持）。|
-|`edges.fields`|list\[string\]|-|是|属性对应的列的表头。如果没有表头，用`[_c0, _c1, _c2]`的形式表示第一列、第二列、第三列，以此类推；如果有表头，使用实际的列名。|
+|`edges.fields`|list\[string\]|-|是|属性对应的列的表头或列名。如果有表头或列名，请直接使用该名称。如果CSV文件没有表头，用`[_c0, _c1, _c2]`的形式表示第一列、第二列、第三列，以此类推。|
 |`edges.nebula.fields`|list\[string\]|-|是|Nebula Graph中定义的属性名称，顺序必须和`edges.fields`一一对应。例如`[_c2, _c3]`对应`[start_year, end_year]`，表示第三列为开始年份的值，第四列为结束年份的值。|
 |`edges.source.field`|string|-|是|边的起始点的列。例如`_c0`表示第一列的值作为边的起始点。|
 |`edges.target.field`|string|-|是|边的目的点的列。例如`_c1`表示第二列的值作为边的目的点。|
 |`edges.ranking`|int|-|否|rank值的列。没有指定时，默认所有rank值为`0`。|
-|`edges.batch`|int|`256`|是|单次写入Nebula Graph的最大边数量。|
+|`edges.batch`|int|`256`|是|单批次写入Nebula Graph的最大边数量。|
 |`edges.partition`|int|`32`|是|Spark分片数量。|

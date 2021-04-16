@@ -68,7 +68,7 @@ scala> sql("describe basketball.serve").show
 
 开始导入数据之前，您需要确认以下信息：
 
-- 已经[安装部署Nebula Graph](https://docs.nebula-graph.com.cn/2.0/#dba)并获取如下信息：
+- 已经[安装部署Nebula Graph](https://docs.nebula-graph.com.cn/2.0/4.deployment-and-installation/2.compile-and-install-nebula-graph/2.install-nebula-graph-by-rpm-or-deb/)并获取如下信息：
 
   - Graph服务和Meta服务的的IP地址和端口。
 
@@ -235,7 +235,7 @@ scala> sql("select playerid, teamid, start_year, end_year from basketball.serve"
       # vertex.field的值必须与上述fields中的列名保持一致。
       vertex: playerid
 
-      # 单次写入 Nebula Graph 的最大点数据量。
+      # 单批次写入 Nebula Graph 的最大点数据量。
       batch: 256
 
       # Spark 分区数量
@@ -295,7 +295,7 @@ scala> sql("select playerid, teamid, start_year, end_year from basketball.serve"
         field: dst_player
       }
 
-      # 单次写入 Nebula Graph 的最大点数据量。
+      # 单批次写入 Nebula Graph 的最大点数据量。
       batch: 256
 
       # Spark 分区数量
@@ -332,6 +332,8 @@ scala> sql("select playerid, teamid, start_year, end_year from basketball.serve"
 ```bash
 <spark_install_path>/bin/spark-submit --master "local" --class com.vesoft.nebula.tools.importer.Exchange <nebula-exchange-2.0.0.jar_path> -c <hive_application.conf_path> 
 ```
+
+>**说明**：jar包有两种获取方式：[自行编译](../ex-ug-compile.md)或者从maven仓库下载。
 
 示例：
 
