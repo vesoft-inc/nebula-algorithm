@@ -33,7 +33,7 @@ import org.apache.spark.util.LongAccumulator
 import scala.collection.JavaConverters._
 
 abstract class ServerBaseWriter extends Writer {
-  private[this] val BATCH_INSERT_TEMPLATE               = "INSERT %s %s(%s) VALUES %s"
+  private[this] val BATCH_INSERT_TEMPLATE               = "INSERT %s `%s`(%s) VALUES %s"
   private[this] val INSERT_VALUE_TEMPLATE               = "%s: (%s)"
   private[this] val INSERT_VALUE_TEMPLATE_WITH_POLICY   = "%s(\"%s\"): (%s)"
   private[this] val ENDPOINT_TEMPLATE                   = "%s(\"%s\")"
