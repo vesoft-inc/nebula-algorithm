@@ -4,7 +4,7 @@
 
 ## 数据集
 
-本文以[basketballplayer数据集](https://docs-cn.oss-cn-hangzhou.aliyuncs.com/dataset/dataset.zip?OSSAccessKeyId=LTAI4G4N4Fb7BSVf3shExmvs&Expires=1618468205&Signature=3EK4fUbjEFM9YigBaSA3BSguh1U%3D)为例。
+本文以[basketballplayer数据集](https://docs-cdn.nebula-graph.com.cn/dataset/dataset.zip)为例。
 
 在本示例中，该数据集已经存入HIVE中名为`basketball`的数据库中，以`player`、`team`、`follow`和`serve`四个表存储了所有点和边的信息。以下为各个表的结构。
 
@@ -330,7 +330,7 @@ scala> sql("select playerid, teamid, start_year, end_year from basketball.serve"
 运行如下命令将HIVE数据导入到Nebula Graph中。关于参数的说明，请参见[导入命令参数](../parameter-reference/ex-ug-para-import-command.md)。
 
 ```bash
-<spark_install_path>/bin/spark-submit --master "local" --class com.vesoft.nebula.tools.importer.Exchange <nebula-exchange-2.0.0.jar_path> -c <hive_application.conf_path> 
+<spark_install_path>/bin/spark-submit --master "local" --class com.vesoft.nebula.tools.importer.Exchange <nebula-exchange-2.0.0.jar_path> -c <hive_application.conf_path> -h
 ```
 
 >**说明**：jar包有两种获取方式：[自行编译](../ex-ug-compile.md)或者从maven仓库下载。
@@ -338,7 +338,7 @@ scala> sql("select playerid, teamid, start_year, end_year from basketball.serve"
 示例：
 
 ```bash
-/usr/local/spark-2.4.7-bin-hadoop2.7/bin/spark-submit  --master "local" --class com.vesoft.nebula.exchange.Exchange  /root/nebula-spark-utils/nebula-exchange/target/nebula-exchange-2.0.0.jar  -c /root/nebula-spark-utils/nebula-exchange/target/classes/hive_application.conf
+/usr/local/spark-2.4.7-bin-hadoop2.7/bin/spark-submit  --master "local" --class com.vesoft.nebula.exchange.Exchange  /root/nebula-spark-utils/nebula-exchange/target/nebula-exchange-2.0.0.jar  -c /root/nebula-spark-utils/nebula-exchange/target/classes/hive_application.conf -h
 ```
 
 您可以在返回信息中搜索`batchSuccess.<tag_name/edge_name>`，确认成功的数量。例如例如`batchSuccess.follow: 300`。

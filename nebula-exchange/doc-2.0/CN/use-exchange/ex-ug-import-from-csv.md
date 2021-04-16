@@ -6,7 +6,7 @@
 
 ## 数据集
 
-本文以[basketballplayer数据集](https://docs-cn.oss-cn-hangzhou.aliyuncs.com/dataset/dataset.zip?OSSAccessKeyId=LTAI4G4N4Fb7BSVf3shExmvs&Expires=1618468205&Signature=3EK4fUbjEFM9YigBaSA3BSguh1U%3D)为例。
+本文以[basketballplayer数据集](https://docs-cdn.nebula-graph.com.cn/dataset/dataset.zip)为例。
 
 ## 环境配置
 

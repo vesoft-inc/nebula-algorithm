@@ -105,6 +105,7 @@
 |`tags.server`|string|`"bolt://127.0.0.1:7687"`|是|Neo4j服务器地址。|
 |`tags.user`|string|-|是|拥有读取权限的Neo4j用户名。|
 |`tags.password`|string|-|是|用户名对应密码。|
+|`tags.database`|string|-|是|Neo4j中保存源数据的数据库名。|
 |`tags.check_point_path`|string|`/tmp/test`|否|设置保存导入进度信息的目录，用于断点续传。如果未设置，表示不启用断点续传。|
 
 ### Hbase源特有参数
