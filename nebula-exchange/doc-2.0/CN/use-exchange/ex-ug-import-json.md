@@ -1,25 +1,48 @@
-# 导入 JSON 文件数据
+# 导入JSON文件数据
 
-本文以一个示例说明如何使用 Exchange 将存储在 HDFS 上的 JSON 文件数据导入 Nebula Graph。
+本文以一个示例说明如何使用Exchange将存储在HDFS上的JSON文件数据导入Nebula Graph。
 
 ## 数据集
 
-本示例所用 JSON 文件（test.json）结构为：`{"source":int, "target":int, "likeness":double}`，表示 `source` 与 `target` 之间一种 `like` 关系。共计 21,645 条数据。
+本文以basketballplayer数据集为例。部分示例数据如下：
 
-以下为部分示例数据：
+- player
 
-```json
-{"source":53802643,"target":87847387,"likeness":0.34}
-{"source":29509860,"target":57501950,"likeness":0.40}
-{"source":97319348,"target":50240344,"likeness":0.77}
-{"source":94295709,"target":8189720,"likeness":0.82}
-{"source":78707720,"target":53874070,"likeness":0.98}
-{"source":23399562,"target":20136097,"likeness":0.47}
-```
+  ```json
+  {"id":"player100","age":42,"name":"Tim Duncan"}
+  {"id":"player101","age":36,"name":"Tony Parker"}
+  {"id":"player102","age":33,"name":"LaMarcus Aldridge"}
+  {"id":"player103","age":32,"name":"Rudy Gay"}
+  ...
+  ```
+
+- team
+
+  ```json
+  {"id":"team200","name":"Warriors"}
+  {"id":"team201","name":"Nuggets"}
+  ...
+  ```
+
+- follow
+
+  ```json
+  {"src":"player100","dst":"player101","degree":95}
+  {"src":"player101","dst":"player102","degree":90}
+  ...
+  ```
+
+- serve
+
+  ```json
+  {"src":"player100","dst":"team204","start_year":"1997","end_year":"2016"}
+  {"src":"player101","dst":"team204","start_year":"1999","end_year":"2018"}
+  ...
+  ```
 
 ## 环境配置
 
-本文示例在 MacOS 下完成，以下是相关的环境配置信息：
+本文示例在MacOS下完成，以下是相关的环境配置信息：
 
 - 硬件规格：
   - CPU：1.7 GHz Quad-Core Intel Core i7
@@ -29,80 +52,95 @@
 
 - Hadoop：2.9.2，伪分布式部署
 
-- Nebula Graph：V1.1.0，使用 Docker Compose 部署。详细信息，参考 [使用 Docker Compose 部署 Nebula Graph](https://github.com/vesoft-inc/nebula-docker-compose/blob/master/README_zh-CN.md)
+- Nebula Graph：2.0.0。使用[Docker Compose部署](https://github.com/vesoft-inc/nebula-docker-compose/blob/master/README_zh-CN.md)。
 
 ## 前提条件
 
-开始迁移数据之前，您需要确认以下信息：
+开始导入数据之前，您需要确认以下信息：
 
-- 已经完成 Exchange 编译。详细信息，参考 [编译 Exchange](../ex-ug-compile.md)。本示例中使用 Exchange v1.0.1。
+- 已经[安装部署Nebula Graph](https://docs.nebula-graph.com.cn/2.0/4.deployment-and-installation/2.compile-and-install-nebula-graph/2.install-nebula-graph-by-rpm-or-deb/)并获取如下信息：
 
-- 已经安装 Spark。
+  - Graph服务和Meta服务的的IP地址和端口。
 
-- 已经安装并开启 Hadoop 服务。
+  - 拥有Nebula Graph写权限的用户名和密码。
 
-- 已经部署并启动 Nebula Graph，并获取：
-  - Graph 服务、Meta 服务所在机器的 IP 地址和端口信息。
-  - Nebula Graph 数据库的拥有写权限的用户名及其密码。
+- 已经编译Exchange。详情请参见[编译Exchange](../ex-ug-compile.md)。本示例中使用Exchange 2.0。
 
-- 在 Nebula Graph 中创建图数据模式（Schema）所需的所有信息，包括标签和边类型的名称、属性等。
+- 已经安装Spark。
+
+- 了解Nebula Graph中创建Schema的信息，包括标签和边类型的名称、属性等。
+
+- 已经安装并开启Hadoop服务。
 
 ## 操作步骤
 
-### 步骤 1. 在 Nebula Graph 中创建 Schema
+### 步骤 1：在 Nebula Graph 中创建 Schema
 
-分析 JSON 文件中的数据，按以下步骤在 Nebula Graph 中创建 Schema：
+### 步骤 1：在Nebula Graph中创建Schema
 
-1. 确认 Schema 要素：Nebula Graph 中的 Schema 要素如下表所示。
+分析文件中的数据，按以下步骤在Nebula Graph中创建Schema：
+
+1. 确认Schema要素。Nebula Graph中的Schema要素如下表所示。
 
     | 要素  | 名称 | 属性 |
     | :--- | :--- | :--- |
-    | 标签（Tag） | `source` | `srcId int` |
-    | 标签（Tag） | `target` | `dstId int` |
-    | 边类型（Edge Type） | `like` | `likeness double` |
+    | 标签（Tag） | `player` | `name string, age int` |
+    | 标签（Tag） | `team` | `name string` |
+    | 边类型（Edge Type） | `follow` | `degree int` |
+    | 边类型（Edge Type） | `serve` | `start_year int, end_year int` |
 
-2. 在 Nebula Graph 里创建一个图空间 **json**，并创建一个 Schema，如下所示。
+2. 使用Nebula Console创建一个图空间**basketballplayer**，并创建一个Schema，如下所示。
 
     ```ngql
-    -- 创建图空间
-    CREATE SPACE json (partition_num=10, replica_factor=1);
+    ## 创建图空间
+    nebula> CREATE SPACE basketballplayer \
+            (partition_num = 10, \
+            replica_factor = 1, \
+            vid_type = FIXED_STRING(30));
     
-    -- 选择图空间 json
-    USE json;
+    ## 选择图空间basketballplayer
+    nebula> USE basketballplayer;
     
-    -- 创建标签 source
-    CREATE TAG source (srcId int);
+    ## 创建标签player
+    nebula> CREATE TAG player(name string, age int);
     
-    -- 创建标签 target
-    CREATE TAG target (dstId int);
+    ## 创建标签team
+    nebula> CREATE TAG team(name string);
     
-    -- 创建边类型 like
-    CREATE EDGE like (likeness double);
+    ## 创建边类型follow
+    nebula> CREATE EDGE follow(degree int);
+
+    ## 创建边类型serve
+    nebula> CREATE EDGE serve(start_year int, end_year int);
     ```
 
-关于 Nebula Graph 构图的更多信息，参考《Nebula Graph Database 手册》的 [快速开始](https://docs.nebula-graph.com.cn/manual-CN/1.overview/2.quick-start/1.get-started/ "点击前往 Nebula Graph 网站")。
+更多信息，请参见[快速开始](https://docs.nebula-graph.com.cn/2.0/2.quick-start/1.quick-start-workflow/)。
 
-### 步骤 2. 处理 JSON 文件
+### 步骤 2：处理JSON文件
 
-分别创建点和边数据 JSON 文件。同时，JSON 文件必须存储在 HDFS 里，并获取文件存储路径。
+确认以下信息：
 
-> **说明**：本示例中仅使用一个 JSON 文件同时写入点和边数据，其中，表示 source 和 target 的部分点数据是重复的，所以，在写入数据时，这些点会被重复写入。向 Nebula Graph 插入点或边时，允许重复插入，但是最后读取时以最后一次写入的数据为准，所以，并不影响使用。在实际使用时，最好分别创建点和边数据文件，提高数据写入速度。
+1. 处理JSON文件以满足Schema的要求。
+
+2. JSON文件必须存储在HDFS中，并已获取文件存储路径。
 
 ### 步骤 3. 修改配置文件
 
-完成 Exchange 编译后，进入 `nebula-java/tools/exchange` 目录，根据 `target/classes/application.conf` 文件修改 果断 数据源相关的配置文件。在本示例中，文件被重命名为 `json_application.conf`。以下配置文件中提供了 JSON 源数据所有配置项。本次示例中未使用的配置项已被注释，但是提供了配置说明。Spark 和 Nebula Graph 相关配置，参考 [Spark 参数](../parameter-reference/ex-ug-paras-spark.md)和 [Nebula Graph 参数](../parameter-reference/ex-ug-paras-nebulagraph.md)。
+编译Exchange后，复制`target/classes/application.conf`文件设置JSON数据源相关的配置。在本示例中，复制的文件名为`json_application.conf`。各个配置项的详细说明请参见[配置说明](../parameter-reference/ex-ug-parameter.md)。
 
 ```conf
 {
-  # Spark 相关配置
+  # Spark相关配置
   spark: {
     app: {
-      name: Spark Writer
+      name: Nebula Exchange 2.0
     }
-
     driver: {
       cores: 1
       maxResultSize: 1G
+    }
+    executor: {
+        memory:1G
     }
 
     cores {
@@ -110,179 +148,253 @@
     }
   }
 
-  # Nebula Graph 相关配置
+  # Nebula Graph相关配置
   nebula: {
     address:{
-      # 以下为 Nebula Graph 的 Graph 服务和 Meta 服务所在机器的 IP 地址及端口
-      # 如果有多个地址，格式为 "ip1:port","ip2:port","ip3:port"
-      # 不同地址之间以英文逗号 (,) 隔开
-      graph:["127.0.0.1:3699"]
-      meta:["127.0.0.1:45500"]
+      # 指定Graph服务和所有Meta服务的IP地址和端口。
+      # 如果有多台服务器，地址之间用英文逗号（,）分隔。
+      # 格式: "ip1:port","ip2:port","ip3:port"
+      graph:["127.0.0.1:9669"]
+      meta:["127.0.0.1:9559"]
     }
-    # 填写的账号必须拥有 Nebula Graph 相应图空间的写数据权限
-    user: user
-    pswd: password
 
-    # 填写 Nebula Graph 中需要写入数据的图空间名称
-    space: json
+    # 指定拥有Nebula Graph写权限的用户名和密码。
+    user: root
+    pswd: nebula
 
+    # 指定图空间名称。
+    space: basketballplayer
     connection {
       timeout: 3000
       retry: 3
     }
-
     execution {
       retry: 3
     }
-
     error: {
       max: 32
       output: /tmp/errors
     }
-
     rate: {
       limit: 1024
       timeout: 1000
     }
   }
 
-  # 处理标签
+  # 处理点
   tags: [
-    # 设置标签 source 相关信息
+    # 设置标签player相关信息。
     {
-      # 设置为 Nebula Graph 中对应的标签名称
-      name: source
+      # 指定Nebula Graph中定义的标签名称。
+      name: player
       type: {
-        # 指定数据源文件格式，设置为 json。
+        # 指定数据源，使用JSON。
         source: json
 
-        # 指定标签数据导入 Nebula Graph 的方式，
-        # 可以设置为：client（以客户端形式导入）和 sst（以 SST 文件格式导入）。
-        # 关于 SST 文件导入配置，参考文档：导入 SST 文件。
+        # 指定如何将点数据导入Nebula Graph：Client或SST。
         sink: client
       }
 
-      # JSON 文件所在的 HDFS 路径，String 类型，必须以 hdfs:// 开头。
-      path: "hdfs://namenode_ip:port/path/to/test.json"
+      # 指定JSON文件的HDFS路径。
+      # 用双引号括起路径，以hdfs://开头。
+      path: "hdfs://192.168.153.10:9000/data/vertex_player.json"
 
-      # 在 fields 里指定 JSON 文件中 key 名称，其对应的 value
-      # 会作为 Nebula Graph 中指定属性 srcId 的数据源
-      # 如果需要指定多个值，用英文逗号（,）隔开
-      fields: ["source"]
-      nebula.fields: ["srcId"]
+      # 在fields里指定JSON文件中key名称，其对应的value会作为Nebula Graph中指定属性的数据源。
+      # 如果需要指定多个值，用英文逗号（,）隔开。
+      fields: [age,name]
 
-      # 将 JSON 文件中某个 key 对应的值作为 Nebula Graph 中点 VID 的来源
-      # 如果 VID 源数据不是 int 类型，则使用以下内容来代替 vertex 的设置，在其中指定 VID 映射策略，建议设置为 "hash"。
-      # vertex: {
-      #   field: key_name_in_json
-      #   policy: "hash"
-      # }
-      vertex: source
+      # 指定Nebula Graph中定义的属性名称。
+      # fields与nebula.fields的顺序必须一一对应。
+      nebula.fields: [age, name]
 
+      # 指定一个列作为VID的源。
+      # vertex的值必须与JSON文件中的字段保持一致。
+      # 目前，Nebula Graph 2.0.0仅支持字符串或整数类型的VID。
+      # 不要使用vertex.policy映射。
+      vertex: {
+        field:id
+        # policy:hash
+      }
+
+      # 指定单批次写入Nebula Graph的最大点数量。
       batch: 256
-      partition: 32
 
-      # isImplicit 设置说明，详见 https://github.com/vesoft-inc/
-      # nebula-java/blob/v1.0/tools/exchange/src/main/resources/
-      # application.conf
-      isImplicit: true
+      # 指定Spark分片数量。
+      partition: 32
     }
-    # 设置标签 target 相关信息
+
+    # 设置标签team相关信息。
     {
-      name: target
+      # 指定Nebula Graph中定义的标签名称。
+      name: team
       type: {
+        # 指定数据源，使用JSON。
         source: json
+
+        # 指定如何将点数据导入Nebula Graph：Client或SST。
         sink: client
       }
-      path: "hdfs://namenode_ip:port/path/to/test.json"
-      fields: ["target"]
-      nebula.fields: ["dstId"]
-      vertex: "target"
+
+      # 指定JSON文件的HDFS路径。
+      # 用双引号括起路径，以hdfs://开头。
+      path: "hdfs://192.168.153.10:9000/data/vertex_team.json"
+
+      # 在fields里指定JSON文件中key名称，其对应的value会作为Nebula Graph中指定属性的数据源。
+      # 如果需要指定多个值，用英文逗号（,）隔开。
+      fields: [name]
+
+      # 指定Nebula Graph中定义的属性名称。
+      # fields与nebula.fields的顺序必须一一对应。
+      nebula.fields: [name]
+
+      # 指定一个列作为VID的源。
+      # vertex的值必须与JSON文件中的字段保持一致。
+      # 目前，Nebula Graph 2.0.0仅支持字符串或整数类型的VID。
+      # 不要使用vertex.policy映射。
+      vertex: {
+        field:id
+        # policy:hash
+      }
+
+
+      # 指定单批次写入Nebula Graph的最大点数量。
       batch: 256
+
+      # 指定Spark分片数量。
       partition: 32
-      isImplicit: true
     }
-  # 如果还有其他标签，参考以上配置添加
+
+
+    # 如果需要添加更多点，请参考前面的配置进行添加。
   ]
-
-  # 处理边数据
+  # 处理边
   edges: [
-    # 设置边类型 like 相关信息
+    # 设置边类型follow相关信息。
     {
-      # Nebula Graph 中对应的边类型名称。
-      name: like
+      # 指定Nebula Graph中定义的边类型名称。
+      name: follow
       type: {
-        # 指定数据源文件格式，设置为 json。
+        # 指定数据源，使用JSON。
         source: json
 
-        # 指定边数据导入 Nebula Graph 的方式，
-        # 可以设置为：client（以客户端形式导入）和 sst（以 SST 文件格式导入）。
-        # 关于 SST 文件导入配置，参考文档：导入 SST 文件（https://
-        # docs.nebula-graph.com.cn/nebula-exchange/
-        # use-exchange/ex-ug-import-sst/）。
+        # 指定如何将点数据导入Nebula Graph：Client或SST。
         sink: client
       }
 
-      # 指定 JSON 文件所在的 HDFS 路径，String 类型，必须以 hdfs:// 开头。
-      path: "hdfs://namenode_ip:port/path/to/test.json"
+      # 指定JSON文件的HDFS路径。
+      # 用双引号括起路径，以hdfs://开头。
+      path: "hdfs://192.168.153.10:9000/data/edge_follow.json"
 
-      # 在 fields 里指定 JSON 文件中 key 名称，其对应的 value
-      # 会作为 Nebula Graph 中指定属性 likeness 的数据源
-      # 如果需要指定多个值，用英文逗号（,）隔开
-      fields: ["likeness"]
-      nebula.fields: ["likeness"]
+      # 在fields里指定JSON文件中key名称，其对应的value会作为Nebula Graph中指定属性的数据源。
+      # 如果需要指定多个值，用英文逗号（,）隔开。
+      fields: [degree]
 
-      # 将 JSON 文件中某两个 key 对应的值作为 Nebula Graph 中边起点和边终点 VID 的来源
-      # 如果 VID 源数据不是 int 类型，则使用以下内容来代替 source 
-      # 和/或 target 的设置，在其中指定 VID 映射策略，建议设置为 "hash"。
-      # source: {
-      #   field: key_name_in_json
-      #   policy: "hash"
-      # }
-      # target: {
-      #   field: key_name_in_json
-      #   policy: "hash"
-      # }
-      source: "source"
-      target: "target"
+      # 指定Nebula Graph中定义的属性名称。
+      # fields与nebula.fields的顺序必须一一对应。
+      nebula.fields: [degree]
 
+      # 指定一个列作为起始点和目的点的源。
+      # vertex的值必须与JSON文件中的字段保持一致。
+      # 目前，Nebula Graph 2.0.0仅支持字符串或整数类型的VID。
+      # 不要使用vertex.policy映射。
+      source: {
+        field: src
+      }
+      target: {
+        field: dst
+      }
+
+
+      # 指定一个列作为rank的源(可选)。
+      #ranking: _c4
+
+      # 指定单批次写入Nebula Graph的最大边数量。
       batch: 256
+
+      # 指定Spark分片数量。
       partition: 32
-      isImplicit: true
     }
-    # 如果还有其他边类型，参考以上配置添加
+
+    # 设置边类型serve相关信息。
+    {
+      # 指定Nebula Graph中定义的边类型名称。
+      name: serve
+      type: {
+        # 指定数据源，使用JSON。
+        source: json
+
+        # 指定如何将点数据导入Nebula Graph：Client或SST。
+        sink: client
+      }
+
+      # 指定JSON文件的HDFS路径。
+      # 用双引号括起路径，以hdfs://开头。
+      path: "hdfs://192.168.153.10:9000/data/edge_serve.json"
+
+      # 在fields里指定JSON文件中key名称，其对应的value会作为Nebula Graph中指定属性的数据源。
+      # 如果需要指定多个值，用英文逗号（,）隔开。
+      fields: [start_year,end_year]
+
+      # 指定Nebula Graph中定义的属性名称。
+      # fields与nebula.fields的顺序必须一一对应。
+      nebula.fields: [start_year, end_year]
+
+      # 指定一个列作为起始点和目的点的源。
+      # vertex的值必须与JSON文件中的字段保持一致。
+      # 目前，Nebula Graph 2.0.0仅支持字符串或整数类型的VID。
+      # 不要使用vertex.policy映射。
+      source: {
+        field: src
+      }
+      target: {
+        field: dst
+      }
+
+
+      # 指定一个列作为rank的源(可选)。
+      #ranking: _c5
+
+
+      # 指定单批次写入Nebula Graph的最大边数量。
+      batch: 256
+
+      # 指定Spark分片数量。
+      partition: 32
+    }
+
   ]
+  # 如果需要添加更多边，请参考前面的配置进行添加。
 }
 ```
 
-### 步骤 4. （可选）检查配置文件是否正确
+### 步骤 4：向Nebula Graph导入数据
 
-完成配置后，运行以下命令检查配置文件格式是否正确。关于参数的说明，参考 [导入命令参数](../parameter-reference/ex-ug-para-import-command.md)。
-
-```bash
-$SPARK_HOME/bin/spark-submit --master "local" --class com.vesoft.nebula.tools.importer.Exchange /path/to/exchange-1.0.1.jar -c /path/to/conf/json_application.conf -D
-```
-
-### 步骤 5. 向 Nebula Graph 导入数据
-
-运行以下命令将 JSON 文件数据导入 Nebula Graph 中。关于参数的说明，参考 [导入命令参数](../parameter-reference/ex-ug-para-import-command.md)。
+运行如下命令将JSON文件数据导入到Nebula Graph中。关于参数的说明，请参见[导入命令参数](../parameter-reference/ex-ug-para-import-command.md)。
 
 ```bash
-$SPARK_HOME/bin/spark-submit --master "local" --class com.vesoft.nebula.tools.importer.Exchange /path/to/exchange-1.0.1.jar -c /path/to/conf/json_application.conf
+<spark_install_path>/bin/spark-submit --master "local" --class com.vesoft.nebula.tools.importer.Exchange <nebula-exchange-2.0.0.jar_path> -c <json_application.conf_path> 
 ```
 
-### 步骤 6. （可选）验证数据
+>**说明**：jar包有两种获取方式：[自行编译](../ex-ug-compile.md)或者从maven仓库下载。
 
-您可以在 Nebula Graph 客户端（例如 Nebula Graph Studio）里执行语句，确认数据是否已导入，例如：
+示例：
+
+```bash
+/usr/local/spark-2.4.7-bin-hadoop2.7/bin/spark-submit  --master "local" --class com.vesoft.nebula.exchange.Exchange  /root/nebula-spark-utils/nebula-exchange/target/nebula-exchange-2.0.0.jar  -c /root/nebula-spark-utils/nebula-exchange/target/classes/json_application.conf
+```
+
+您可以在返回信息中搜索`batchSuccess.<tag_name/edge_name>`，确认成功的数量。例如例如`batchSuccess.follow: 300`。
+
+### 步骤 5：（可选）验证数据
+
+您可以在Nebula Graph客户端（例如Nebula Graph Studio）中执行查询语句，确认数据是否已导入。例如：
 
 ```ngql
-GO FROM 53802643 OVER like;
+GO FROM "player100" OVER follow;
 ```
 
-如果返回边终点（`like._dst`）即表明数据已导入。
+您也可以使用命令[`SHOW STATS`](https://docs.nebula-graph.com.cn/2.0/3.ngql-guide/7.general-query-statements/6.show/14.show-stats/)查看统计数据。
 
-您也可以使用 db_dump 工具统计数据是否已经全部导入。详细的使用信息参考 [Dump Tool](https://docs.nebula-graph.com.cn/manual-CN/3.build-develop-and-administration/5.storage-service-administration/data-export/dump-tool/)。
+### 步骤 6：（可选）在Nebula Graph中重建索引
 
-### 步骤 7. （可选）在 Nebula Graph 中重构索引
-
-导入数据后，您可以在 Nebula Graph 中重新创建并重构索引。详细信息，参考[《Nebula Graph Database 手册》](https://docs.nebula-graph.com.cn/manual-CN/2.query-language/4.statement-syntax/1.data-definition-statements/ "点击前往 Nebula Graph 网站")。
+导入数据后，您可以在Nebula Graph中重新创建并重建索引。详情请参见[索引介绍](https://docs.nebula-graph.com.cn/2.0/3.ngql-guide/14.native-index-statements/)。

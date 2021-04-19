@@ -1,19 +1,19 @@
 # Limitations
 
-This article introduces the limitations of Exchange v2.x.
+This article introduces the limitations of Exchange 2.0.
 
 ## Supported Nebula Graph versions
 
-Exchange v2.x supports Nebula Graph v2.x only. If you are using Nebula Graph v1.x, please use [Nebula Exchange v1.x](https://github.com/vesoft-inc/nebula-java/tree/v1.0/tools "Click to go to GitHub").
+Exchange 2.0 supports Nebula Graph 2.0.0 only. If you are using Nebula Graph 1.x, please use [Nebula Exchange 1.x](https://github.com/vesoft-inc/nebula-java/tree/v1.0/tools "Click to go to GitHub").
 
 ## Supported operation systems
 
-You can use Exchange v2.x in these operation systems:
+You can use Exchange 2.0 in these operation systems:
 
 - CentOS 7
 - macOS
 
-> **NOTE**: Importing SST files with Exchange v2.x is supported in Linux only.
+> **NOTE**: Importing SST files with Exchange 2.0 is supported in Linux only.
 
 ## Software dependencies
 
@@ -29,4 +29,4 @@ In these scenarios, Hadoop Distributed File System (HDFS) must be deployed:
 
 - Importing data from HDFS to Nebula Graph
 
-- Importing SST files into Nebula Graph
+- Generate SST files

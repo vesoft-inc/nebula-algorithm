@@ -4,8 +4,6 @@ This article introduces the generally-used procedure on how to use Exchange to i
 
 ## Prerequisites
 
-To import data with Exchange, do a check of these:
-
 - Nebula Graph is deployed and started. Get the information:
   - IP addresses and ports of the Graph Service and the Meta Service.
   - A Nebula Graph account with the privilege of writing data and its password.
@@ -40,3 +38,8 @@ For more information, see the examples:
 - [Import data from HIVE](ex-ug-import-hive.md)
 - [Import data from CSV files](ex-ug-import-from-csv.md)
 - [Import data from JSON files](ex-ug-import-json.md)
+
+<!---
+client:parquet、ORC、neo4j、hbase、pulsar、kafka
+SST
+>
