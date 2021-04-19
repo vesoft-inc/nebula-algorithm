@@ -44,4 +44,4 @@ After the compiling, you can see the structure of the Exchange directory as foll
 In the `target` directory, you can see the `exchange-2.x.y.jar` file.
 > **NOTE**: The version of the JAR file depends on the releases of Nebula Java Client. You can find the latest versions on the [Releases page of the nebula-spark-utils repository](https://github.com/vesoft-inc/nebula-spark-utils "Click to go to GitHub").
 
-To import data, you can refer to the example configuration in the `target/classes/application.conf`, `target/classes/server_application.conf`, and `target/classes/stream_application.conf` files.
+To import data, you can refer to the example configuration in the `target/classes/application.conf` files.
