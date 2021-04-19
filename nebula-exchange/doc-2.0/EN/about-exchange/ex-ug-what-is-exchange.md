@@ -38,7 +38,7 @@ Exchange has these features:
 
 ## Supported data sources
 
-You can use Exchange v2.x to convert data of these sources into vertex and edge data and then import them to Nebula Graph v2.x:
+You can use Exchange 2.0 to convert data of these sources into vertex and edge data and then import them to Nebula Graph:
 
 - Data of different formats stored on HDFS, including:
   - Apache Parquet

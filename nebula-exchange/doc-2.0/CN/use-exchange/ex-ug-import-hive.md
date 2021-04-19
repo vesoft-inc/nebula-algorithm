@@ -1,55 +1,56 @@
-# 导入 HIVE 数据
+# 导入HIVE数据
 
-本文以一个示例说明如何使用 Exchange 将存储在 HIVE 的数据导入 Nebula Graph。
+本文以一个示例说明如何使用Exchange将存储在HIVE上的数据导入Nebula Graph。
 
 ## 数据集
 
-本文以美国 Stanford Network Analysis Platform (SNAP) 提供的 [Social Network: MOOC User Action Dataset](https://snap.stanford.edu/data/act-mooc.html "点击前往 Stanford Network Analysis Platform (SNAP) 网站") 以及由公开网络上获取的不重复的 97 个课程名称作为示例数据集，包括：
+本文以[basketballplayer数据集](https://docs-cdn.nebula-graph.com.cn/dataset/dataset.zip)为例。
 
-- 两类点（`user` 和 `course`），共计 7,144 个点。
-- 一种关系（`action`），共计 411,749 条边。
-
-详细的数据集，您可以从 [nebula-web-docker](https://github.com/vesoft-inc/nebula-web-docker/tree/master/example/mooc-actions "点击前往 GitHub") 仓库中下载。
-
-在本示例中，该数据集已经存入 HIVE 中名为 `mooc` 的数据库中，以 `users`、`courses` 和 `actions` 三个表存储了所有点和边的信息。以下为各个表的结构。
+在本示例中，该数据集已经存入HIVE中名为`basketball`的数据库中，以`player`、`team`、`follow`和`serve`四个表存储了所有点和边的信息。以下为各个表的结构。
 
 ```sql
-scala> sql("describe mooc.users").show
+scala> sql("describe basketball.player").show
 +--------+---------+-------+
 |col_name|data_type|comment|
 +--------+---------+-------+
-|  userid|   bigint|   null|
+|playerid|   string|   null|
+|     age|   bigint|   null|
+|    name|   string|   null|
 +--------+---------+-------+
 
-scala> sql("describe mooc.courses").show
+scala> sql("describe basketball.team").show
 +----------+---------+-------+
 |  col_name|data_type|comment|
 +----------+---------+-------+
-|  courseid|   bigint|   null|
-|coursename|   string|   null|
+|    teamid|   string|   null|
+|      name|   string|   null|
 +----------+---------+-------+
 
-scala> sql("describe mooc.actions").show
-+--------+---------+-------+
-|col_name|data_type|comment|
-+--------+---------+-------+
-|actionid|   bigint|   null|
-|   srcid|   bigint|   null|
-|   dstid|   string|   null|
-|duration|   double|   null|
-|feature0|   double|   null|
-|feature1|   double|   null|
-|feature2|   double|   null|
-|feature3|   double|   null|
-|   label|  boolean|   null|
-+--------+---------+-------+
+scala> sql("describe basketball.follow").show
++----------+---------+-------+
+|  col_name|data_type|comment|
++----------+---------+-------+
+|src_player|   string|   null|
+|dst_player|   string|   null|
+|    degree|   bigint|   null|
++----------+---------+-------+
+
+scala> sql("describe basketball.serve").show
++----------+---------+-------+
+|  col_name|data_type|comment|
++----------+---------+-------+
+|  playerid|   string|   null|
+|    teamid|   string|   null|
+|start_year|   bigint|   null|
+|  end_year|   bigint|   null|
++----------+---------+-------+
 ```
 
-> **说明**：Hive 的 `bigint` 与 Nebula Graph 的 `int` 对应。
+> **说明**：Hive的数据类型`bigint`与Nebula Graph的`int`对应。
 
 ## 环境配置
 
-本文示例在 MacOS 下完成，以下是相关的环境配置信息：
+本文示例在MacOS下完成，以下是相关的环境配置信息：
 
 - 硬件规格：
   - CPU：1.7 GHz Quad-Core Intel Core i7
@@ -61,109 +62,104 @@ scala> sql("describe mooc.actions").show
 
 - HIVE：2.3.7，Hive Metastore 数据库为 MySQL 8.0.22
 
-- Nebula Graph：V1.2.0，使用 Docker Compose 部署。详细信息，参考 [使用 Docker Compose 部署 Nebula Graph](https://github.com/vesoft-inc/nebula-docker-compose/blob/master/README_zh-CN.md)
+- Nebula Graph：2.0.0。使用[Docker Compose部署](https://github.com/vesoft-inc/nebula-docker-compose/blob/master/README_zh-CN.md)。
 
 ## 前提条件
 
 开始导入数据之前，您需要确认以下信息：
 
-- 已经完成 Exchange 编译。详细信息，参考 [编译 Exchange](../ex-ug-compile.md)。本示例中使用 Exchange v1.1.0。
+- 已经[安装部署Nebula Graph](https://docs.nebula-graph.com.cn/2.0/4.deployment-and-installation/2.compile-and-install-nebula-graph/2.install-nebula-graph-by-rpm-or-deb/)并获取如下信息：
 
-- 已经安装 Spark。
+  - Graph服务和Meta服务的的IP地址和端口。
 
-- 已经安装并开启 Hadoop 服务，并已启动 Hive Metastore 数据库（本示例中为 MySQL）。
+  - 拥有Nebula Graph写权限的用户名和密码。
 
-- 已经部署并启动 Nebula Graph，并获取：
-  - Graph 服务、Meta 服务所在机器的 IP 地址和端口信息。
-  - Nebula Graph 数据库的拥有写权限的用户名及其密码。
+- 已经编译Exchange。详情请参见[编译Exchange](../ex-ug-compile.md)。本示例中使用Exchange 2.0。
 
-- 在 Nebula Graph 中创建图数据模式（Schema）所需的所有信息，包括标签和边类型的名称、属性等。
+- 已经安装Spark。
+
+- 了解Nebula Graph中创建Schema的信息，包括标签和边类型的名称、属性等。
+
+- 已经安装并开启Hadoop服务，并已启动Hive Metastore数据库（本示例中为 MySQL）。
 
 ## 操作步骤
 
-### 步骤 1. 在 Nebula Graph 中创建 Schema
+### 步骤 1：在Nebula Graph中创建Schema
 
-按以下步骤在 Nebula Graph 中创建 Schema：
+分析数据，按以下步骤在Nebula Graph中创建Schema：
 
-1. 确认 Schema 要素：Nebula Graph 中的 Schema 要素如下表所示。
+1. 确认Schema要素。Nebula Graph中的Schema要素如下表所示。
 
     | 要素  | 名称 | 属性 |
     | :--- | :--- | :--- |
-    | 标签（Tag） | `user` | `userId int` |
-    | 标签（Tag） | `course` | `courseId int, courseName string` |
-    | 边类型（Edge Type） | `action` | `actionId int, duration double, label bool, feature0 double, feature1 double, feature2 double, feature3 double` |
+    | 标签（Tag） | `player` | `name string, age int` |
+    | 标签（Tag） | `team` | `name string` |
+    | 边类型（Edge Type） | `follow` | `degree int` |
+    | 边类型（Edge Type） | `serve` | `start_year int, end_year int` |
 
-2. 在 Nebula Graph 里创建一个图空间 **hive**，并创建一个 Schema，如下所示。
+2. 在Nebula Graph中创建一个图空间**basketballplayer**，并创建一个Schema，如下所示。
 
     ```ngql
-    -- 创建图空间
-    CREATE SPACE hive(partition_num=10, replica_factor=1);
+    ## 创建图空间
+    nebula> CREATE SPACE basketballplayer \
+            (partition_num = 10, \
+            replica_factor = 1, \
+            vid_type = FIXED_STRING(30));
     
-    -- 选择图空间 hive
-    USE hive;
+    ## 选择图空间basketballplayer
+    nebula> USE basketballplayer;
     
-    -- 创建标签 user
-    CREATE TAG user(userId int);
+    ## 创建标签player
+    nebula> CREATE TAG player(name string, age int);
     
-    -- 创建标签 course
-    CREATE TAG course(courseId int, courseName string);
+    ## 创建标签team
+    nebula> CREATE TAG team(name string);
     
-    -- 创建边类型 action
-    CREATE EDGE action (actionId int, duration double, label bool, feature0 double, feature1 double, feature2 double, feature3 double);
+    ## 创建边类型follow
+    nebula> CREATE EDGE follow(degree int);
+
+    ## 创建边类型serve
+    nebula> CREATE EDGE serve(start_year int, end_year int);
     ```
 
-关于 Nebula Graph 构图的更多信息，参考《Nebula Graph Database 手册》的 [快速开始](../../manual-CN/1.overview/2.quick-start/1.get-started/ "点击前往 Nebula Graph 网站")。
+更多信息，请参见[快速开始](https://docs.nebula-graph.com.cn/2.0/2.quick-start/1.quick-start-workflow/)。
 
-### 步骤 2. 使用 Spark SQL 确认 HIVE SQL 语句
+### 步骤 2：使用Spark SQL确认HIVE SQL语句
 
-启动 spark-shell 环境后，依次运行以下语句，确认 Spark 能读取 HIVE 中的数据。
+启动spark-shell环境后，依次运行以下语句，确认Spark能读取HIVE中的数据。
 
 ```sql
-scala> sql("select userid from mooc.users").show
-scala> sql("select courseid, coursename from mooc.courses").show
-scala> sql("select actionid, srcid, dstid, duration, feature0, feature1, feature2, feature3, label from mooc.actions").show
+scala> sql("select playerid, age, name from basketball.player").show
+scala> sql("select teamid, name from basketball.team").show
+scala> sql("select src_player, dst_player, degree from basketball.follow").show
+scala> sql("select playerid, teamid, start_year, end_year from basketball.serve").show
 ```
 
-以下为 `mooc.actions` 表中读出的结果。
+以下为表`basketball.player`中读出的结果。
 
 ```mysql
-+--------+-----+--------------------+--------+------------+------------+-----------+-----------+-----+
-|actionid|srcid|               dstid|duration|    feature0|    feature1|   feature2|   feature3|label|
-+--------+-----+--------------------+--------+------------+------------+-----------+-----------+-----+
-|       0|    0|Environmental Dis...|     0.0|-0.319991479|-0.435701433|0.106783779|-0.06730924|false|
-|       1|    0|  History of Ecology|     6.0|-0.319991479|-0.435701433|0.106783779|-0.06730924|false|
-|       2|    0|      Women in Islam|    41.0|-0.319991479|-0.435701433|0.106783779|-0.06730924|false|
-|       3|    0|  History of Ecology|    49.0|-0.319991479|-0.435701433|0.106783779|-0.06730924|false|
-|       4|    0|      Women in Islam|    51.0|-0.319991479|-0.435701433|0.106783779|-0.06730924|false|
-|       5|    0|Legacies of the A...|    55.0|-0.319991479|-0.435701433|0.106783779|-0.06730924|false|
-|       6|    0|          ITP Core 2|    59.0|-0.319991479|-0.435701433|0.106783779|-0.06730924|false|
-|       7|    0|The Research Pape...|    62.0|-0.319991479|-0.435701433|0.106783779|-0.06730924|false|
-|       8|    0|        Neurobiology|    65.0|-0.319991479|-0.435701433|0.106783779|-0.06730924|false|
-|       9|    0|           Wikipedia|   113.0|-0.319991479|-0.435701433|1.108826104|12.77723482|false|
-|      10|    0|Media History and...|   226.0|-0.319991479|-0.435701433|0.607804941|149.4512115|false|
-|      11|    0|             WIKISOO|   974.0|-0.319991479|-0.435701433|1.108826104|3.344522776|false|
-|      12|    0|Environmental Dis...|  1000.0|-0.319991479|-0.435701433|0.106783779|-0.06730924|false|
-|      13|    0|             WIKISOO|  1172.0|-0.319991479|-0.435701433|1.108826104|1.136866766|false|
-|      14|    0|      Women in Islam|  1182.0|-0.319991479|-0.435701433|0.106783779|-0.06730924|false|
-|      15|    0|  History of Ecology|  1185.0|-0.319991479|-0.435701433|0.106783779|-0.06730924|false|
-|      16|    0|Human Development...|  1687.0|-0.319991479|-0.435701433|0.106783779|-0.06730924|false|
-|      17|    1|Human Development...|  7262.0|-0.319991479|-0.435701433|0.106783779|-0.06730924|false|
-|      18|    1|  History of Ecology|  7266.0|-0.319991479|-0.435701433|0.106783779|-0.06730924|false|
-|      19|    1|      Women in Islam|  7273.0|-0.319991479|-0.435701433|0.607804941|0.936170765|false|
-+--------+-----+--------------------+--------+------------+------------+-----------+-----------+-----+
-only showing top 20 rows
++---------+----+-----------------+
+| playerid| age|             name|
++---------+----+-----------------+
+|player100|  42|       Tim Duncan|
+|player101|  36|      Tony Parker|
+|player102|  33|LaMarcus Aldridge|
+|player103|  32|         Rudy Gay|
+|player104|  32|  Marco Belinelli|
++---------+----+-----------------+
+...
 ```
 
-### 步骤 3. 修改配置文件
+### 步骤 3：修改配置文件
 
-完成 Exchange 编译后，进入 `nebula-java/tools/exchange` 目录，根据 `target/classes/application.conf` 文件修改 HIVE 数据源相关的配置文件。在本示例中，文件被重命名为 `hive_application.conf`。以下仅详细说明点和边数据的配置信息，本次示例中未使用的配置项已被注释，但是提供了配置说明。Spark 和 Nebula Graph 相关配置，参考 [Spark 参数](../parameter-reference/ex-ug-paras-spark.md)和 [Nebula Graph 参数](../parameter-reference/ex-ug-paras-nebulagraph.md)。
+编译Exchange后，复制`target/classes/application.conf`文件设置HIVE数据源相关的配置。在本示例中，复制的文件名为`hive_application.conf`。各个配置项的详细说明请参见[配置说明](../parameter-reference/ex-ug-parameter.md)。
 
 ```conf
 {
-  # Spark 相关配置
+  # Spark相关配置
   spark: {
     app: {
-      name: Spark Writer
+      name: Nebula Exchange 2.0
     }
     driver: {
       cores: 1
@@ -173,20 +169,30 @@ only showing top 20 rows
       max: 16
     }
   }
-  # Nebula Graph 相关配置
+
+  # 如果Spark和HIVE部署在不同集群，才需要配置连接HIVE的参数，否则请忽略这些配置。
+  #hive: {
+  #  waredir: "hdfs://NAMENODE_IP:9000/apps/svr/hive-xxx/warehouse/"
+  #  connectionURL: "jdbc:mysql://your_ip:3306/hive_spark?characterEncoding=UTF-8"
+  #  connectionDriverName: "com.mysql.jdbc.Driver"
+  #  connectionUserName: "user"
+  #  connectionPassword: "password"
+  #}
+
+  # Nebula Graph相关配置
   nebula: {
     address:{
-      # 以下为 Nebula Graph 的 Graph 服务和 Meta 服务所在机器的 IP 地址及端口
-      # 如果有多个地址，格式为 "ip1:port","ip2:port","ip3:port"
-      # 不同地址之间以英文逗号 (,) 隔开
-      graph:["127.0.0.1:3699"]
-      meta:["127.0.0.1:45500"]
+      # 以下为Nebula Graph的Graph服务和所有Meta服务所在机器的IP地址及端口。
+      # 如果有多个地址，格式为 "ip1:port","ip2:port","ip3:port"。
+      # 不同地址之间以英文逗号 (,) 隔开。
+      graph:["127.0.0.1:9669"]
+      meta:["127.0.0.1:9559"]
     }
-    # 填写的账号必须拥有 Nebula Graph 相应图空间的写数据权限
-    user: user
-    pswd: password
-    # 填写 Nebula Graph 中需要写入数据的图空间名称
-    space: hive
+    # 填写的账号必须拥有Nebula Graph相应图空间的写数据权限。
+    user: root
+    pswd: nebula
+    # 填写Nebula Graph中需要写入数据的图空间名称。
+    space: basketballplayer
     connection {
       timeout: 3000
       retry: 3
@@ -203,149 +209,150 @@ only showing top 20 rows
       timeout: 1000
     }
   }
-  # 处理标签
+  # 处理点
   tags: [
-    # 设置标签相关信息
+    # 设置标签player相关信息。
     {
-      # Nebula Graph 中对应的标签名称。
-      name: user
+      # Nebula Graph中对应的标签名称。
+      name: player
       type: {
-        # 指定数据源文件格式，设置为 hive。
+        # 指定数据源文件格式，设置为hive。
         source: hive
-        # 指定点数据导入 Nebula Graph 的方式，
-        # 可以设置为：client（以客户端形式导入）和 sst（以 SST 文件格式导入）。
-        # 关于 SST 文件导入配置，参考文档：导入 SST 文件（https://
-        # docs.nebula-graph.com.cn/nebula-exchange/
-        # use-exchange/ex-ug-import-sst/）。
+        # 指定如何将点数据导入Nebula Graph：Client或SST。
         sink: client
       }
 
-      # 设置读取数据库 mooc 中 users 表数据的 SQL 语句
-      exec: "select userid from mooc.users"
+      # 设置读取数据库basketball中player表数据的SQL语句
+      exec: "select playerid, age, name from basketball.player"
 
-      # 在 fields 里指定 users 表中的列名称，其对应的 value
-      # 会作为 Nebula Graph 中指定属性 userId (nebula.fields) 的数据源
-      # fields 和 nebula.fields 里的配置必须一一对应
-      # 如果需要指定多个列名称，用英文逗号（,）隔开
-      fields: [userid]
-      nebula.fields: [userId]
+      # 在fields里指定player表中的列名称，其对应的value会作为Nebula Graph中指定属性。
+      # fields和nebula.fields里的配置必须一一对应。
+      # 如果需要指定多个列名称，用英文逗号（,）隔开。
+      fields: [age,name]
+      nebula.fields: [age,name]
 
-      # 指定表中某一列数据为 Nebula Graph 中点 VID 的来源。
-      # vertex.field 的值必须与上述 fields 中的列名保持一致。
-      # 如果数据不是 int 类型，则添加 vertex.policy 指定 VID 映射策略，建议设置为 "hash"，参考以下 course 标签的设置。
-      vertex: userid
+      # 指定表中某一列数据为Nebula Graph中点VID的来源。
+      # vertex.field的值必须与上述fields中的列名保持一致。
+      vertex: playerid
 
-      # 单次写入 Nebula Graph 的最大点数据量。
+      # 单批次写入 Nebula Graph 的最大点数据量。
       batch: 256
 
       # Spark 分区数量
       partition: 32
-
-      # isImplicit 的设置说明参考：https://github.com/vesoft-inc/nebula-java/
-      # blob/v1.0/tools/exchange/src/main/resources/application.conf
-      isImplicit: true
     }
+    # 设置标签team相关信息。
     {
-      name: course
+      name: team
       type: {
         source: hive
         sink: client
       }
-      exec: "select courseid, coursename from mooc.courses"
-      fields: [courseid, coursename]
-      nebula.fields: [courseId, courseName]
-
-      # 指定表中某一列数据为 Nebula Graph 中点 VID 的来源。
-      # vertex.field 的值必须与上述 fields 中的列名保持一致。
-      # 如果数据不是 int 类型，则添加 vertex.policy 指定 VID 映射策略，建议设置为 "hash"。
+      exec: "select teamid, name from basketball.team"
+      fields: [name]
+      nebula.fields: [name]
       vertex: {
-        field: coursename
-        policy: "hash"
+        field: teamid
       }
       batch: 256
       partition: 32
-      isImplicit: true
     }
 
   ]
 
   # 处理边数据
   edges: [
-    # 设置边类型 action 相关信息
+    # 设置边类型follow相关信息
     {
-      # Nebula Graph 中对应的边类型名称。
-      name: action
+      # Nebula Graph中对应的边类型名称。
+      name: follow
 
       type: {
-        # 指定数据源文件格式，设置为 hive。
+        # 指定数据源文件格式，设置为hive。
         source: hive
 
-        # 指定边数据导入 Nebula Graph 的方式，
-        # 可以设置为：client（以客户端形式导入）和 sst（以 SST 文件格式导入）。
-        # 关于 SST 文件导入配置，参考文档：导入 SST 文件（https://
-        # docs.nebula-graph.com.cn/nebula-exchange/
-        # use-exchange/ex-ug-import-sst/）。
+        # 指定边数据导入Nebula Graph的方式，
+        # 指定如何将点数据导入Nebula Graph：Client或SST。
         sink: client
       }
 
-      # 设置读取数据库 mooc 中 actions 表数据的 SQL 语句
-      exec: "select actionid, srcid, dstid, duration, feature0, feature1, feature2, feature3, label from mooc.actions"
+      # 设置读取数据库basketball中follow表数据的SQL语句。
+      exec: "select src_player, dst_player, degree from basketball.follow"
 
-      # 在 fields 里指定 actions 表中的列名称，其对应的 value
-      # 会作为 Nebula Graph 中 action 的属性（nebula.fields）值来源
-      # fields 和 nebula.fields 里的配置必须一一对应
-      # 如果需要指定多个列名称，用英文逗号（,）隔开
-      fields: [actionid, duration, feature0, feature1, feature2, feature3, label]
-      nebula.fields: [actionId, duration, feature0, feature1, feature2, feature3, label]
+      # 在fields里指定follow表中的列名称，其对应的value会作为Nebula Graph中指定属性。
+      # fields和nebula.fields里的配置必须一一对应。
+      # 如果需要指定多个列名称，用英文逗号（,）隔开。
+      fields: [degree]
+      nebula.fields: [degree]
 
-      # 在 source 里，将 actions 表中某一列作为边起点数据源
-      # 在 target 里，将 actions 表中某一列作为边终点数据源
-      # 如果数据源是 int 或 long 类型，直接指定列名
-      # 如果数据源不是 int 类型，则添加 vertex.policy 指定 VID 映射策略，建议设置为 "hash"
-      source: srcid
-      target: {
-        field: dstid
-        policy: "hash"
+      # 在source里，将follow表中某一列作为边的起始点数据源。
+      # 在target里，将follow表中某一列作为边的目的点数据源。
+      source: {
+        field: src_player
       }
 
-      # 单次写入 Nebula Graph 的最大点数据量。
+      target: {
+        field: dst_player
+      }
+
+      # 单批次写入 Nebula Graph 的最大点数据量。
       batch: 256
 
       # Spark 分区数量
+      partition: 32
+    }
+
+    # 设置边类型serve相关信息
+    {
+      name: serve
+      type: {
+        source: hive
+        sink: client
+      }
+      exec: "select playerid, teamid, start_year, end_year from basketball.serve"
+      fields: [start_year,end_year]
+      nebula.fields: [start_year,end_year]
+      source: {
+        field: playerid
+      }
+      target: {
+        field: teamid
+      }
+      batch: 256
       partition: 32
     }
   ]
 }
 ```
 
-### 步骤 4. （可选）检查配置文件是否正确
+### 步骤 4：向Nebula Graph导入数据
 
-完成配置后，运行以下命令检查配置文件格式是否正确。关于参数的说明，参考 [导入命令参数](../parameter-reference/ex-ug-para-import-command.md)。
-
-```bash
-$SPARK_HOME/bin/spark-submit --master "local" --class com.vesoft.nebula.tools.importer.Exchange /path/to/exchange-1.1.0.jar -c /path/to/conf/hive_application.conf -h -D
-```
-
-### 步骤 5. 向 Nebula Graph 导入数据
-
-运行以下命令将 HIVE 中的数据导入到 Nebula Graph 中。关于参数的说明，参考 [导入命令参数](../parameter-reference/ex-ug-para-import-command.md)。
+运行如下命令将HIVE数据导入到Nebula Graph中。关于参数的说明，请参见[导入命令参数](../parameter-reference/ex-ug-para-import-command.md)。
 
 ```bash
-$SPARK_HOME/bin/spark-submit --master "local" --class com.vesoft.nebula.tools.importer.Exchange /path/to/exchange-1.1.0.jar -c /path/to/conf/hive_application.conf -h
+<spark_install_path>/bin/spark-submit --master "local" --class com.vesoft.nebula.tools.importer.Exchange <nebula-exchange-2.0.0.jar_path> -c <hive_application.conf_path> -h
 ```
 
-### 步骤 6. （可选）验证数据
+>**说明**：jar包有两种获取方式：[自行编译](../ex-ug-compile.md)或者从maven仓库下载。
 
-您可以在 Nebula Graph 客户端（例如 Nebula Graph Studio）里执行语句，确认数据是否已导入，例如：
+示例：
+
+```bash
+/usr/local/spark-2.4.7-bin-hadoop2.7/bin/spark-submit  --master "local" --class com.vesoft.nebula.exchange.Exchange  /root/nebula-spark-utils/nebula-exchange/target/nebula-exchange-2.0.0.jar  -c /root/nebula-spark-utils/nebula-exchange/target/classes/hive_application.conf -h
+```
+
+您可以在返回信息中搜索`batchSuccess.<tag_name/edge_name>`，确认成功的数量。例如例如`batchSuccess.follow: 300`。
+
+### 步骤 5：（可选）验证数据
+
+您可以在Nebula Graph客户端（例如Nebula Graph Studio）中执行查询语句，确认数据是否已导入。例如：
 
 ```ngql
-GO FROM 1 OVER action;
+GO FROM "player100" OVER follow;
 ```
 
-如果返回边终点（`action._dst`）即表明数据已导入。
+您也可以使用命令[`SHOW STATS`](https://docs.nebula-graph.com.cn/2.0/3.ngql-guide/7.general-query-statements/6.show/14.show-stats/)查看统计数据。
 
-您也可以使用 db_dump 工具统计数据是否已经全部导入。详细的使用信息参考 [Dump Tool](https://docs.nebula-graph.com.cn/manual-CN/3.build-develop-and-administration/5.storage-service-administration/data-export/dump-tool/)。
+### 步骤 6：（可选）在Nebula Graph中重建索引
 
-### 步骤 7. （可选）在 Nebula Graph 中重构索引
-
-导入数据后，您可以在 Nebula Graph 中重新创建并重构索引。详细信息，参考[《Nebula Graph Database 手册》](https://docs.nebula-graph.com.cn/manual-CN/2.query-language/4.statement-syntax/1.data-definition-statements/ "点击前往 Nebula Graph 网站")。
+导入数据后，您可以在Nebula Graph中重新创建并重建索引。详情请参见[索引介绍](https://docs.nebula-graph.com.cn/2.0/3.ngql-guide/14.native-index-statements/)。
