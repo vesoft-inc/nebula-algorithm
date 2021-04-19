@@ -7,6 +7,7 @@
 package com.vesoft.nebula.exchange.reader
 
 import com.vesoft.nebula.exchange.config.FileBaseSourceConfigEntry
+import com.vesoft.nebula.exchange.utils.NebulaUtils.DEFAULT_EMPTY_VALUE
 import org.apache.spark.sql.catalyst.encoders.RowEncoder
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
@@ -82,6 +83,7 @@ class CSVReader(override val session: SparkSession, csvConfig: FileBaseSourceCon
     session.read
       .option("delimiter", csvConfig.separator.get)
       .option("header", csvConfig.header.get)
+      .option("emptyValue", DEFAULT_EMPTY_VALUE)
       .csv(path)
   }
 }
