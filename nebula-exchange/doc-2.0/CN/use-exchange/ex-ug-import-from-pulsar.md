@@ -302,6 +302,6 @@ GO FROM "player100" OVER follow;
 
 您也可以使用命令[`SHOW STATS`](https://docs.nebula-graph.com.cn/2.0/3.ngql-guide/7.general-query-statements/6.show/14.show-stats/)查看统计数据。
 
-### 步骤 5：（可选）在Nebula Graph中重建索引
+### 步骤 5：（如有）在Nebula Graph中重建索引
 
 导入数据后，您可以在Nebula Graph中重新创建并重建索引。详情请参见[索引介绍](https://docs.nebula-graph.com.cn/2.0/3.ngql-guide/14.native-index-statements/)。
