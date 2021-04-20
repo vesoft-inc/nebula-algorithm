@@ -19,7 +19,7 @@ For more information, see [Exchange README](https://github.com/vesoft-inc/nebula
 
 Both are Spark applications, and Exchange is based on Spark Writer. Both of them are designed for the migration of data into a Nebula Graph cluster in a distributed environment, but the later maintenance work will focus on Exchange. Compared with Spark Writer, Exchange has the following improvements:
 
-- Supporting more data sources, such as MySQL, Neo4j, HIVE, HBase, Kafka, and Pulsar.
+- Supporting more data sources, such as MySQL, Neo4j, Hive, HBase, Kafka, and Pulsar.
 
 - Some problems with Spark Writer were fixed. For example, by default Spark reads source data from HDFS as strings, which is probably different from your graph schema defined in Nebula Graph. Exchange supports automatically matching and converting data types. With it, when a non-string data type is defined in Nebula Graph, Exchange converts the strings into data of the required data type.
 
@@ -53,7 +53,7 @@ TODO:doc
 
 ### 报NoSuchMethod、MethodNotFound错误（`Exception in thread "main" java.lang.NoSuchMethodError`等）
 
-绝大多数是因为jar包冲突和版本冲突导致的报错，请检查报错服务的版本，与Exchange中使用的版本进行对比，检查是否一致，尤其是Spark版本、Scala版本、Hive版本。
+绝大多数是因为JAR包冲突和版本冲突导致的报错，请检查报错服务的版本，与Exchange中使用的版本进行对比，检查是否一致，尤其是Spark版本、Scala版本、Hive版本。
 
 ### Exchange导入Hive数据时报错`Exception in thread "main" org.apache.spark.sql.AnalysisException: Table or view not found`
 

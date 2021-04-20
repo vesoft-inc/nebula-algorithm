@@ -35,7 +35,7 @@ To import data from a source to Nebula Graph, follow these steps:
 
 For more information, see the examples:
 
-- [Import data from HIVE](ex-ug-import-hive.md)
+- [Import data from Hive](ex-ug-import-hive.md)
 - [Import data from CSV files](ex-ug-import-from-csv.md)
 - [Import data from JSON files](ex-ug-import-json.md)
 

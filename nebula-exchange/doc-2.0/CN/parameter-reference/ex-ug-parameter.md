@@ -8,7 +8,7 @@
 
 - Spark相关配置
 
-- HIVE配置（可选）
+- Hive配置（可选）
 
 - Nebula Graph相关配置
 
@@ -28,9 +28,9 @@
 |`spark.executor.memory`|string|`1G`|否|Spark驱动程序使用的内存量，可以指定单位，例如512M、1G。|
 |`spark.cores.max`|int|`16`|否|当驱动程序以“粗粒度”共享模式在独立部署集群或Mesos集群上运行时，跨集群（而非从每台计算机）请求应用程序的最大CPU核数。如果未设置，则值为Spark的独立集群管理器上的`spark.deploy.defaultCores`或Mesos上的infinite（所有可用的内核）。|
 
-## HIVE配置（可选）
+## Hive配置（可选）
 
-如果Spark和HIVE部署在不同集群，才需要配置连接HIVE的参数，否则请忽略这些配置。
+如果Spark和Hive部署在不同集群，才需要配置连接Hive的参数，否则请忽略这些配置。
 
 |参数|数据类型|默认值|是否必须|说明|
 |:---|:---|:---|:---|:---|
@@ -91,7 +91,7 @@
 |`tags.separator`|string|`,`|是|分隔符。默认值为英文逗号（,）。|
 |`tags.header`|bool|`true`|是|文件是否有表头。|
 
-### HIVE源特有参数
+### Hive源特有参数
 
 |参数|数据类型|默认值|是否必须|说明|
 |:---|:---|:---|:---|:---|
@@ -107,6 +107,18 @@
 |`tags.password`|string|-|是|用户名对应密码。|
 |`tags.database`|string|-|是|Neo4j中保存源数据的数据库名。|
 |`tags.check_point_path`|string|`/tmp/test`|否|设置保存导入进度信息的目录，用于断点续传。如果未设置，表示不启用断点续传。|
+
+### MySQL源特有参数
+
+|参数|数据类型|默认值|是否必须|说明|
+|:---|:---|:---|:---|:---|
+|`tags.host`|string|-|是|MySQL服务器地址。|
+|`tags.port`|string|-|是|MySQL服务器端口。|
+|`tags.database`|string|-|是|数据库名称。|
+|`tags.table`|string|-|是|需要作为数据源的表名称。|
+|`tags.user`|string|-|是|拥有读取权限的MySQL用户名。|
+|`tags.password`|string|-|是|用户名对应密码。|
+|`tags.sentence`|string|-|是|查询数据源的语句。例如`"select teamid, name from basketball.team order by teamid;"`。|   
 
 ### Hbase源特有参数
 
@@ -138,7 +150,7 @@
 
 对于不同的数据源，边的配置也有所不同，有很多通用参数，也有部分特有参数，配置时需要配置通用参数和不同数据源的特有参数。
 
-边配置的不同数据源特有参数请参见上方点配置内的特有参数介绍。
+边配置的不同数据源特有参数请参见上方点配置内的特有参数介绍，注意区分tags和edges即可。
 
 ### 通用参数
 

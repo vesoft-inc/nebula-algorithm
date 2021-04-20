@@ -13,7 +13,7 @@
     - [导入 CSV 文件数据](use-exchange/ex-ug-import-from-csv.md)
     - [导入 JSON 文件数据](use-exchange/ex-ug-import-json.md)
     - 导入 HBase 数据[DOC_TO_DO]
-    - 导入 HIVE 数据[DOC_TO_DO]
+    - 导入 Hive 数据[DOC_TO_DO]
     - 导入 Kafka 数据[DOC_TO_DO]
     - 导入 MySQL 数据[DOC_TO_DO]
     - [导入 SST 文件](use-exchange/ex-ug-import-sst.md)

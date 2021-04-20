@@ -1,6 +1,6 @@
-# Import data from HIVE
+# Import data from Hive
 
-This article uses an example to show how to use Exchange to import data from HIVE into Nebula Graph.
+This article uses an example to show how to use Exchange to import data from Hive into Nebula Graph.
 
 ## Dataset
 
@@ -11,7 +11,7 @@ In this article, the [Social Network: MOOC User Action Dataset](https://snap.sta
 
 You can download the example dataset from the [nebula-web-docker](https://github.com/vesoft-inc/nebula-web-docker/tree/master/example/mooc-actions "Click to go to GitHub") repository.
 
-In this example, the dataset is stored in a database named `mooc` in HIVE, and the information of all vertices and edges is stored in the `users`, `courses`, and `actions` tables. Here are the structures of all the tables.
+In this example, the dataset is stored in a database named `mooc` in Hive, and the information of all vertices and edges is stored in the `users`, `courses`, and `actions` tables. Here are the structures of all the tables.
 
 ```sql
 scala> sql("describe mooc.users").show
@@ -45,7 +45,7 @@ scala> sql("describe mooc.actions").show
 +--------+---------+-------+
 ```
 
-> **NOTE**: `bigint` in HIVE equals to `int` in Nebula Graph.
+> **NOTE**: `bigint` in Hive equals to `int` in Nebula Graph.
 
 ## Environment
 
@@ -59,13 +59,13 @@ The practice is done in macOS. Here is the environment information:
 
 - Hadoop 2.9.2, deployed in the Pseudo-Distributed mode
 
-- HIVE 2.3.7, with MySQL 8.0.22
+- Hive 2.3.7, with MySQL 8.0.22
 
 - Nebula Graph v2-nightly, deployed with Docker Compose. For more information, see [Deploy Nebula Graph with Docker Compose](https://github.com/vesoft-inc/nebula-docker-compose "Click to go to GitHub").
 
 ## Prerequisites
 
-To import data from HIVE with Exchange v2.x, do a check of these:
+To import data from Hive with Exchange v2.x, do a check of these:
 
 - Exchange v2.x is compiled. For more information, see [Compile Exchange v2.x](../ex-ug-compile.md). Exchange 2.0.0 is used in this example.
 
@@ -114,9 +114,9 @@ Follow these steps to create a schema in Nebula Graph:
 
 For more information, see [Quick Start of Nebula Graph](../../2.quick-start/4.nebula-graph-crud.md).
 
-### Step 2. Verify the HIVE SQL statements
+### Step 2. Verify the Hive SQL statements
 
-When spark-shell starts, run these statements one by one to make sure that Spark can read data from HIVE.
+When spark-shell starts, run these statements one by one to make sure that Spark can read data from Hive.
 
 ```sql
 scala> sql("select userid from mooc.users").show
@@ -156,7 +156,7 @@ only showing top 20 rows
 
 ### Step 3. Edit configuration file
 
-After compiling of Exchange, copy the `target/classes/application.conf` file and edit the configuration for HIVE. In this example, a new configuration file is named `hive_ application.conf`. In this file, the vertex and edge related configuration is introduced as comments and all the items that are not used in this example are commented out. For more information about the Spark and Nebula related parameters, see [Spark related parameters](../parameter-reference/ex-ug-paras-spark.md) and [Nebula Graph related parameters](../parameter-reference/ex-ug-paras-nebulagraph.md).
+After compiling of Exchange, copy the `target/classes/application.conf` file and edit the configuration for Hive. In this example, a new configuration file is named `hive_ application.conf`. In this file, the vertex and edge related configuration is introduced as comments and all the items that are not used in this example are commented out. For more information about the Spark and Nebula related parameters, see [Spark related parameters](../parameter-reference/ex-ug-paras-spark.md) and [Nebula Graph related parameters](../parameter-reference/ex-ug-paras-nebulagraph.md).
 
 ```conf
 {
@@ -177,8 +177,8 @@ After compiling of Exchange, copy the `target/classes/application.conf` file and
     }
   }
 
-  # If Spark and HIVE are deployed in the different clusters, 
-  # configure these parameters for HIVE. Otherwise, ignore them. 
+  # If Spark and Hive are deployed in the different clusters, 
+  # configure these parameters for Hive. Otherwise, ignore them. 
   #hive: {
   #  waredir: "hdfs://NAMENODE_IP:9000/apps/svr/hive-xxx/warehouse/"
   #  connectionURL: "jdbc:mysql://your_ip:3306/hive_spark?characterEncoding=UTF-8"
@@ -240,7 +240,7 @@ After compiling of Exchange, copy the `target/classes/application.conf` file and
       # Specifies the column names from the users table to fields. 
       # Their values are used as the source of the userId (nebula.fields) property defined in Nebula Graph.
       # If more than one column name is specified, separate them with commas.
-      # fields for the HIVE and nebula.fields for Nebula Graph must have the one-to-one correspondence relationship.
+      # fields for the Hive and nebula.fields for Nebula Graph must have the one-to-one correspondence relationship.
       fields: [userid]
       nebula.fields: [userId]
 
@@ -310,7 +310,7 @@ After compiling of Exchange, copy the `target/classes/application.conf` file and
       # Their values are used as the source of the properties of 
       # the action edge type defined in Nebula Graph.
       # If more than one column name is specified, separate them with commas.
-      # fields for the HIVE and nebula.fields for Nebula Graph must 
+      # fields for the Hive and nebula.fields for Nebula Graph must 
       # have the one-to-one correspondence relationship.
       fields: [actionid, duration, feature0, feature1, feature2, feature3, label]
       nebula.fields: [actionId, duration, feature0, feature1, feature2, feature3, label]

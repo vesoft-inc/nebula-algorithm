@@ -48,7 +48,7 @@ You can use Exchange 2.0 to convert data of these sources into vertex and edge d
 
 - Apache HBase&trade;
 
-- Data warehouses: HIVE
+- Data warehouses: Hive
 
 - Graph databases: Neo4j 2.4.5-M1.
 

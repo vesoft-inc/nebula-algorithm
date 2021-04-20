@@ -4,12 +4,12 @@
 
 ## Nebula Graph版本
 
-Exchange client版本（即jar包版本）和Nebula Graph的版本对应关系如下。
+Exchange client版本（即JAR包版本）和Nebula Graph的版本对应关系如下。
 |Exchange client版本|Nebula Graph版本|
 |:---|:---|
 |2.0.0|2.0.0|
 
-jar包有两种获取方式：[自行编译](../ex-ug-compile.md)或者从maven仓库下载。
+JAR包有两种获取方式：[自行编译](../ex-ug-compile.md)或者从maven仓库下载。
 
 如果您正在使用Nebula Graph 1.x，请使用[Nebula Exchange 1.x](https://github.com/vesoft-inc/nebula-java/tree/v1.0/tools "Click to go to GitHub")。
 
