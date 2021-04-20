@@ -43,19 +43,19 @@ Exchange具有以下优点：
 Exchange 2.0支持将以下格式或来源的数据转换为Nebula Graph能识别的点和边数据：
 
 - 存储在HDFS的数据，包括：
-  - Apache Parquet
-  - Apache ORC
-  - JSON
-  - CSV
+  - [Apache Parquet](../use-exchange/ex-ug-import-from-parquet.md)
+  - [Apache ORC](../use-exchange/ex-ug-import-from-orc.md)
+  - [JSON](../use-exchange/ex-ug-import-from-json.md)
+  - [CSV](../use-exchange/ex-ug-import-from-csv.md)
 
-- Apache HBase&trade;
+- [Apache HBase&trade;](../use-exchange/ex-ug-import-from-hbase.md)
 
-- 数据仓库：HIVE
+- 数据仓库：[Hive](../use-exchange/ex-ug-import-from-hive.md)
 
-- 图数据库：Neo4j 2.4.5-M1
+- 图数据库：[Neo4j](../use-exchange/ex-ug-import-from-neo4j.md)（Client版本2.4.5-M1）
 
-- 关系型数据库：MySQL
+- 关系型数据库：[MySQL](../use-exchange/ex-ug-import-from-mysql.md)
 
-- 流处理软件平台：Apache Kafka&reg;
+- 流处理软件平台：[Apache Kafka&reg;](../use-exchange/ex-ug-import-from-kafka.md)
 
-- 发布/订阅消息平台：Apache Pulsar 2.4.5
+- 发布/订阅消息平台：[Apache Pulsar 2.4.5](../use-exchange/ex-ug-import-from-pulsar.md)

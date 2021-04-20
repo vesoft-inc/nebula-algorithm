@@ -74,8 +74,6 @@
 
 ## 操作步骤
 
-### 步骤 1：在 Nebula Graph 中创建 Schema
-
 ### 步骤 1：在Nebula Graph中创建Schema
 
 分析文件中的数据，按以下步骤在Nebula Graph中创建Schema：
@@ -197,7 +195,7 @@
 
       # 指定JSON文件的HDFS路径。
       # 用双引号括起路径，以hdfs://开头。
-      path: "hdfs://192.168.153.10:9000/data/vertex_player.json"
+      path: "hdfs://192.168.*.*:9000/data/vertex_player.json"
 
       # 在fields里指定JSON文件中key名称，其对应的value会作为Nebula Graph中指定属性的数据源。
       # 如果需要指定多个值，用英文逗号（,）隔开。
@@ -213,7 +211,6 @@
       # 不要使用vertex.policy映射。
       vertex: {
         field:id
-        # policy:hash
       }
 
       # 指定单批次写入Nebula Graph的最大点数量。
@@ -237,7 +234,7 @@
 
       # 指定JSON文件的HDFS路径。
       # 用双引号括起路径，以hdfs://开头。
-      path: "hdfs://192.168.153.10:9000/data/vertex_team.json"
+      path: "hdfs://192.168.*.*:9000/data/vertex_team.json"
 
       # 在fields里指定JSON文件中key名称，其对应的value会作为Nebula Graph中指定属性的数据源。
       # 如果需要指定多个值，用英文逗号（,）隔开。
@@ -253,7 +250,6 @@
       # 不要使用vertex.policy映射。
       vertex: {
         field:id
-        # policy:hash
       }
 
 
@@ -283,7 +279,7 @@
 
       # 指定JSON文件的HDFS路径。
       # 用双引号括起路径，以hdfs://开头。
-      path: "hdfs://192.168.153.10:9000/data/edge_follow.json"
+      path: "hdfs://192.168.*.*:9000/data/edge_follow.json"
 
       # 在fields里指定JSON文件中key名称，其对应的value会作为Nebula Graph中指定属性的数据源。
       # 如果需要指定多个值，用英文逗号（,）隔开。
@@ -329,7 +325,7 @@
 
       # 指定JSON文件的HDFS路径。
       # 用双引号括起路径，以hdfs://开头。
-      path: "hdfs://192.168.153.10:9000/data/edge_serve.json"
+      path: "hdfs://192.168.*.*:9000/data/edge_serve.json"
 
       # 在fields里指定JSON文件中key名称，其对应的value会作为Nebula Graph中指定属性的数据源。
       # 如果需要指定多个值，用英文逗号（,）隔开。
@@ -372,10 +368,10 @@
 运行如下命令将JSON文件数据导入到Nebula Graph中。关于参数的说明，请参见[导入命令参数](../parameter-reference/ex-ug-para-import-command.md)。
 
 ```bash
-<spark_install_path>/bin/spark-submit --master "local" --class com.vesoft.nebula.tools.importer.Exchange <nebula-exchange-2.0.0.jar_path> -c <json_application.conf_path> 
+<spark_install_path>/bin/spark-submit --master "local" --class com.vesoft.nebula.exchange.Exchange <nebula-exchange-2.0.0.jar_path> -c <json_application.conf_path> 
 ```
 
->**说明**：jar包有两种获取方式：[自行编译](../ex-ug-compile.md)或者从maven仓库下载。
+>**说明**：JAR包有两种获取方式：[自行编译](../ex-ug-compile.md)或者从maven仓库下载。
 
 示例：
 
@@ -395,6 +391,6 @@ GO FROM "player100" OVER follow;
 
 您也可以使用命令[`SHOW STATS`](https://docs.nebula-graph.com.cn/2.0/3.ngql-guide/7.general-query-statements/6.show/14.show-stats/)查看统计数据。
 
-### 步骤 6：（可选）在Nebula Graph中重建索引
+### 步骤 6：（如有）在Nebula Graph中重建索引
 
 导入数据后，您可以在Nebula Graph中重新创建并重建索引。详情请参见[索引介绍](https://docs.nebula-graph.com.cn/2.0/3.ngql-guide/14.native-index-statements/)。

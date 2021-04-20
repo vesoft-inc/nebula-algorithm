@@ -10,7 +10,7 @@
   - [Use Exchange](use-exchange/ex-ug-import-steps.md)
   - [Import data from CSV files](use-exchange/ex-ug-import-from-csv.md)
   - [Import data from JSON files](use-exchange/ex-ug-import-json.md)
-  - [Import data from HIVE](use-exchange/ex-ug-import-hive.md)
+  - [Import data from Hive](use-exchange/ex-ug-import-hive.md)
   - [Import data from Apache Parquet][DOC_TODO]
   - [Import data from Apache ORC][DOC_TODO]
   - [Import data from Neo4j][DOC_TODO]

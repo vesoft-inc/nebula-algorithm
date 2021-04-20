@@ -111,7 +111,7 @@ Exchange读取Neo4j数据时需要完成以下工作：
 
 ```conf
 {
-  # Spark relation config
+  # Spark相关配置
   spark: {
     app: {
       name: Nebula Exchange 2.0
@@ -132,7 +132,7 @@ Exchange读取Neo4j数据时需要完成以下工作：
   }
 
 
-  # Nebula Graph relation config
+  # Nebula Graph相关配置
   nebula: {
     address:{
       graph:["127.0.0.1:9669"]
@@ -141,13 +141,6 @@ Exchange读取Neo4j数据时需要完成以下工作：
     user: root
     pswd: nebula
     space: basketballplayer
-
-    # parameters for SST import, not required
-    path:{
-        local:"/tmp"
-        remote:"/sst"
-        hdfs.namenode: "hdfs://name_node:9000"
-    }
 
     connection {
       timeout: 3000
@@ -160,7 +153,6 @@ Exchange读取Neo4j数据时需要完成以下工作：
 
     error: {
       max: 32
-      # failed import job will be recorded in output path
       output: /tmp/errors
     }
 
@@ -170,19 +162,18 @@ Exchange读取Neo4j数据时需要完成以下工作：
     }
   }
 
-  # Processing tags
-  # There are tag config examples for different dataSources.
+  # 处理点
   tags: [
 
 
-    # neo4j
+    # 设置标签player相关信息。
     {
       name: player
       type: {
         source: neo4j
         sink: client
       }
-      server: "bolt://192.168.8.156:7687"
+      server: "bolt://192.168.*.*:7687"
       user: neo4j
       password:neo4j
       database:neo4j
@@ -191,20 +182,19 @@ Exchange读取Neo4j数据时需要完成以下工作：
       nebula.fields: [age,name]
       vertex: {
         field:id
-        # policy:hash
       }
       partition: 10
       batch: 1000
       check_point_path: /tmp/test
    }
-
+  # 设置标签team相关信息。
   {
       name: team
       type: {
         source: neo4j
         sink: client
       }
-      server: "bolt://192.168.8.156:7687"
+      server: "bolt://192.168.*.*:7687"
       user: neo4j
       password:neo4j
       database:neo4j
@@ -213,7 +203,6 @@ Exchange读取Neo4j数据时需要完成以下工作：
       nebula.fields: [name]
       vertex: {
         field:id
-        # policy:hash
       }
       partition: 10
       batch: 1000
@@ -221,16 +210,16 @@ Exchange读取Neo4j数据时需要完成以下工作：
    }
   ]
 
-  # Processing edges
-  # There are edge config examples for different dataSources.
+  # 处理边数据
   edges: [
+    # 设置边类型follow相关信息
     {
       name: follow
       type: {
         source: neo4j
         sink: client
       }
-      server: "bolt://192.168.8.156:7687"
+      server: "bolt://192.168.*.*:7687"
       user: neo4j
       password:neo4j
       database:neo4j
@@ -247,14 +236,14 @@ Exchange读取Neo4j数据时需要完成以下工作：
       batch: 1000
       check_point_path: /tmp/test
     }
-
+   # 设置边类型serve相关信息
    {
       name: serve
       type: {
         source: neo4j
         sink: client
       }
-      server: "bolt://192.168.8.156:7687"
+      server: "bolt://192.168.*.*:7687"
       user: neo4j
       password:neo4j
       database:neo4j
@@ -296,10 +285,10 @@ Nebula Graph在创建点和边时会将ID作为唯一主键，如果主键已存
 运行如下命令将文件数据导入到Nebula Graph中。关于参数的说明，请参见[导入命令参数](../parameter-reference/ex-ug-para-import-command.md)。
 
 ```bash
-<spark_install_path>/bin/spark-submit --master "local" --class com.vesoft.nebula.tools.importer.Exchange <nebula-exchange-2.0.0.jar_path> -c <neo4j_application.conf_path> 
+<spark_install_path>/bin/spark-submit --master "local" --class com.vesoft.nebula.exchange.Exchange <nebula-exchange-2.0.0.jar_path> -c <neo4j_application.conf_path> 
 ```
 
->**说明**：jar包有两种获取方式：[自行编译](../ex-ug-compile.md)或者从maven仓库下载。
+>**说明**：JAR包有两种获取方式：[自行编译](../ex-ug-compile.md)或者从maven仓库下载。
 
 示例：
 
@@ -319,6 +308,6 @@ GO FROM "player100" OVER follow;
 
 您也可以使用命令[`SHOW STATS`](https://docs.nebula-graph.com.cn/2.0/3.ngql-guide/7.general-query-statements/6.show/14.show-stats/)查看统计数据。
 
-### 步骤 6：（可选）在Nebula Graph中重建索引
+### 步骤 6：（如有）在Nebula Graph中重建索引
 
 导入数据后，您可以在Nebula Graph中重新创建并重建索引。详情请参见[索引介绍](https://docs.nebula-graph.com.cn/2.0/3.ngql-guide/14.native-index-statements/)。
