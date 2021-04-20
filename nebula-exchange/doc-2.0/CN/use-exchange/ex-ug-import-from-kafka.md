@@ -260,7 +260,7 @@
 }
 ```
 
-### 步骤 4：向Nebula Graph导入数据
+### 步骤 3：向Nebula Graph导入数据
 
 运行如下命令将Kafka数据导入到Nebula Graph中。关于参数的说明，请参见[导入命令参数](../parameter-reference/ex-ug-para-import-command.md)。
 
@@ -278,7 +278,7 @@
 
 您可以在返回信息中搜索`batchSuccess.<tag_name/edge_name>`，确认成功的数量。例如例如`batchSuccess.follow: 300`。
 
-### 步骤 5：（可选）验证数据
+### 步骤 4：（可选）验证数据
 
 您可以在Nebula Graph客户端（例如Nebula Graph Studio）中执行查询语句，确认数据是否已导入。例如：
 
@@ -288,6 +288,6 @@ GO FROM "player100" OVER follow;
 
 您也可以使用命令[`SHOW STATS`](https://docs.nebula-graph.com.cn/2.0/3.ngql-guide/7.general-query-statements/6.show/14.show-stats/)查看统计数据。
 
-### 步骤 6：（可选）在Nebula Graph中重建索引
+### 步骤 5：（可选）在Nebula Graph中重建索引
 
 导入数据后，您可以在Nebula Graph中重新创建并重建索引。详情请参见[索引介绍](https://docs.nebula-graph.com.cn/2.0/3.ngql-guide/14.native-index-statements/)。
