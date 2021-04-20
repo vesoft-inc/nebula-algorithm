@@ -183,7 +183,7 @@ ROW                                COLUMN+CELL
         # 指定如何将点数据导入Nebula Graph：Client或SST。
         sink: client
       }
-      host:192.168.153.10
+      host:192.168.*.*
       port:2181
       table:"player"
       columnFamily:"cf"
@@ -214,7 +214,7 @@ ROW                                COLUMN+CELL
         source: hbase
         sink: client
       }
-      host:192.168.153.10
+      host:192.168.*.*
       port:2181
       table:"team"
       columnFamily:"cf"
@@ -245,7 +245,7 @@ ROW                                COLUMN+CELL
         sink: client
       }
 
-      host:192.168.153.10
+      host:192.168.*.*
       port:2181
       table:"follow"
       columnFamily:"cf"
@@ -282,7 +282,7 @@ ROW                                COLUMN+CELL
         source: hbase
         sink: client
       }
-      host:192.168.153.10
+      host:192.168.*.*
       port:2181
       table:"serve"
       columnFamily:"cf"

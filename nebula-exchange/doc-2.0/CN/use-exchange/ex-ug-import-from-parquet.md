@@ -163,7 +163,7 @@
 
       # 指定Parquet文件的HDFS路径。
       # 用双引号括起路径，以hdfs://开头。
-      path: "hdfs://192.168.153.10:9000/data/vertex_player.parquet"
+      path: "hdfs://192.168.*.*9000/data/vertex_player.parquet"
 
       # 在fields里指定Parquet文件中key名称，其对应的value会作为Nebula Graph中指定属性的数据源。
       # 如果需要指定多个值，用英文逗号（,）隔开。
@@ -202,7 +202,7 @@
 
       # 指定Parquet文件的HDFS路径。
       # 用双引号括起路径，以hdfs://开头。
-      path: "hdfs://192.168.153.10:9000/data/vertex_team.parquet"
+      path: "hdfs://192.168.*.*:9000/data/vertex_team.parquet"
 
       # 在fields里指定Parquet文件中key名称，其对应的value会作为Nebula Graph中指定属性的数据源。
       # 如果需要指定多个值，用英文逗号（,）隔开。
@@ -247,7 +247,7 @@
 
       # 指定Parquet文件的HDFS路径。
       # 用双引号括起路径，以hdfs://开头。
-      path: "hdfs://192.168.153.10:9000/data/edge_follow.parquet"
+      path: "hdfs://192.168.*.*:9000/data/edge_follow.parquet"
 
       # 在fields里指定Parquet文件中key名称，其对应的value会作为Nebula Graph中指定属性的数据源。
       # 如果需要指定多个值，用英文逗号（,）隔开。
@@ -293,7 +293,7 @@
 
       # 指定Parquet文件的HDFS路径。
       # 用双引号括起路径，以hdfs://开头。
-      path: "hdfs://192.168.153.10:9000/data/edge_serve.parquet"
+      path: "hdfs://192.168.*.*:9000/data/edge_serve.parquet"
 
       # 在fields里指定Parquet文件中key名称，其对应的value会作为Nebula Graph中指定属性的数据源。
       # 如果需要指定多个值，用英文逗号（,）隔开。

@@ -56,6 +56,6 @@ Exchange 2.0支持将以下格式或来源的数据转换为Nebula Graph能识�
 
 - 关系型数据库：[MySQL](../use-exchange/ex-ug-import-from-mysql.md)
 
-- 流处理软件平台：Apache Kafka&reg;
+- 流处理软件平台：[Apache Kafka&reg;](../use-exchange/ex-ug-import-from-kafka.md)
 
-- 发布/订阅消息平台：Apache Pulsar 2.4.5
+- 发布/订阅消息平台：[Apache Pulsar 2.4.5](../use-exchange/ex-ug-import-from-pulsar.md)

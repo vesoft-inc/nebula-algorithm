@@ -173,7 +173,7 @@ Exchange读取Neo4j数据时需要完成以下工作：
         source: neo4j
         sink: client
       }
-      server: "bolt://192.168.8.156:7687"
+      server: "bolt://192.168.*.*:7687"
       user: neo4j
       password:neo4j
       database:neo4j
@@ -194,7 +194,7 @@ Exchange读取Neo4j数据时需要完成以下工作：
         source: neo4j
         sink: client
       }
-      server: "bolt://192.168.8.156:7687"
+      server: "bolt://192.168.*.*:7687"
       user: neo4j
       password:neo4j
       database:neo4j
@@ -219,7 +219,7 @@ Exchange读取Neo4j数据时需要完成以下工作：
         source: neo4j
         sink: client
       }
-      server: "bolt://192.168.8.156:7687"
+      server: "bolt://192.168.*.*:7687"
       user: neo4j
       password:neo4j
       database:neo4j
@@ -243,7 +243,7 @@ Exchange读取Neo4j数据时需要完成以下工作：
         source: neo4j
         sink: client
       }
-      server: "bolt://192.168.8.156:7687"
+      server: "bolt://192.168.*.*:7687"
       user: neo4j
       password:neo4j
       database:neo4j

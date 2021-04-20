@@ -195,7 +195,7 @@
 
       # 指定JSON文件的HDFS路径。
       # 用双引号括起路径，以hdfs://开头。
-      path: "hdfs://192.168.153.10:9000/data/vertex_player.json"
+      path: "hdfs://192.168.*.*:9000/data/vertex_player.json"
 
       # 在fields里指定JSON文件中key名称，其对应的value会作为Nebula Graph中指定属性的数据源。
       # 如果需要指定多个值，用英文逗号（,）隔开。
@@ -234,7 +234,7 @@
 
       # 指定JSON文件的HDFS路径。
       # 用双引号括起路径，以hdfs://开头。
-      path: "hdfs://192.168.153.10:9000/data/vertex_team.json"
+      path: "hdfs://192.168.*.*:9000/data/vertex_team.json"
 
       # 在fields里指定JSON文件中key名称，其对应的value会作为Nebula Graph中指定属性的数据源。
       # 如果需要指定多个值，用英文逗号（,）隔开。
@@ -279,7 +279,7 @@
 
       # 指定JSON文件的HDFS路径。
       # 用双引号括起路径，以hdfs://开头。
-      path: "hdfs://192.168.153.10:9000/data/edge_follow.json"
+      path: "hdfs://192.168.*.*:9000/data/edge_follow.json"
 
       # 在fields里指定JSON文件中key名称，其对应的value会作为Nebula Graph中指定属性的数据源。
       # 如果需要指定多个值，用英文逗号（,）隔开。
@@ -325,7 +325,7 @@
 
       # 指定JSON文件的HDFS路径。
       # 用双引号括起路径，以hdfs://开头。
-      path: "hdfs://192.168.153.10:9000/data/edge_serve.json"
+      path: "hdfs://192.168.*.*:9000/data/edge_serve.json"
 
       # 在fields里指定JSON文件中key名称，其对应的value会作为Nebula Graph中指定属性的数据源。
       # 如果需要指定多个值，用英文逗号（,）隔开。

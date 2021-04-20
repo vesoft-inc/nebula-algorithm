@@ -185,7 +185,7 @@ mysql> desc serve;
         sink: client
       }
 
-      host:192.168.8.156
+      host:192.168.*.*
       port:3306
       database:"basketball"
       table:"player"
@@ -219,7 +219,7 @@ mysql> desc serve;
         sink: client
       }
 
-      host:192.168.8.156
+      host:192.168.*.*
       port:3306
       database:"basketball"
       table:"team"
@@ -254,7 +254,7 @@ mysql> desc serve;
         sink: client
       }
 
-      host:192.168.8.156
+      host:192.168.*.*
       port:3306
       database:"basketball"
       table:"follow"
@@ -293,7 +293,7 @@ mysql> desc serve;
         sink: client
       }
 
-      host:192.168.8.156
+      host:192.168.*.*
       port:3306
       database:"basketball"
       table:"serve"

@@ -163,7 +163,7 @@
 
       # 指定ORC文件的HDFS路径。
       # 用双引号括起路径，以hdfs://开头。
-      path: "hdfs://192.168.153.10:9000/data/vertex_player.orc"
+      path: "hdfs://192.168.*.*:9000/data/vertex_player.orc"
 
       # 在fields里指定ORC文件中key名称，其对应的value会作为Nebula Graph中指定属性的数据源。
       # 如果需要指定多个值，用英文逗号（,）隔开。
@@ -202,7 +202,7 @@
 
       # 指定ORC文件的HDFS路径。
       # 用双引号括起路径，以hdfs://开头。
-      path: "hdfs://192.168.153.10:9000/data/vertex_team.orc"
+      path: "hdfs://192.168.*.*:9000/data/vertex_team.orc"
 
       # 在fields里指定ORC文件中key名称，其对应的value会作为Nebula Graph中指定属性的数据源。
       # 如果需要指定多个值，用英文逗号（,）隔开。
@@ -247,7 +247,7 @@
 
       # 指定ORC文件的HDFS路径。
       # 用双引号括起路径，以hdfs://开头。
-      path: "hdfs://192.168.153.10:9000/data/edge_follow.orc"
+      path: "hdfs://192.168.*.*:9000/data/edge_follow.orc"
 
       # 在fields里指定ORC文件中key名称，其对应的value会作为Nebula Graph中指定属性的数据源。
       # 如果需要指定多个值，用英文逗号（,）隔开。
@@ -293,7 +293,7 @@
 
       # 指定ORC文件的HDFS路径。
       # 用双引号括起路径，以hdfs://开头。
-      path: "hdfs://192.168.153.10:9000/data/edge_serve.orc"
+      path: "hdfs://192.168.*.*:9000/data/edge_serve.orc"
 
       # 在fields里指定ORC文件中key名称，其对应的value会作为Nebula Graph中指定属性的数据源。
       # 如果需要指定多个值，用英文逗号（,）隔开。
