@@ -593,8 +593,8 @@ object Configs {
         val fields: ListBuffer[String] = new ListBuffer[String]
         fields.append(config.getStringList("fields").asScala: _*)
 
-        if (config.hasPath("vertex")) {
-          fields.append(config.getString("vertex"))
+        if (config.hasPath("vertex.field")) {
+          fields.append(config.getString("vertex.field"))
         }
         if (config.hasPath("source.field")) {
           fields.append(config.getString("source.field"))
