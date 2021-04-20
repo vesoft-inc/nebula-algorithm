@@ -105,16 +105,4 @@ object NebulaUtils {
     }
     propNames.toList
   }
-
-  def escapePropName(nebulaFields: List[String]): List[String] = {
-    val propNames: ListBuffer[String] = new ListBuffer[String]
-    for (key <- nebulaFields) {
-      val sb = new StringBuilder()
-      sb.append("`")
-      sb.append(key)
-      sb.append("`")
-      propNames.append(sb.toString())
-    }
-    propNames.toList
-  }
 }
