@@ -270,7 +270,7 @@
 
 
       # 指定一个列作为rank的源(可选)。
-      #ranking: _c4
+      #ranking: rank
 
       # 指定单批次写入Nebula Graph的最大边数量。
       batch: 256
@@ -336,7 +336,7 @@
 运行如下命令将ORC文件数据导入到Nebula Graph中。关于参数的说明，请参见[导入命令参数](../parameter-reference/ex-ug-para-import-command.md)。
 
 ```bash
-<spark_install_path>/bin/spark-submit --master "local" --class com.vesoft.nebula.exchange.Exchange <nebula-exchange-2.0.0.jar_path> -c <orc_application.conf_path> 
+${SPARK_HOME}/bin/spark-submit --master "local" --class com.vesoft.nebula.exchange.Exchange <nebula-exchange-2.0.0.jar_path> -c <orc_application.conf_path> 
 ```
 
 >**说明**：JAR包有两种获取方式：[自行编译](../ex-ug-compile.md)或者从maven仓库下载。
@@ -344,7 +344,7 @@
 示例：
 
 ```bash
-/usr/local/spark-2.4.7-bin-hadoop2.7/bin/spark-submit  --master "local" --class com.vesoft.nebula.exchange.Exchange  /root/nebula-spark-utils/nebula-exchange/target/nebula-exchange-2.0.0.jar  -c /root/nebula-spark-utils/nebula-exchange/target/classes/orc_application.conf
+${SPARK_HOME}/bin/spark-submit  --master "local" --class com.vesoft.nebula.exchange.Exchange  /root/nebula-spark-utils/nebula-exchange/target/nebula-exchange-2.0.0.jar  -c /root/nebula-spark-utils/nebula-exchange/target/classes/orc_application.conf
 ```
 
 您可以在返回信息中搜索`batchSuccess.<tag_name/edge_name>`，确认成功的数量。例如例如`batchSuccess.follow: 300`。
