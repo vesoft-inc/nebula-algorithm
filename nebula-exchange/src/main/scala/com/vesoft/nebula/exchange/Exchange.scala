@@ -87,7 +87,7 @@ object Exchange {
         LOG.info("you don't config hive source, so using hive tied with spark.")
       } else {
         val hiveConfig = configs.hiveConfigEntry.get
-        sparkConf.set("spark.sql.warehouse.dir", hiveConfig.waredir)
+        sparkConf.set("spark.sql.warehouse.dir", hiveConfig.warehouse)
         sparkConf
           .set("javax.jdo.option.ConnectionURL", hiveConfig.connectionURL)
           .set("javax.jdo.option.ConnectionDriverName", hiveConfig.connectionDriverName)
@@ -198,6 +198,7 @@ object Exchange {
       LOG.info(s"batchFailure.reimport: ${batchFailure.value}")
     }
     spark.close()
+    sys.exit(0)
   }
 
   /**

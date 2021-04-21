@@ -10,8 +10,7 @@ import java.nio.file.{Files, Paths}
 import java.nio.{ByteBuffer, ByteOrder}
 
 import com.vesoft.nebula.client.graph.data.HostAddress
-import com.vesoft.nebula.client.meta.{MetaCache, MetaManager}
-import com.vesoft.nebula.encoder.{NebulaCodec, NebulaCodecImpl}
+import com.vesoft.nebula.encoder.{NebulaCodecImpl}
 import com.vesoft.nebula.exchange.{
   ErrorHandler,
   GraphProvider,
@@ -114,8 +113,8 @@ class VerticesProcessor(data: DataFrame,
     if (tagConfig.dataSinkConfigEntry.category == SinkCategory.SST) {
       val fileBaseConfig = tagConfig.dataSinkConfigEntry.asInstanceOf[FileBaseSinkConfigEntry]
       val namenode       = fileBaseConfig.fsName.orNull
-      val spaceName      = config.databaseConfig.space
       val tagName        = tagConfig.name
+      val vidType        = metaProvider.getVidType(space)
 
       val spaceVidLen = metaProvider.getSpaceVidLen(space)
       val tagItem     = metaProvider.getTagItem(space, tagName)
@@ -125,7 +124,6 @@ class VerticesProcessor(data: DataFrame,
           iter.map { row =>
             val index: Int       = row.schema.fieldIndex(tagConfig.vertexField)
             var vertexId: String = row.get(index).toString
-
             if (tagConfig.vertexPolicy.isDefined) {
               tagConfig.vertexPolicy.get match {
                 case KeyPolicy.HASH =>
@@ -145,11 +143,22 @@ class VerticesProcessor(data: DataFrame,
               hostAddrs.append(new HostAddress(addr.getHostText, addr.getPort))
             }
 
-            val partitionId = NebulaUtils.getPartitionId(spaceName, vertexId, partitionNum)
+            val partitionId = NebulaUtils.getPartitionId(vertexId, partitionNum, vidType)
 
             val codec = new NebulaCodecImpl()
-            val vertexKey =
-              codec.vertexKey(spaceVidLen, partitionId, vertexId.getBytes, tagItem.getTag_id)
+
+            import java.nio.ByteBuffer
+            val vidBytes = if (vidType == VidType.INT) {
+              ByteBuffer
+                .allocate(8)
+                .order(ByteOrder.nativeOrder)
+                .putLong(vertexId.toLong)
+                .array
+            } else {
+              vertexId.getBytes()
+            }
+
+            val vertexKey = codec.vertexKey(spaceVidLen, partitionId, vidBytes, tagItem.getTag_id)
             val values = for {
               property <- fieldKeys if property.trim.length != 0
             } yield
@@ -173,7 +182,7 @@ class VerticesProcessor(data: DataFrame,
               val value = vertex.getAs[Array[Byte]](1)
               var part = ByteBuffer
                 .wrap(key, 0, 4)
-                .order(ByteOrder.LITTLE_ENDIAN)
+                .order(ByteOrder.nativeOrder)
                 .getInt >> 8
               if (part <= 0) {
                 part = part + partitionNum
@@ -211,6 +220,8 @@ class VerticesProcessor(data: DataFrame,
         .map { row =>
           val vertexID = {
             val index = row.schema.fieldIndex(tagConfig.vertexField)
+            assert(index >= 0 && row.get(index) != null,
+                   s"vertexId must exist and cannot be null, your row data is $row")
             val value = row.get(index).toString
             if (tagConfig.vertexPolicy.isEmpty) {
               // process string type vid

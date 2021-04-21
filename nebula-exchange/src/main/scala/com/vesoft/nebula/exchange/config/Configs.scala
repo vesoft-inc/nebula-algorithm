@@ -13,6 +13,7 @@ import com.google.common.net.HostAndPort
 import com.vesoft.nebula.exchange.KeyPolicy
 import com.typesafe.config.{Config, ConfigFactory}
 import com.vesoft.nebula.exchange.Argument
+import com.vesoft.nebula.exchange.utils.NebulaUtils
 import org.apache.log4j.Logger
 
 import scala.collection.JavaConverters._
@@ -154,14 +155,14 @@ case class SparkConfigEntry(map: Map[String, String]) {
   }
 }
 
-case class HiveConfigEntry(waredir: String,
+case class HiveConfigEntry(warehouse: String,
                            connectionURL: String,
                            connectionDriverName: String,
                            connectionUserName: String,
                            connectionPassWord: String) {
   override def toString: String =
     s"HiveConfigEntry:{" +
-      s"waredir=$waredir, " +
+      s"warehouse=$warehouse, " +
       s"connectionURL=$connectionURL, " +
       s"connectionDriverName=$connectionDriverName, " +
       s"connectionUserName=$connectionUserName, " +
@@ -254,12 +255,12 @@ object Configs {
 
     var hiveEntryOpt: Option[HiveConfigEntry] = None
     if (config.hasPath("hive")) {
-      val waredir              = config.getString("hive.waredir")
+      val warehouse            = config.getString("hive.warehouse")
       val connectionURL        = config.getString("hive.connectionURL")
       val connectionDriverName = config.getString("hive.connectionDriverName")
       val connectionUserName   = config.getString("hive.connectionUserName")
       val connectionPassword   = config.getString("hive.connectionPassword")
-      val hiveEntry = HiveConfigEntry(waredir,
+      val hiveEntry = HiveConfigEntry(warehouse,
                                       connectionURL,
                                       connectionDriverName,
                                       connectionUserName,
@@ -353,6 +354,7 @@ object Configs {
         } else {
           fields
         }
+
         val isGeo = !edgeConfig.hasPath("source") &&
           edgeConfig.hasPath("latitude") &&
           edgeConfig.hasPath("longitude")
