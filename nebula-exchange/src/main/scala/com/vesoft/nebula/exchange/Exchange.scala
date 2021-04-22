@@ -144,8 +144,10 @@ object Exchange {
             batchFailure)
           processor.process()
           if (tagConfig.dataSinkConfigEntry.category == SinkCategory.CLIENT) {
-            LOG.info(s"batchSuccess.${tagConfig.name}: ${batchSuccess.value}")
-            LOG.info(s"batchFailure.${tagConfig.name}: ${batchFailure.value}")
+            LOG.info(s"Client-Import: batchSuccess.${tagConfig.name}: ${batchSuccess.value}")
+            LOG.info(s"Client-Import: batchFailure.${tagConfig.name}: ${batchFailure.value}")
+          } else {
+            LOG.info(s"SST-Import: failure.${tagConfig.name}: ${batchFailure.value}")
           }
         }
       }
@@ -178,8 +180,10 @@ object Exchange {
           )
           processor.process()
           if (edgeConfig.dataSinkConfigEntry.category == SinkCategory.CLIENT) {
-            LOG.info(s"batchSuccess.${edgeConfig.name}: ${batchSuccess.value}")
-            LOG.info(s"batchFailure.${edgeConfig.name}: ${batchFailure.value}")
+            LOG.info(s"Client-Import: batchSuccess.${edgeConfig.name}: ${batchSuccess.value}")
+            LOG.info(s"Client-Import: batchFailure.${edgeConfig.name}: ${batchFailure.value}")
+          } else {
+            LOG.info(s"SST-Import: failure.${edgeConfig.name}: ${batchFailure.value}")
           }
         }
       }
