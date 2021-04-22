@@ -288,6 +288,7 @@
       separator: ","
 
       # 指定一个列作为rank的源(可选)。
+
       #ranking: rank
 
       # 如果CSV文件有表头，请将header设置为true。
