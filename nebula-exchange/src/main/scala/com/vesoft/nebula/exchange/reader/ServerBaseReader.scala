@@ -15,7 +15,7 @@ import com.vesoft.nebula.exchange.config.{
   Neo4JSourceConfigEntry,
   ServerDataSourceConfigEntry
 }
-import com.vesoft.nebula.exchange.utils.HDFSUtils
+import com.vesoft.nebula.exchange.utils.{HDFSUtils, Neo4jUtils}
 import org.apache.hadoop.hbase.HBaseConfiguration
 import org.apache.hadoop.hbase.client.Result
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable
@@ -155,7 +155,7 @@ class Neo4JReader(override val session: SparkSession, neo4jConfig: Neo4JSourceCo
         result.map(record => {
           val row = new Array[Any](record.keys().size())
           for (i <- row.indices)
-            row.update(i, Executor.convert(record.get(i).toString))
+            row.update(i, Executor.convert(Neo4jUtils.convertNeo4jData(record.get(i))))
           new GenericRowWithSchema(values = row, schema).asInstanceOf[Row]
         })
       })
