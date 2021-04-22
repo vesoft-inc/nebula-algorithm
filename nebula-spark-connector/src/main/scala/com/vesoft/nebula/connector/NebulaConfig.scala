@@ -88,9 +88,12 @@ object NebulaConnectionConfig {
 /**
   * Base config needed when write dataframe into nebula graph
   */
-private[connector] class WriteNebulaConfig(space: String, batch: Int) extends Serializable {
-  def getSpace = space
-  def getBatch = batch
+private[connector] class WriteNebulaConfig(space: String, user: String, passwd: String, batch: Int)
+    extends Serializable {
+  def getSpace  = space
+  def getBatch  = batch
+  def getUser   = user
+  def getPasswd = passwd
 }
 
 /**
@@ -107,8 +110,10 @@ class WriteNebulaVertexConfig(space: String,
                               vidField: String,
                               vidPolicy: String,
                               batch: Int,
-                              vidAsProp: Boolean)
-    extends WriteNebulaConfig(space, batch) {
+                              vidAsProp: Boolean,
+                              user: String,
+                              passwd: String)
+    extends WriteNebulaConfig(space, user, passwd, batch) {
   def getTagName   = tagName
   def getVidField  = vidField
   def getVidPolicy = if (vidPolicy == null) "" else vidPolicy
@@ -129,6 +134,8 @@ object WriteNebulaVertexConfig {
     var vidPolicy: String = _
     var vidField: String  = _
     var batch: Int        = 1000
+    var user: String      = "root"
+    var passwd: String    = "nebula"
 
     /** whether set vid as property */
     var vidAsProp: Boolean = false
@@ -173,9 +180,26 @@ object WriteNebulaVertexConfig {
       this
     }
 
+    def withUser(user: String): WriteVertexConfigBuilder = {
+      this.user = user
+      this
+    }
+
+    def withPasswd(passwd: String): WriteVertexConfigBuilder = {
+      this.passwd = passwd
+      this
+    }
+
     def build(): WriteNebulaVertexConfig = {
       check()
-      new WriteNebulaVertexConfig(space, tagName, vidField, vidPolicy, batch, vidAsProp)
+      new WriteNebulaVertexConfig(space,
+                                  tagName,
+                                  vidField,
+                                  vidPolicy,
+                                  batch,
+                                  vidAsProp,
+                                  user,
+                                  passwd)
     }
 
     private def check(): Unit = {
@@ -221,8 +245,10 @@ class WriteNebulaEdgeConfig(space: String,
                             batch: Int,
                             srcAsProp: Boolean,
                             dstAsProp: Boolean,
-                            rankAsProp: Boolean)
-    extends WriteNebulaConfig(space, batch) {
+                            rankAsProp: Boolean,
+                            user: String,
+                            passwd: String)
+    extends WriteNebulaConfig(space, user, passwd, batch) {
   def getEdgeName  = edgeName
   def getSrcFiled  = srcFiled
   def getSrcPolicy = if (srcPolicy == null) "" else srcPolicy
@@ -254,6 +280,8 @@ object WriteNebulaEdgeConfig {
     var dstPolicy: String  = _
     var rankField: String  = _
     var batch: Int         = 1000
+    var user: String       = "root"
+    var passwd: String     = "nebula"
 
     /** whether srcId as property */
     var srcAsProp: Boolean = false
@@ -341,6 +369,16 @@ object WriteNebulaEdgeConfig {
       this
     }
 
+    def withUser(user: String): WriteEdgeConfigBuilder = {
+      this.user = user
+      this
+    }
+
+    def withPasswd(passwd: String): WriteEdgeConfigBuilder = {
+      this.passwd = passwd
+      this
+    }
+
     def build(): WriteNebulaEdgeConfig = {
       check()
       new WriteNebulaEdgeConfig(space,
@@ -353,7 +391,9 @@ object WriteNebulaEdgeConfig {
                                 batch,
                                 srcAsProp,
                                 dstAsProp,
-                                rankAsProp)
+                                rankAsProp,
+                                user,
+                                passwd)
     }
 
     private def check(): Unit = {
