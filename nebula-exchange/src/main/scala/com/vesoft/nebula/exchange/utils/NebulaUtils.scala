@@ -6,6 +6,7 @@
 
 package com.vesoft.nebula.exchange.utils
 
+import com.google.common.primitives.UnsignedLong
 import com.vesoft.nebula.exchange.{MetaProvider, VidType}
 import com.vesoft.nebula.exchange.config.{SchemaConfigEntry, Type}
 import org.apache.commons.codec.digest.MurmurHash2
@@ -79,13 +80,16 @@ object NebulaUtils {
   }
 
   def getPartitionId(id: String, partitionSize: Int, vidType: VidType.Value): Int = {
-    val hashValue = if (vidType == VidType.INT) {
-      java.lang.Long.parseUnsignedLong(id)
+    val hashValue: Int = if (vidType == VidType.INT) {
+      val value = java.lang.Long.parseUnsignedLong(id)
+      (Math.floorMod(value, partitionSize) + 1).toInt
     } else {
-      val hash = MurmurHash2.hash64(id.getBytes, id.length, 0xc70f6907)
-      java.lang.Long.parseUnsignedLong(java.lang.Long.toUnsignedString(hash))
+      val hash     = MurmurHash2.hash64(id.getBytes, id.length, 0xc70f6907)
+      val value    = UnsignedLong.fromLongBits(hash)
+      val partSize = UnsignedLong.fromLongBits(partitionSize)
+      value.mod(partSize).intValue + 1
     }
-    (Math.floorMod(hashValue, partitionSize) + 1).toInt
+    hashValue
   }
 
   def escapePropName(nebulaFields: List[String]): List[String] = {

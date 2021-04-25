@@ -14,7 +14,8 @@ import org.slf4j.LoggerFactory
   * @param path
   */
 class NebulaSSTWriter(path: String) extends Writer {
-  require(path.trim.size != 0)
+  require(path.trim.nonEmpty)
+  var isOpen = false
 
   private val LOG = LoggerFactory.getLogger(getClass)
 
@@ -36,6 +37,7 @@ class NebulaSSTWriter(path: String) extends Writer {
   override def prepare(): Unit = {
     writer = new SstFileWriter(env, options)
     writer.open(path)
+    isOpen = true
   }
 
   def write(key: Array[Byte], value: Array[Byte]): Unit = {
@@ -43,8 +45,10 @@ class NebulaSSTWriter(path: String) extends Writer {
   }
 
   override def close(): Unit = {
-    writer.finish()
-    writer.close()
+    if (isOpen) {
+      writer.finish()
+      writer.close()
+    }
     options.close()
     env.close()
   }

@@ -1,12 +1,44 @@
-# 导入CSV文件数据
+# 导入JSON文件数据
 
-本文以一个示例说明如何使用Exchange将存储在HDFS上的CSV文件数据导入Nebula Graph。
-
-如果您要向Nebula Graph导入本地CSV文件，请参见[Nebula Importer](https://github.com/vesoft-inc/nebula-importer "Click to go to GitHub")。
+本文以一个示例说明如何使用Exchange将存储在HDFS上的JSON文件数据导入Nebula Graph。
 
 ## 数据集
 
-本文以[basketballplayer数据集](https://docs-cdn.nebula-graph.com.cn/dataset/dataset.zip)为例。
+本文以basketballplayer数据集为例。部分示例数据如下：
+
+- player
+
+  ```json
+  {"id":"player100","age":42,"name":"Tim Duncan"}
+  {"id":"player101","age":36,"name":"Tony Parker"}
+  {"id":"player102","age":33,"name":"LaMarcus Aldridge"}
+  {"id":"player103","age":32,"name":"Rudy Gay"}
+  ...
+  ```
+
+- team
+
+  ```json
+  {"id":"team200","name":"Warriors"}
+  {"id":"team201","name":"Nuggets"}
+  ...
+  ```
+
+- follow
+
+  ```json
+  {"src":"player100","dst":"player101","degree":95}
+  {"src":"player101","dst":"player102","degree":90}
+  ...
+  ```
+
+- serve
+
+  ```json
+  {"src":"player100","dst":"team204","start_year":"1997","end_year":"2016"}
+  {"src":"player101","dst":"team204","start_year":"1999","end_year":"2018"}
+  ...
+  ```
 
 ## 环境配置
 
@@ -16,9 +48,9 @@
   - CPU：1.7 GHz Quad-Core Intel Core i7
   - 内存：16 GB
 
-- Spark：2.4.7 单机版
+- Spark：2.3.0，单机版
 
-- Hadoop：2.9.2 伪分布式部署
+- Hadoop：2.9.2，伪分布式部署
 
 - Nebula Graph：2.0.0。使用[Docker Compose部署](https://github.com/vesoft-inc/nebula-docker-compose/blob/master/README_zh-CN.md)。
 
@@ -44,7 +76,7 @@
 
 ### 步骤 1：在Nebula Graph中创建Schema
 
-分析CSV文件中的数据，按以下步骤在Nebula Graph中创建Schema：
+分析文件中的数据，按以下步骤在Nebula Graph中创建Schema：
 
 1. 确认Schema要素。Nebula Graph中的Schema要素如下表所示。
 
@@ -82,18 +114,17 @@
 
 更多信息，请参见[快速开始](https://docs.nebula-graph.com.cn/2.0/2.quick-start/1.quick-start-workflow/)。
 
-### 步骤 2：处理CSV文件
+### 步骤 2：处理JSON文件
 
 确认以下信息：
 
-1. 处理CSV文件以满足Schema的要求。
-   > **说明**：Exchange支持上传有表头或者无表头的CSV文件。
+1. 处理JSON文件以满足Schema的要求。
 
-2. CSV文件必须存储在HDFS中，并已获取文件存储路径。
+2. JSON文件必须存储在HDFS中，并已获取文件存储路径。
 
-### 步骤 3：修改配置文件
+### 步骤 3. 修改配置文件
 
-编译Exchange后，复制`target/classes/application.conf`文件设置CSV数据源相关的配置。在本示例中，复制的文件名为`csv_application.conf`。各个配置项的详细说明请参见[配置说明](../parameter-reference/ex-ug-parameter.md)。
+编译Exchange后，复制`target/classes/application.conf`文件设置JSON数据源相关的配置。在本示例中，复制的文件名为`json_application.conf`。各个配置项的详细说明请参见[配置说明](../parameter-reference/ex-ug-parameter.md)。
 
 ```conf
 {
@@ -155,40 +186,32 @@
       # 指定Nebula Graph中定义的标签名称。
       name: player
       type: {
-        # 指定数据源，使用CSV。
-        source: csv
+        # 指定数据源，使用JSON。
+        source: json
 
         # 指定如何将点数据导入Nebula Graph：Client或SST。
         sink: client
       }
 
-      # 指定CSV文件的HDFS路径。
+      # 指定JSON文件的HDFS路径。
       # 用双引号括起路径，以hdfs://开头。
-      path: "hdfs://192.168.*.*:9000/data/vertex_player.csv"
+      path: "hdfs://192.168.*.*:9000/data/vertex_player.json"
 
-      # 如果CSV文件没有表头，使用[_c0, _c1, _c2, ..., _cn]表示其表头，并将列指示为属性值的源。
-      # 如果CSV文件有表头，则使用实际的列名。
-      fields: [_c1, _c2]
+      # 在fields里指定JSON文件中key名称，其对应的value会作为Nebula Graph中指定属性的数据源。
+      # 如果需要指定多个值，用英文逗号（,）隔开。
+      fields: [age,name]
 
       # 指定Nebula Graph中定义的属性名称。
       # fields与nebula.fields的顺序必须一一对应。
       nebula.fields: [age, name]
 
       # 指定一个列作为VID的源。
-      # vertex的值必须与上述fields或者csv.fields中的列名保持一致。
+      # vertex的值必须与JSON文件中的字段保持一致。
       # 目前，Nebula Graph 2.0.0仅支持字符串或整数类型的VID。
       # 不要使用vertex.policy映射。
       vertex: {
-        field:_c0
-        # policy:hash
+        field:id
       }
-
-      # 指定的分隔符。默认值为英文逗号（,）。
-      separator: ","
-
-      # 如果CSV文件有表头，请将header设置为true。
-      # 如果CSV文件没有表头，请将header设置为false。默认值为false。
-      header: false
 
       # 指定单批次写入Nebula Graph的最大点数量。
       batch: 256
@@ -202,40 +225,33 @@
       # 指定Nebula Graph中定义的标签名称。
       name: team
       type: {
-        # 指定数据源，使用CSV。
-        source: csv
+        # 指定数据源，使用JSON。
+        source: json
 
         # 指定如何将点数据导入Nebula Graph：Client或SST。
         sink: client
       }
 
-      # 指定CSV文件的HDFS路径。
+      # 指定JSON文件的HDFS路径。
       # 用双引号括起路径，以hdfs://开头。
-      path: "hdfs://192.168.*.*:9000/data/vertex_team.csv"
+      path: "hdfs://192.168.*.*:9000/data/vertex_team.json"
 
-      # 如果CSV文件没有表头，使用[_c0, _c1, _c2, ..., _cn]表示其表头，并将列指示为属性值的源。
-      # 如果CSV文件有表头，则使用实际的列名。
-      fields: [_c1]
+      # 在fields里指定JSON文件中key名称，其对应的value会作为Nebula Graph中指定属性的数据源。
+      # 如果需要指定多个值，用英文逗号（,）隔开。
+      fields: [name]
 
       # 指定Nebula Graph中定义的属性名称。
       # fields与nebula.fields的顺序必须一一对应。
       nebula.fields: [name]
 
       # 指定一个列作为VID的源。
-      # vertex的值必须与上述fields或者csv.fields中的列名保持一致。
+      # vertex的值必须与JSON文件中的字段保持一致。
       # 目前，Nebula Graph 2.0.0仅支持字符串或整数类型的VID。
       # 不要使用vertex.policy映射。
       vertex: {
-        field:_c0
-        # policy:hash
+        field:id
       }
 
-      # 指定的分隔符。默认值为英文逗号（,）。
-      separator: ","
-
-      # 如果CSV文件有表头，请将header设置为true。
-      # 如果CSV文件没有表头，请将header设置为false。默认值为false。
-      header: false
 
       # 指定单批次写入Nebula Graph的最大点数量。
       batch: 256
@@ -254,46 +270,39 @@
       # 指定Nebula Graph中定义的边类型名称。
       name: follow
       type: {
-        # 指定数据源，使用CSV。
-        source: csv
+        # 指定数据源，使用JSON。
+        source: json
 
         # 指定如何将点数据导入Nebula Graph：Client或SST。
         sink: client
       }
 
-      # 指定CSV文件的HDFS路径。
+      # 指定JSON文件的HDFS路径。
       # 用双引号括起路径，以hdfs://开头。
-      path: "hdfs://192.168.*.*:9000/data/edge_follow.csv"
+      path: "hdfs://192.168.*.*:9000/data/edge_follow.json"
 
-      # 如果CSV文件没有表头，使用[_c0, _c1, _c2, ..., _cn]表示其表头，并将列指示为属性值的源。
-      # 如果CSV文件有表头，则使用实际的列名。
-      fields: [_c2]
+      # 在fields里指定JSON文件中key名称，其对应的value会作为Nebula Graph中指定属性的数据源。
+      # 如果需要指定多个值，用英文逗号（,）隔开。
+      fields: [degree]
 
       # 指定Nebula Graph中定义的属性名称。
       # fields与nebula.fields的顺序必须一一对应。
       nebula.fields: [degree]
 
       # 指定一个列作为起始点和目的点的源。
-      # vertex的值必须与上述fields或者csv.fields中的列名保持一致。
+      # vertex的值必须与JSON文件中的字段保持一致。
       # 目前，Nebula Graph 2.0.0仅支持字符串或整数类型的VID。
       # 不要使用vertex.policy映射。
       source: {
-        field: _c0
+        field: src
       }
       target: {
-        field: _c1
+        field: dst
       }
 
-      # 指定的分隔符。默认值为英文逗号（,）。
-      separator: ","
 
       # 指定一个列作为rank的源(可选)。
-
       #ranking: rank
-
-      # 如果CSV文件有表头，请将header设置为true。
-      # 如果CSV文件没有表头，请将header设置为false。默认值为false。
-      header: false
 
       # 指定单批次写入Nebula Graph的最大边数量。
       batch: 256
@@ -307,45 +316,40 @@
       # 指定Nebula Graph中定义的边类型名称。
       name: serve
       type: {
-        # 指定数据源，使用CSV。
-        source: csv
+        # 指定数据源，使用JSON。
+        source: json
 
         # 指定如何将点数据导入Nebula Graph：Client或SST。
         sink: client
       }
 
-      # 指定CSV文件的HDFS路径。
+      # 指定JSON文件的HDFS路径。
       # 用双引号括起路径，以hdfs://开头。
-      path: "hdfs://192.168.*.*:9000/data/edge_serve.csv"
+      path: "hdfs://192.168.*.*:9000/data/edge_serve.json"
 
-      # 如果CSV文件没有表头，使用[_c0, _c1, _c2, ..., _cn]表示其表头，并将列指示为属性值的源。
-      # 如果CSV文件有表头，则使用实际的列名。
-      fields: [_c2,_c3]
+      # 在fields里指定JSON文件中key名称，其对应的value会作为Nebula Graph中指定属性的数据源。
+      # 如果需要指定多个值，用英文逗号（,）隔开。
+      fields: [start_year,end_year]
 
       # 指定Nebula Graph中定义的属性名称。
       # fields与nebula.fields的顺序必须一一对应。
       nebula.fields: [start_year, end_year]
 
       # 指定一个列作为起始点和目的点的源。
-      # vertex的值必须与上述fields或者csv.fields中的列名保持一致。
+      # vertex的值必须与JSON文件中的字段保持一致。
       # 目前，Nebula Graph 2.0.0仅支持字符串或整数类型的VID。
       # 不要使用vertex.policy映射。
       source: {
-        field: _c0
+        field: src
       }
       target: {
-        field: _c1
+        field: dst
       }
 
-      # 指定的分隔符。默认值为英文逗号（,）。
-      separator: ","
 
       # 指定一个列作为rank的源(可选)。
       #ranking: _c5
 
-      # 如果CSV文件有表头，请将header设置为true。
-      # 如果CSV文件没有表头，请将header设置为false。默认值为false。
-      header: false
 
       # 指定单批次写入Nebula Graph的最大边数量。
       batch: 256
@@ -361,10 +365,10 @@
 
 ### 步骤 4：向Nebula Graph导入数据
 
-运行如下命令将CSV文件数据导入到Nebula Graph中。关于参数的说明，请参见[导入命令参数](../parameter-reference/ex-ug-para-import-command.md)。
+运行如下命令将JSON文件数据导入到Nebula Graph中。关于参数的说明，请参见[导入命令参数](../parameter-reference/ex-ug-para-import-command.md)。
 
 ```bash
-${SPARK_HOME}/bin/spark-submit --master "local" --class com.vesoft.nebula.exchange.Exchange <nebula-exchange-2.0.0.jar_path> -c <csv_application.conf_path> 
+${SPARK_HOME}/bin/spark-submit --master "local" --class com.vesoft.nebula.exchange.Exchange <nebula-exchange-2.0.0.jar_path> -c <json_application.conf_path> 
 ```
 
 >**说明**：JAR包有两种获取方式：[自行编译](../ex-ug-compile.md)或者从maven仓库下载。
@@ -372,7 +376,7 @@ ${SPARK_HOME}/bin/spark-submit --master "local" --class com.vesoft.nebula.exchan
 示例：
 
 ```bash
-${SPARK_HOME}/bin/spark-submit  --master "local" --class com.vesoft.nebula.exchange.Exchange  /root/nebula-spark-utils/nebula-exchange/target/nebula-exchange-2.0.0.jar  -c /root/nebula-spark-utils/nebula-exchange/target/classes/csv_application.conf
+${SPARK_HOME}/bin/spark-submit  --master "local" --class com.vesoft.nebula.exchange.Exchange  /root/nebula-spark-utils/nebula-exchange/target/nebula-exchange-2.0.0.jar  -c /root/nebula-spark-utils/nebula-exchange/target/classes/json_application.conf
 ```
 
 您可以在返回信息中搜索`batchSuccess.<tag_name/edge_name>`，确认成功的数量。例如例如`batchSuccess.follow: 300`。
