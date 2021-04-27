@@ -25,6 +25,10 @@ Import command:
 ```
 $SPARK_HOME/bin/spark-submit --class com.vesoft.nebula.exchange.Exchange --master local nebula-exchange-2.0.0.jar -c /path/to/application.conf
 ```
+If your source is HIVE, import command is:
+```
+$SPARK_HOME/bin/spark-submit --class com.vesoft.nebula.exchange.Exchange --master local nebula-exchange-2.0.0.jar -c /path/to/application.conf -h
+```
 
 For more details about Exchange, please refer to [Exchange 1.0](https://github.com/vesoft-inc/nebula-java/tree/v1.0/tools/exchange) .
 
@@ -36,4 +40,4 @@ For more details about Exchange, please refer to [Exchange 1.0](https://github.c
 3. Supports importing data from other Hive sources besides Hive on Spark.
 4. Supports recording and retrying the INSERT statement after failures during data import.
 
-Refer to [application.conf](https://github.com/vesoft-inc/nebula-spark-utils/tree/main/nebula-exchange/src/main/resources) as an example to edit the configuration file.
+Refer to [application.conf](https://github.com/vesoft-inc/nebula-spark-utils/tree/master/nebula-exchange/src/main/resources/application.conf) as an example to edit the configuration file.
