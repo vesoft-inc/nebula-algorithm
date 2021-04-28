@@ -17,6 +17,8 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 object NebulaUtils {
+  val DEFAULT_EMPTY_VALUE: String = "_NEBULA_EMPTY"
+
   private[this] val LOG = Logger.getLogger(this.getClass)
 
   def getDataSourceFieldType(sourceConfig: SchemaConfigEntry,

@@ -33,12 +33,14 @@ Exchange 2.0 仅支持 Nebula Graph 2.x。
 
 *4. Exchange 2.0 将导入失败的 INSERT 语句进行落盘，存于配置文件的 error/output 路径中。*
 
-*5. 配置文件参考 [application.conf](https://github.com/vesoft-inc/nebula-spark-utils/tree/main/nebula-exchange/src/main/resources)。*
+*5. 配置文件参考 [application.conf](https://github.com/vesoft-inc/nebula-spark-utils/tree/master/nebula-exchange/src/main/resources/application.conf )。*
 
 *6. Exchange 2.0 的导入命令：*
 ```
 $SPARK_HOME/bin/spark-submit --class com.vesoft.nebula.exchange.Exchange --master local nebula-exchange-2.0.0.jar -c /path/to/application.conf
 ```
+如果数据源有HIVE，则导入命令最后还需要加 `-h` 表示启用HIVE数据源。
+
 ## 贡献
 
 Nebula Exchange 2.0 是一个完全开源的项目，欢迎开源爱好者通过以下方式参与：
