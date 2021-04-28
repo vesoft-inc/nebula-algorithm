@@ -6,6 +6,7 @@
 
 package com.vesoft.nebula.exchange.processor
 
+import com.vesoft.nebula.exchange.utils.NebulaUtils.DEFAULT_EMPTY_VALUE
 import com.vesoft.nebula.{Date, DateTime, NullType, Time, Value}
 import com.vesoft.nebula.meta.PropertyType
 import com.vesoft.nebula.exchange.utils.{HDFSUtils, NebulaUtils}
@@ -48,7 +49,11 @@ trait Processor extends Serializable {
 
     fieldTypeMap(field) match {
       case PropertyType.STRING | PropertyType.FIXED_STRING => {
-        val result = NebulaUtils.escapeUtil(row.get(index).toString).mkString("\"", "", "\"")
+        var value = row.get(index).toString
+        if (value.equals(DEFAULT_EMPTY_VALUE)) {
+          value = ""
+        }
+        val result = NebulaUtils.escapeUtil(value).mkString("\"", "", "\"")
         if (toBytes) result.getBytes else result
       }
       case PropertyType.DATE     => "date(\"" + row.get(index) + "\")"
@@ -77,14 +82,17 @@ trait Processor extends Serializable {
     fieldTypeMap(field) match {
       case PropertyType.UNKNOWN =>
         throw new IllegalArgumentException("date type in nebula is UNKNOWN.")
-      case PropertyType.STRING | PropertyType.FIXED_STRING => row.get(index).toString
-      case PropertyType.BOOL                               => row.get(index).toString.toBoolean
-      case PropertyType.DOUBLE                             => row.get(index).toString.toDouble
-      case PropertyType.FLOAT                              => row.get(index).toString.toFloat
-      case PropertyType.INT8                               => row.get(index).toString.toByte
-      case PropertyType.INT16                              => row.get(index).toString.toShort
-      case PropertyType.INT32                              => row.get(index).toString.toInt
-      case PropertyType.INT64 | PropertyType.VID           => row.get(index).toString.toLong
+      case PropertyType.STRING | PropertyType.FIXED_STRING => {
+        val value = row.get(index).toString
+        if (value.equals(DEFAULT_EMPTY_VALUE)) "" else value
+      }
+      case PropertyType.BOOL                     => row.get(index).toString.toBoolean
+      case PropertyType.DOUBLE                   => row.get(index).toString.toDouble
+      case PropertyType.FLOAT                    => row.get(index).toString.toFloat
+      case PropertyType.INT8                     => row.get(index).toString.toByte
+      case PropertyType.INT16                    => row.get(index).toString.toShort
+      case PropertyType.INT32                    => row.get(index).toString.toInt
+      case PropertyType.INT64 | PropertyType.VID => row.get(index).toString.toLong
       case PropertyType.TIME => {
         val values = row.get(index).toString.split(":")
         if (values.size < 3) {

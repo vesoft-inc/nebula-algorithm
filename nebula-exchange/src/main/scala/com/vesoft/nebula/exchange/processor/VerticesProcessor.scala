@@ -204,6 +204,11 @@ class VerticesProcessor(data: DataFrame,
               }
               writer.write(key, value)
             }
+          } catch {
+            case e: Throwable => {
+              LOG.error(e)
+              batchFailure.add(1)
+            }
           } finally {
             if (writer != null) {
               writer.close()
