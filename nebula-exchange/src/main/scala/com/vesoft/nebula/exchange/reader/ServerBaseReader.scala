@@ -15,7 +15,7 @@ import com.vesoft.nebula.exchange.config.{
   Neo4JSourceConfigEntry,
   ServerDataSourceConfigEntry
 }
-import com.vesoft.nebula.exchange.utils.HDFSUtils
+import com.vesoft.nebula.exchange.utils.{HDFSUtils, Neo4jUtils}
 import org.apache.hadoop.hbase.HBaseConfiguration
 import org.apache.hadoop.hbase.client.Result
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable
@@ -34,6 +34,7 @@ import org.apache.tinkerpop.gremlin.process.computer.clustering.peerpressure.{
 import org.apache.tinkerpop.gremlin.spark.process.computer.SparkGraphComputer
 import org.apache.tinkerpop.gremlin.spark.structure.io.PersistedOutputRDD
 import org.apache.tinkerpop.gremlin.structure.util.GraphFactory
+import org.neo4j.driver.internal.types.{TypeConstructor, TypeRepresentation}
 import org.neo4j.driver.{AuthTokens, GraphDatabase}
 import org.neo4j.spark.dataframe.CypherTypes
 import org.neo4j.spark.utils.Neo4jSessionAwareIterator
@@ -140,20 +141,21 @@ class Neo4JReader(override val session: SparkSession, neo4jConfig: Neo4JSourceCo
             s"${neo4jConfig.checkPointPath.get}/${neo4jConfig.name}.${TaskContext.getPartitionId()}"
           HDFSUtils.saveContent(path, offset.start.toString)
         }
-        val query  = s"${neo4jConfig.sentence} SKIP ${offset.start} LIMIT ${offset.size}"
-        val result = new Neo4jSessionAwareIterator(config, query, Maps.newHashMap(), false)
-        val fields = if (result.hasNext) result.peek().keys().asScala else List()
+        val query     = s"${neo4jConfig.sentence} SKIP ${offset.start} LIMIT ${offset.size}"
+        val result    = new Neo4jSessionAwareIterator(config, query, Maps.newHashMap(), false)
+        val fields    = if (result.hasNext) result.peek().keys().asScala else List()
+        val neo4jType = new TypeRepresentation(TypeConstructor.STRING)
         val schema =
           if (result.hasNext)
             StructType(
               fields
-                .map(k => (k, result.peek().get(k).`type`()))
+                .map(k => (k, neo4jType))
                 .map(keyType => CypherTypes.field(keyType)))
           else new StructType()
         result.map(record => {
           val row = new Array[Any](record.keys().size())
           for (i <- row.indices)
-            row.update(i, Executor.convert(record.get(i).asObject()))
+            row.update(i, Executor.convert(Neo4jUtils.convertNeo4jData(record.get(i))))
           new GenericRowWithSchema(values = row, schema).asInstanceOf[Row]
         })
       })
