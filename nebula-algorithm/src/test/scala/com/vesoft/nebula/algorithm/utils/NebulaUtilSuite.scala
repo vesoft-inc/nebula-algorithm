@@ -12,7 +12,7 @@ class NebulaUtilSuite {
 
   @Test
   def validateWithWeight: Unit = {
-    val hostPorts: String        = "127.0.0.1:45500"
+    val hostPorts: String        = "127.0.0.1:9559"
     val nameSpace: String        = "nb"
     val labels: List[String]     = List("serve", "follow")
     val hasWeight: Boolean       = true
@@ -21,7 +21,7 @@ class NebulaUtilSuite {
 
   @Test
   def validateWithoutWeight: Unit = {
-    val hostPorts: String        = "127.0.0.1:45500"
+    val hostPorts: String        = "127.0.0.1:9559"
     val nameSpace: String        = "nb"
     val labels: List[String]     = List("serve")
     val hasWeight: Boolean       = false
