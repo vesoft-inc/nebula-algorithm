@@ -6,9 +6,10 @@
 
 package com.vesoft.nebula.connector
 
+import com.vesoft.nebula.connector.writer.NebulaExecutor
 import org.apache.commons.codec.digest.MurmurHash2
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.types.{LongType, StringType}
+import org.apache.spark.sql.types.LongType
 import org.apache.spark.sql.{
   DataFrame,
   DataFrameReader,
@@ -47,7 +48,7 @@ package object connector {
                             values: List[NebulaVertex],
                             policy: Option[KeyPolicy.Value]) {
 
-    def propertyNames: String = propNames.mkString(",")
+    def propertyNames: String = NebulaExecutor.escapePropName(propNames).mkString(",")
 
     override def toString: String = {
       s"Vertices: " +
@@ -72,7 +73,7 @@ package object connector {
                          values: List[NebulaEdge],
                          sourcePolicy: Option[KeyPolicy.Value],
                          targetPolicy: Option[KeyPolicy.Value]) {
-    def propertyNames: String = propNames.mkString(",")
+    def propertyNames: String = NebulaExecutor.escapePropName(propNames).mkString(",")
     def getSourcePolicy       = sourcePolicy
     def getTargetPolicy       = targetPolicy
 
