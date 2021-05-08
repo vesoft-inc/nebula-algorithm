@@ -19,6 +19,7 @@ import com.vesoft.nebula.exchange.config.{
   SinkCategory,
   StreamingDataSourceConfigEntry
 }
+import com.vesoft.nebula.exchange.utils.NebulaUtils.DEFAULT_EMPTY_VALUE
 import com.vesoft.nebula.exchange.utils.{HDFSUtils, NebulaUtils}
 import com.vesoft.nebula.exchange.{
   Edge,
@@ -115,9 +116,16 @@ class EdgeProcessor(data: DataFrame,
         .mapPartitions { iter =>
           iter.map { row =>
             val srcIndex: Int = row.schema.fieldIndex(edgeConfig.sourceField)
+            assert(srcIndex >= 0 && !row.isNullAt(srcIndex),
+                   s"edge source vertex must exist and cannot be null, your row data is $row")
             var srcId: String = row.get(srcIndex).toString
+            if (srcId.equals(DEFAULT_EMPTY_VALUE)) { srcId = "" }
+
             val dstIndex: Int = row.schema.fieldIndex(edgeConfig.targetField)
+            assert(dstIndex >= 0 && !row.isNullAt(dstIndex),
+                   s"edge target vertex must exist and cannot be null, your row data is $row")
             var dstId: String = row.get(dstIndex).toString
+            if (dstId.equals(DEFAULT_EMPTY_VALUE)) { dstId = "" }
 
             if (edgeConfig.sourcePolicy.isDefined) {
               edgeConfig.sourcePolicy.get match {
@@ -259,9 +267,10 @@ class EdgeProcessor(data: DataFrame,
         .map { row =>
           var sourceField = if (!edgeConfig.isGeo) {
             val sourceIndex = row.schema.fieldIndex(edgeConfig.sourceField)
-            assert(sourceIndex >= 0 && row.get(sourceIndex) != null,
+            assert(sourceIndex >= 0 && !row.isNullAt(sourceIndex),
                    s"source vertexId must exist and cannot be null, your row data is $row")
-            row.get(sourceIndex).toString
+            val value = row.get(sourceIndex).toString
+            if (value.equals(DEFAULT_EMPTY_VALUE)) "" else value
           } else {
             val lat = row.getDouble(row.schema.fieldIndex(edgeConfig.latitude.get))
             val lng = row.getDouble(row.schema.fieldIndex(edgeConfig.longitude.get))
@@ -282,9 +291,10 @@ class EdgeProcessor(data: DataFrame,
           }
 
           val targetIndex = row.schema.fieldIndex(edgeConfig.targetField)
-          assert(targetIndex >= 0 && row.get(targetIndex) != null,
+          assert(targetIndex >= 0 && !row.isNullAt(targetIndex),
                  s"target vertexId must exist and cannot be null, your row data is $row")
           var targetField = row.get(targetIndex).toString
+          if (targetField.equals(DEFAULT_EMPTY_VALUE)) targetField = ""
           if (edgeConfig.targetPolicy.isEmpty) {
             // process string type vid
             if (isVidStringType) {

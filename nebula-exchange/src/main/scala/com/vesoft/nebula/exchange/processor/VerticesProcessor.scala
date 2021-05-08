@@ -10,7 +10,7 @@ import java.nio.file.{Files, Paths}
 import java.nio.{ByteBuffer, ByteOrder}
 
 import com.vesoft.nebula.client.graph.data.HostAddress
-import com.vesoft.nebula.encoder.{NebulaCodecImpl}
+import com.vesoft.nebula.encoder.NebulaCodecImpl
 import com.vesoft.nebula.exchange.{
   ErrorHandler,
   GraphProvider,
@@ -27,6 +27,7 @@ import com.vesoft.nebula.exchange.config.{
   StreamingDataSourceConfigEntry,
   TagConfigEntry
 }
+import com.vesoft.nebula.exchange.utils.NebulaUtils.DEFAULT_EMPTY_VALUE
 import com.vesoft.nebula.exchange.utils.{HDFSUtils, NebulaUtils}
 import com.vesoft.nebula.exchange.writer.{NebulaGraphClientWriter, NebulaSSTWriter}
 import org.apache.commons.codec.digest.MurmurHash2
@@ -122,8 +123,13 @@ class VerticesProcessor(data: DataFrame,
       data
         .mapPartitions { iter =>
           iter.map { row =>
-            val index: Int       = row.schema.fieldIndex(tagConfig.vertexField)
+            val index: Int = row.schema.fieldIndex(tagConfig.vertexField)
+            assert(index >= 0 && !row.isNullAt(index),
+                   s"vertexId must exist and cannot be null, your row data is $row")
             var vertexId: String = row.get(index).toString
+            if (vertexId.equals(DEFAULT_EMPTY_VALUE)) {
+              vertexId = ""
+            }
             if (tagConfig.vertexPolicy.isDefined) {
               tagConfig.vertexPolicy.get match {
                 case KeyPolicy.HASH =>
@@ -225,9 +231,10 @@ class VerticesProcessor(data: DataFrame,
         .map { row =>
           val vertexID = {
             val index = row.schema.fieldIndex(tagConfig.vertexField)
-            assert(index >= 0 && row.get(index) != null,
+            assert(index >= 0 && !row.isNullAt(index),
                    s"vertexId must exist and cannot be null, your row data is $row")
-            val value = row.get(index).toString
+            var value = row.get(index).toString
+            if (value.equals(DEFAULT_EMPTY_VALUE)) { value = "" }
             if (tagConfig.vertexPolicy.isEmpty) {
               // process string type vid
               if (isVidStringType) {
