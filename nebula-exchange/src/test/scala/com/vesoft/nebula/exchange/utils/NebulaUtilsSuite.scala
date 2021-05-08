@@ -79,7 +79,7 @@ class NebulaUtilsSuite {
                                           1,
                                           Some(""))
 
-    val space   = "testSST1"
+    val space   = "test_string"
     val address = new ListBuffer[HostAndPort]()
     address.append(HostAndPort.fromParts("127.0.0.1", 9559))
     val metaProvider = new MetaProvider(address.toList)
@@ -105,14 +105,14 @@ class NebulaUtilsSuite {
     val storageClient = new StorageClient("127.0.0.1", 9559)
     storageClient.connect()
     for (i <- 1 to 12) {
-      val vid            = i + ""
+      val vid            = Integer.toString(i)
       val partitionId    = NebulaUtils.getPartitionId(vid, 10, VidType.STRING)
-      val scanResultIter = storageClient.scanVertex("testSST1", partitionId, "person")
+      val scanResultIter = storageClient.scanVertex("test_string", partitionId, "person")
       var containVertex  = false
       while (scanResultIter.hasNext) {
         val scanResult = scanResultIter.next()
         val map        = scanResult.getVidVertices
-        for (value <- map.keySet().asScala) {
+        for (value <- map.keySet().asScala if !containVertex) {
           if (value.asString().equals(vid)) {
             containVertex = true
           }
@@ -122,14 +122,14 @@ class NebulaUtilsSuite {
     }
 
     for (i <- 1 to 12) {
-      val vid            = i + ""
+      val vid            = Integer.toString(i)
       val partitionId    = NebulaUtils.getPartitionId(vid, 10, VidType.INT)
-      val scanResultIter = storageClient.scanVertex("testSST2", partitionId, "person")
+      val scanResultIter = storageClient.scanVertex("test_int", partitionId, "person")
       var containVertex  = false
       while (scanResultIter.hasNext) {
         val scanResult = scanResultIter.next()
         val map        = scanResult.getVidVertices
-        for (value <- map.keySet().asScala) {
+        for (value <- map.keySet().asScala if !containVertex) {
           if (value.asLong() == vid.toLong) {
             containVertex = true
           }
