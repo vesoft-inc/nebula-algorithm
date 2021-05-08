@@ -162,7 +162,6 @@ class EdgeProcessor(data: DataFrame,
             val codec       = new NebulaCodecImpl()
 
             import java.nio.ByteBuffer
-            val order = ByteOrder.nativeOrder
             val srcBytes = if (vidType == VidType.INT) {
               ByteBuffer
                 .allocate(8)

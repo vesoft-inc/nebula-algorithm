@@ -26,6 +26,8 @@ import com.vesoft.nebula.meta.PropertyType
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.types.StructType
 
+import scala.collection.mutable.ListBuffer
+
 object NebulaExecutor {
 
   /**
@@ -138,7 +140,7 @@ object NebulaExecutor {
       case PropertyType.STRING | PropertyType.FIXED_STRING =>
         NebulaUtils.escapeUtil(propValue.toString).mkString("\"", "", "\"")
       case PropertyType.DATE     => "date(\"" + propValue + "\")"
-      case PropertyType.DATETIME => "datatime(\"" + propValue + "\")"
+      case PropertyType.DATETIME => "datetime(\"" + propValue + "\")"
       case PropertyType.TIME     => "time(\"" + propValue + "\")"
       case PropertyType.TIMESTAMP => {
         if (NebulaUtils.isNumic(propValue.toString)) {
@@ -260,6 +262,24 @@ object NebulaExecutor {
       }
       .mkString(", ")
     BATCH_INSERT_TEMPLATE.format(DataTypeEnum.EDGE.toString, edgeName, edges.propertyNames, values)
+  }
+
+  /**
+    * escape nebula property name, add `` for each property.
+    *
+    * @param nebulaFields nebula property name list
+    * @return escaped nebula property name list
+    */
+  def escapePropName(nebulaFields: List[String]): List[String] = {
+    val propNames: ListBuffer[String] = new ListBuffer[String]
+    for (key <- nebulaFields) {
+      val sb = new StringBuilder()
+      sb.append("`")
+      sb.append(key)
+      sb.append("`")
+      propNames.append(sb.toString())
+    }
+    propNames.toList
   }
 
 }
