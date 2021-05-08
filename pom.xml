@@ -47,6 +47,7 @@
     <modules>
         <module>nebula-exchange</module>
         <module>nebula-spark-connector</module>
+        <module>nebula-algorithm</module>
         <module>example</module>
     </modules>
 
