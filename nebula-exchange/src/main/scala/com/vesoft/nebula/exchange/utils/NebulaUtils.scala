@@ -47,7 +47,11 @@ object NebulaUtils {
   }
 
   def isNumic(str: String): Boolean = {
-    for (char <- str.toCharArray) {
+    val newStr: String = if (str.startsWith("-")) {
+      str.substring(1)
+    } else { str }
+
+    for (char <- newStr.toCharArray) {
       if (!Character.isDigit(char)) return false
     }
     true
@@ -80,16 +84,14 @@ object NebulaUtils {
   }
 
   def getPartitionId(id: String, partitionSize: Int, vidType: VidType.Value): Int = {
-    val hashValue: Int = if (vidType == VidType.INT) {
-      val value = java.lang.Long.parseUnsignedLong(id)
-      (Math.floorMod(value, partitionSize) + 1).toInt
+    val hashValue: Long = if (vidType == VidType.STRING) {
+      MurmurHash2.hash64(id.getBytes, id.length, 0xc70f6907)
     } else {
-      val hash     = MurmurHash2.hash64(id.getBytes, id.length, 0xc70f6907)
-      val value    = UnsignedLong.fromLongBits(hash)
-      val partSize = UnsignedLong.fromLongBits(partitionSize)
-      value.mod(partSize).intValue + 1
+      id.toLong
     }
-    hashValue
+    val unsignedValue = UnsignedLong.fromLongBits(hashValue)
+    val partSize      = UnsignedLong.fromLongBits(partitionSize)
+    unsignedValue.mod(partSize).intValue + 1
   }
 
   def escapePropName(nebulaFields: List[String]): List[String] = {

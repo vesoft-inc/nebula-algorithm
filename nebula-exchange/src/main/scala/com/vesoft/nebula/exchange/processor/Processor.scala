@@ -39,10 +39,7 @@ trait Processor extends Serializable {
     * DataTime type: add datetime() function for attribute value.
     * eg: convert attribute value 2020-01-01T22:30:40 to datetime("2020-01-01T22:30:40")
     */
-  def extraValueForClient(row: Row,
-                          field: String,
-                          fieldTypeMap: Map[String, Int],
-                          toBytes: Boolean = false): Any = {
+  def extraValueForClient(row: Row, field: String, fieldTypeMap: Map[String, Int]): Any = {
     val index = row.schema.fieldIndex(field)
 
     if (row.isNullAt(index)) return null
@@ -54,10 +51,10 @@ trait Processor extends Serializable {
           value = ""
         }
         val result = NebulaUtils.escapeUtil(value).mkString("\"", "", "\"")
-        if (toBytes) result.getBytes else result
+        result
       }
       case PropertyType.DATE     => "date(\"" + row.get(index) + "\")"
-      case PropertyType.DATETIME => "datatime(\"" + row.get(index) + "\")"
+      case PropertyType.DATETIME => "datetime(\"" + row.get(index) + "\")"
       case PropertyType.TIME     => "time(\"" + row.get(index) + "\")"
       case PropertyType.TIMESTAMP => {
         val value = row.get(index).toString
