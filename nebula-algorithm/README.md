@@ -18,14 +18,17 @@ nebula-algorithm 是一款基于 [GraphX](https://spark.apache.org/graphx/) 的 
  
 使用 `nebula-algorithm`，可以通过提交 `Spark` 任务的形式使用完整的算法工具对 `Nebula Graph` 数据库中的数据执行图计算，也可以通过编程形式调用`lib`库下的算法针对DataFrame执行图计算。
 
-## 编译 Nebula-Algorithm
+## 如何获取
+ 1. 编译打包 Nebula-Algorithm
+    ```
+    $ git clone https://github.com/vesoft-inc/nebula-spark-utils.git
+    $ cd nebula-algorithm
+    $ mvn clean package -Dgpg.skip -Dmaven.javadoc.skip=true -Dmaven.test.skip=true
+    ```
+    编译完成后，在 `nebula-algorithm/target` 目录下会生成 `nebula-algorithm-2.0.0.jar` 。
 
-```
-$ git clone https://github.com/vesoft-inc/nebula-spark-utils.git
-$ cd nebula-algorithm
-$ mvn clean package -Dgpg.skip -Dmaven.javadoc.skip=true -Dmaven.test.skip=true
-```
-编译完成后，在 `nebula-algorithm/target` 目录下会生成 `nebula-algorithm-2.0.0.jar` 。
+ 2. 在 Maven 远程仓库下载
+   https://repo1.maven.org/maven2/com/vesoft/nebula-algorithm/2.0.0/
 
 # 使用 Nebula-Algorithm
 
