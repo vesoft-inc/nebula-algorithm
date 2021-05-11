@@ -43,12 +43,12 @@ object NebulaSparkReaderExample {
     val config =
       NebulaConnectionConfig
         .builder()
-        .withMetaAddress("127.0.0.1:45500")
+        .withMetaAddress("127.0.0.1:9559")
         .withConenctionRetry(2)
         .build()
     val nebulaReadVertexConfig: ReadNebulaConfig = ReadNebulaConfig
       .builder()
-      .withSpace("exchange")
+      .withSpace("test")
       .withLabel("person")
       .withNoColumn(false)
       .withReturnCols(List("birthday"))
@@ -67,13 +67,13 @@ object NebulaSparkReaderExample {
     val config =
       NebulaConnectionConfig
         .builder()
-        .withMetaAddress("127.0.0.1:45500")
+        .withMetaAddress("127.0.0.1:9559")
         .withTimeout(6000)
         .withConenctionRetry(2)
         .build()
     val nebulaReadEdgeConfig: ReadNebulaConfig = ReadNebulaConfig
       .builder()
-      .withSpace("exchange")
+      .withSpace("test")
       .withLabel("knows")
       .withNoColumn(false)
       .withReturnCols(List("degree"))
@@ -91,13 +91,13 @@ object NebulaSparkReaderExample {
     val config =
       NebulaConnectionConfig
         .builder()
-        .withMetaAddress("127.0.0.1:45500")
+        .withMetaAddress("127.0.0.1:9559")
         .withTimeout(6000)
         .withConenctionRetry(2)
         .build()
     val nebulaReadVertexConfig: ReadNebulaConfig = ReadNebulaConfig
       .builder()
-      .withSpace("exchange")
+      .withSpace("test")
       .withLabel("person")
       .withNoColumn(false)
       .withReturnCols(List("birthday"))
@@ -115,14 +115,14 @@ object NebulaSparkReaderExample {
     val config =
       NebulaConnectionConfig
         .builder()
-        .withMetaAddress("127.0.0.1:45500")
+        .withMetaAddress("127.0.0.1:9559")
         .withTimeout(6000)
         .withConenctionRetry(2)
         .build()
     val nebulaReadEdgeConfig: ReadNebulaConfig = ReadNebulaConfig
       .builder()
-      .withSpace("exchange")
-      .withLabel("knows1")
+      .withSpace("test")
+      .withLabel("knows")
       .withNoColumn(false)
       .withReturnCols(List("timep"))
       .withLimit(10)

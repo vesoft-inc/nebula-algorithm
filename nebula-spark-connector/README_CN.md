@@ -30,8 +30,8 @@ Nebula Spark Connector 2.0 仅支持 Nebula Graph 2.x。如果您正在使用 Ne
   ```
     val config = NebulaConnectionConfig
       .builder()
-      .withMetaAddress("127.0.0.1:45500")
-      .withGraphAddress("127.0.0.1:3699")
+      .withMetaAddress("127.0.0.1:9559")
+      .withGraphAddress("127.0.0.1:9669")
       .build()
     val nebulaWriteVertexConfig = WriteNebulaVertexConfig
       .builder()
@@ -47,7 +47,7 @@ Nebula Spark Connector 2.0 仅支持 Nebula Graph 2.x。如果您正在使用 Ne
   ```
     val config = NebulaConnectionConfig
       .builder()
-      .withMetaAddress("127.0.0.1:45500")
+      .withMetaAddress("127.0.0.1:9559")
       .withConenctionRetry(2)
       .build()
     val nebulaReadVertexConfig = ReadNebulaConfig
@@ -66,7 +66,7 @@ Nebula Spark Connector 2.0 仅支持 Nebula Graph 2.x。如果您正在使用 Ne
   ```
     val config = NebulaConnectionConfig
       .builder()
-      .withMetaAddress("127.0.0.1:45500")
+      .withMetaAddress("127.0.0.1:9559")
       .withConenctionRetry(2)
       .build()
     val nebulaReadVertexConfig = ReadNebulaConfig

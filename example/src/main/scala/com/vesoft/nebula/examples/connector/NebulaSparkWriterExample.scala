@@ -34,7 +34,7 @@ object NebulaSparkWriterExample {
       .getOrCreate()
 
     writeVertex(spark)
-    // writeEdge(spark)
+    writeEdge(spark)
 
     spark.close()
     sys.exit()
@@ -48,8 +48,8 @@ object NebulaSparkWriterExample {
     val config =
       NebulaConnectionConfig
         .builder()
-        .withMetaAddress("127.0.0.1:45500")
-        .withGraphAddress("127.0.0.1:3699")
+        .withMetaAddress("127.0.0.1:9559")
+        .withGraphAddress("127.0.0.1:9669")
         .withConenctionRetry(2)
         .build()
     val nebulaWriteVertexConfig: WriteNebulaVertexConfig = WriteNebulaVertexConfig
@@ -72,8 +72,8 @@ object NebulaSparkWriterExample {
     val config =
       NebulaConnectionConfig
         .builder()
-        .withMetaAddress("127.0.0.1:45509")
-        .withGraphAddress("127.0.0.1:3799")
+        .withMetaAddress("127.0.0.1:9559")
+        .withGraphAddress("127.0.0.1:9669")
         .build
     val nebulaWriteEdgeConfig: WriteNebulaEdgeConfig = WriteNebulaEdgeConfig
       .builder()
