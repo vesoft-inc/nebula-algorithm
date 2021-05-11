@@ -25,8 +25,9 @@ class ReloadProcessor(data: DataFrame,
   }
 
   private def processEachPartition(iterator: Iterator[Row]): Unit = {
-    val graphProvider = new GraphProvider(config.databaseConfig.getGraphAddress)
-    val session       = graphProvider.getGraphClient(config.userConfig)
+    val graphProvider =
+      new GraphProvider(config.databaseConfig.getGraphAddress, config.connectionConfig.timeout)
+    val session = graphProvider.getGraphClient(config.userConfig)
     if (session == null) {
       throw new IllegalArgumentException("connect to graph failed.")
     }

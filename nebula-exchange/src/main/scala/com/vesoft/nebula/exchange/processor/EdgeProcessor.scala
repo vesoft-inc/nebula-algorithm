@@ -57,11 +57,10 @@ class EdgeProcessor(data: DataFrame,
   private[this] val DEFAULT_MAX_CELL_LEVEL = 18
 
   private def processEachPartition(iterator: Iterator[Edge]): Unit = {
-    val graphProvider = new GraphProvider(config.databaseConfig.getGraphAddress)
+    val graphProvider =
+      new GraphProvider(config.databaseConfig.getGraphAddress, config.connectionConfig.timeout)
     val writer = new NebulaGraphClientWriter(config.databaseConfig,
                                              config.userConfig,
-                                             config.connectionConfig,
-                                             config.executionConfig.retry,
                                              config.rateConfig,
                                              edgeConfig,
                                              graphProvider)
@@ -98,7 +97,9 @@ class EdgeProcessor(data: DataFrame,
     val address = config.databaseConfig.getMetaAddress
     val space   = config.databaseConfig.space
 
-    val metaProvider    = new MetaProvider(address)
+    val timeout         = config.connectionConfig.timeout
+    val retry           = config.connectionConfig.retry
+    val metaProvider    = new MetaProvider(address, timeout, retry)
     val fieldTypeMap    = NebulaUtils.getDataSourceFieldType(edgeConfig, space, metaProvider)
     val isVidStringType = metaProvider.getVidType(space) == VidType.STRING
     val partitionNum    = metaProvider.getPartNumber(space)

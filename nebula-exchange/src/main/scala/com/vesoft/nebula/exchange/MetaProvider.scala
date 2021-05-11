@@ -20,7 +20,9 @@ import scala.collection.mutable.ListBuffer
 /**
   * MetaProvider provide nebula graph meta query operations.
   */
-class MetaProvider(addresses: List[HostAndPort]) extends AutoCloseable with Serializable {
+class MetaProvider(addresses: List[HostAndPort], timeout: Int, retry: Int)
+    extends AutoCloseable
+    with Serializable {
   private[this] lazy val LOG = Logger.getLogger(this.getClass)
 
   val address: ListBuffer[HostAddress] = new ListBuffer[HostAddress]
