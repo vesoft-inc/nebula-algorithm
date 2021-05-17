@@ -38,12 +38,12 @@ nebula-algorithm 是一款基于 [GraphX](https://spark.apache.org/graphx/) 的 
 
    * 设置配置文件
    
-    关于配置项的具体说明参考[示例配置](https://github.com/vesoft-inc/nebula-spark-utils/tree/master/nebula-spark-utils/nebula-algorithm/src/main/resources/application.conf)
+    关于配置项的具体说明参考[示例配置](https://github.com/vesoft-inc/nebula-spark-utils/blob/master/nebula-algorithm/src/main/resources/application.conf)
 
    * 提交算法任务
 
     ```
-    ${SPARK_HOME}/bin/spark-submit --master <mode> --class com.vesoft.nebula.algorithm.Main nebula-algorithm-2.0.0.jar -p property_file
+    ${SPARK_HOME}/bin/spark-submit --master <mode> --class com.vesoft.nebula.algorithm.Main nebula-algorithm-2.0.0.jar -p application.conf
     ```
 * 使用方法2：调用 nebula-algorithm 算法接口
 
@@ -62,7 +62,7 @@ nebula-algorithm 是一款基于 [GraphX](https://spark.apache.org/graphx/) 的 
    val louvainResult = PageRankAlgo.apply(spark, data, prConfig, false)
    ```
  
-    其他算法的调用方法见[测试示例](https://github.com/vesoft-inc/nebula-spark-utils/tree/master/nebula-spark-utils/nebula-algorithm/src/test/scala/com/vesoft/nebula/algorithm/lib) 。
+    其他算法的调用方法见[测试示例](https://github.com/vesoft-inc/nebula-spark-utils/tree/master/nebula-algorithm/src/test/scala/com/vesoft/nebula/algorithm/lib) 。
     
     *注：执行算法的DataFrame默认第一列是源点，第二列是目标点，第三列是边权重。*
 
