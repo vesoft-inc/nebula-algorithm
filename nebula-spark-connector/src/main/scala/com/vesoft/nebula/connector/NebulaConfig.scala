@@ -88,12 +88,17 @@ object NebulaConnectionConfig {
 /**
   * Base config needed when write dataframe into nebula graph
   */
-private[connector] class WriteNebulaConfig(space: String, user: String, passwd: String, batch: Int)
+private[connector] class WriteNebulaConfig(space: String,
+                                           user: String,
+                                           passwd: String,
+                                           batch: Int,
+                                           writeMode: String)
     extends Serializable {
-  def getSpace  = space
-  def getBatch  = batch
-  def getUser   = user
-  def getPasswd = passwd
+  def getSpace     = space
+  def getBatch     = batch
+  def getUser      = user
+  def getPasswd    = passwd
+  def getWriteMode = writeMode
 }
 
 /**
@@ -112,8 +117,9 @@ class WriteNebulaVertexConfig(space: String,
                               batch: Int,
                               vidAsProp: Boolean,
                               user: String,
-                              passwd: String)
-    extends WriteNebulaConfig(space, user, passwd, batch) {
+                              passwd: String,
+                              writeMode: String)
+    extends WriteNebulaConfig(space, user, passwd, batch, writeMode) {
   def getTagName   = tagName
   def getVidField  = vidField
   def getVidPolicy = if (vidPolicy == null) "" else vidPolicy
@@ -136,6 +142,7 @@ object WriteNebulaVertexConfig {
     var batch: Int        = 1000
     var user: String      = "root"
     var passwd: String    = "nebula"
+    var writeMode: String = "insert"
 
     /** whether set vid as property */
     var vidAsProp: Boolean = false
@@ -190,6 +197,11 @@ object WriteNebulaVertexConfig {
       this
     }
 
+    def withWriteMode(writeMode: String): WriteVertexConfigBuilder = {
+      this.writeMode = writeMode
+      this
+    }
+
     def build(): WriteNebulaVertexConfig = {
       check()
       new WriteNebulaVertexConfig(space,
@@ -199,7 +211,8 @@ object WriteNebulaVertexConfig {
                                   batch,
                                   vidAsProp,
                                   user,
-                                  passwd)
+                                  passwd,
+                                  writeMode)
     }
 
     private def check(): Unit = {
@@ -213,8 +226,14 @@ object WriteNebulaVertexConfig {
           || vidPolicy.equalsIgnoreCase(KeyPolicy.UUID.toString),
         "config vidPolicy is illegal, please don't set vidPolicy or set vidPolicy \"HASH\" or \"UUID\""
       )
+      try {
+        WriteMode.withName(writeMode.toLowerCase())
+      } catch {
+        case e: Throwable =>
+          assert(false, s"optional write mode: insert or update, your write mode is $writeMode")
+      }
       LOG.info(
-        s"NebulaWriteVertexConfig={space=$space,tagName=$tagName,vidField=$vidField,vidPolicy=$vidPolicy,batch=$batch}")
+        s"NebulaWriteVertexConfig={space=$space,tagName=$tagName,vidField=$vidField,vidPolicy=$vidPolicy,batch=$batch,writeMode=$writeMode}")
     }
   }
 
@@ -247,8 +266,9 @@ class WriteNebulaEdgeConfig(space: String,
                             dstAsProp: Boolean,
                             rankAsProp: Boolean,
                             user: String,
-                            passwd: String)
-    extends WriteNebulaConfig(space, user, passwd, batch) {
+                            passwd: String,
+                            writeMode: String)
+    extends WriteNebulaConfig(space, user, passwd, batch, writeMode) {
   def getEdgeName  = edgeName
   def getSrcFiled  = srcFiled
   def getSrcPolicy = if (srcPolicy == null) "" else srcPolicy
@@ -291,6 +311,8 @@ object WriteNebulaEdgeConfig {
 
     /** whether set rank as property */
     var rankAsProp: Boolean = false
+
+    var writeMode: String = WriteMode.INSERT.toString
 
     def withSpace(space: String): WriteEdgeConfigBuilder = {
       this.space = space
@@ -379,6 +401,11 @@ object WriteNebulaEdgeConfig {
       this
     }
 
+    def withWriteMode(writeMode: String): WriteEdgeConfigBuilder = {
+      this.writeMode = writeMode
+      this
+    }
+
     def build(): WriteNebulaEdgeConfig = {
       check()
       new WriteNebulaEdgeConfig(space,
@@ -393,7 +420,8 @@ object WriteNebulaEdgeConfig {
                                 dstAsProp,
                                 rankAsProp,
                                 user,
-                                passwd)
+                                passwd,
+                                writeMode)
     }
 
     private def check(): Unit = {
@@ -414,8 +442,14 @@ object WriteNebulaEdgeConfig {
         "config dstPolicy is illegal, please don't set dstPolicy or set dstPolicy \"HASH\" or \"UUID\""
       )
       assert(batch > 0, s"config batch must be positive, your batch is $batch.")
+      try {
+        WriteMode.withName(writeMode.toLowerCase)
+      } catch {
+        case e: Throwable =>
+          assert(false, s"optional write mode: insert or update, your write mode is $writeMode")
+      }
       LOG.info(
-        s"NebulaWriteEdgeConfig={space=$space,edgeName=$edgeName,srcField=$srcIdField,srcPolicy=$srcPolicy，dstField=$dstIdField,dstPolicy=$dstPolicy,rankField=$rankField}")
+        s"NebulaWriteEdgeConfig={space=$space,edgeName=$edgeName,srcField=$srcIdField,srcPolicy=$srcPolicy，dstField=$dstIdField,dstPolicy=$dstPolicy,rankField=$rankField,writeMode=$writeMode}")
     }
   }
 

@@ -7,7 +7,7 @@
 package com.vesoft.nebula.connector.writer
 
 import com.vesoft.nebula.connector.connector.{NebulaEdge, NebulaEdges}
-import com.vesoft.nebula.connector.{KeyPolicy, NebulaOptions}
+import com.vesoft.nebula.connector.{KeyPolicy, NebulaOptions, WriteMode}
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.sources.v2.writer.{DataWriter, WriterCommitMessage}
 import org.apache.spark.sql.types.StructType
@@ -76,7 +76,15 @@ class NebulaEdgeWriter(nebulaOptions: NebulaOptions,
 
   def execute(): Unit = {
     val nebulaEdges = NebulaEdges(propNames, edges.toList, srcPolicy, dstPolicy)
-    val exec        = NebulaExecutor.toExecuteSentence(nebulaOptions.label, nebulaEdges)
+    val exec = if (nebulaOptions.writeMode == WriteMode.INSERT) {
+      NebulaExecutor.toExecuteSentence(nebulaOptions.label, nebulaEdges)
+    } else {
+      nebulaEdges.values
+        .map { edge =>
+          NebulaExecutor.toUpdateExecuteStatement(nebulaOptions.label, nebulaEdges.propNames, edge)
+        }
+        .mkString(";")
+    }
     edges.clear()
     submit(exec)
   }
