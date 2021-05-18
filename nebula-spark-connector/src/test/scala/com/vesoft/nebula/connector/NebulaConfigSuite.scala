@@ -25,7 +25,11 @@ class NebulaConfigSuite extends AnyFunSuite with BeforeAndAfterAll {
     }
 
     try {
-      NebulaConnectionConfig.builder().withMetaAddress("127.0.0.1:45500").withTimeout(1).build()
+      NebulaConnectionConfig
+        .builder()
+        .withMetaAddress("127.0.0.1:9559")
+        .withTimeout(1)
+        .build()
       assert(true)
     } catch {
       case _: Throwable => assert(false)
