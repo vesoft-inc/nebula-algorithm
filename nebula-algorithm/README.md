@@ -58,7 +58,7 @@ Limitation: Due to Nebula Algorithm will not encode string id, thus during the a
 
    Now there are 10 algorithms provided in `lib` from `nebula-algorithm`, which could be invoked in a programming fashion as below:
    
-   * Add dependencies from `pom.xml`
+   * Add dependencies in `pom.xml`.
    ```
     <dependency>
          <groupId>com.vesoft</groupId>
@@ -66,7 +66,7 @@ Limitation: Due to Nebula Algorithm will not encode string id, thus during the a
          <version>2.0.0</version>
     </dependency>
    ```
-   * Pass arguments of the algorithm, below is an example for `PageRank`.
+   * Instantiate algorithm's config, below is an example for `PageRank`.
    ```
    val prConfig = new PRConfig(5, 1.0)
    val louvainResult = PageRankAlgo.apply(spark, data, prConfig, false)
