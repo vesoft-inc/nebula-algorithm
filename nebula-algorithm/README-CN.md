@@ -1,4 +1,4 @@
-# 欢迎使用 nebula-algorithm
+# 欢迎使用 Nebula Algorithm
 
 nebula-algorithm 是一款基于 [GraphX](https://spark.apache.org/graphx/) 的 Spark 应用程序，提供了以下图计算算法：
 
@@ -19,7 +19,7 @@ nebula-algorithm 是一款基于 [GraphX](https://spark.apache.org/graphx/) 的 
 使用 `nebula-algorithm`，可以通过提交 `Spark` 任务的形式使用完整的算法工具对 `Nebula Graph` 数据库中的数据执行图计算，也可以通过编程形式调用`lib`库下的算法针对DataFrame执行图计算。
 
 ## 如何获取
- 1. 编译打包 Nebula-Algorithm
+ 1. 编译打包 Nebula Algorithm
     ```
     $ git clone https://github.com/vesoft-inc/nebula-spark-utils.git
     $ cd nebula-algorithm
@@ -30,9 +30,9 @@ nebula-algorithm 是一款基于 [GraphX](https://spark.apache.org/graphx/) 的 
  2. 在 Maven 远程仓库下载
    https://repo1.maven.org/maven2/com/vesoft/nebula-algorithm/2.0.0/
 
-# 使用 Nebula-Algorithm
+# 使用 Nebula Algorithm
 
-   使用限制：Nebula-Algorithm 未自动对字符串id进行编码，因此执行图算法时，边的源点和目标点必须是整数（Nebula Space 的 vid_type可以是String类型，但数据必须是整数）。
+   使用限制：Nebula Algorithm 未自动对字符串id进行编码，因此执行图算法时，边的源点和目标点必须是整数（Nebula Space 的 vid_type可以是String类型，但数据必须是整数）。
    
 * 使用方法1：直接提交 nebula-algorithm 算法包
 
@@ -64,11 +64,11 @@ nebula-algorithm 是一款基于 [GraphX](https://spark.apache.org/graphx/) 的 
  
     其他算法的调用方法见[测试示例](https://github.com/vesoft-inc/nebula-spark-utils/tree/master/nebula-algorithm/src/test/scala/com/vesoft/nebula/algorithm/lib) 。
     
-    *注：执行算法的DataFrame默认第一列是源点，第二列是目标点，第三列是边权重。*
+    > 注：执行算法的DataFrame默认第一列是源点，第二列是目标点，第三列是边权重。
 
 ## 贡献
 
-nebula-algorithm 是一个完全开源的项目，欢迎开源爱好者通过以下方式参与：
+Nebula Algorithm 是一个完全开源的项目，欢迎开源爱好者通过以下方式参与：
 
 - 前往 [Nebula Graph 论坛](https://discuss.nebula-graph.com.cn/ "点击前往“Nebula Graph 论坛") 上参与 Issue 讨论，如答疑、提供想法或者报告无法解决的问题
 - 撰写或改进文档
