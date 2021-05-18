@@ -9,17 +9,19 @@ nebula-algorithm is a Spark Application based on [GraphX](https://spark.apache.o
 
 |          Name          |Use Case|
 |:------------------------:|:---------------:|
-|         PageRank         | 网页排序、重点节点挖掘|
-|         Louvain          | 社团挖掘、层次化聚类|
-|          KCore             |社区发现、金融风控|
-|     LabelPropagation     |资讯传播、广告推荐、社区发现|
-|    ConnectedComponent    |社区发现、孤岛发现|
-|StronglyConnectedComponent|社区发现|
-|       ShortestPath        |路径规划、网络规划|
-|       TriangleCount      |网络结构分析|
-|   BetweennessCentrality  |关键节点挖掘，节点影响力计算|
+|         PageRank         | page ranking, important node digging|
+|         Louvain          | community digging, hierarchical clustering|
+|          KCore           | community detection, financial risk control|
+|     LabelPropagation     | community detection, consultation propagation, advertising recommendation|
+|    ConnectedComponent    | community detection, isolated island detection|
+|StronglyConnectedComponent| community detection|
+|       ShortestPath       | path plan, network plan|
+|       TriangleCount      | network structure analysis|
+|   BetweennessCentrality  | important node digging, node influence calculation|
+|        DegreeStatic      | graph structure analysis|
 
-You could either leverage comprehensive Nebula-Algorithm tooling in way to submit its `Spark Application` or invoke its `lib` in a programming way to apply Graph Compute towards the `DataFrame`.
+
+You could submit the entire spark application or invoke algorithms in `lib` library to apply graph algorithms for DataFrame.
 
 ## Get Nebula-Algorithm
  1. Build Nebula-Algorithm
