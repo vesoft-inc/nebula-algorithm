@@ -6,10 +6,10 @@
 
 package com.vesoft.nebula.exchange.processor
 
-import com.vesoft.nebula.exchange.utils.NebulaUtils.DEFAULT_EMPTY_VALUE
 import com.vesoft.nebula.{Date, DateTime, NullType, Time, Value}
-import com.vesoft.nebula.meta.PropertyType
+import com.vesoft.nebula.exchange.utils.NebulaUtils.DEFAULT_EMPTY_VALUE
 import com.vesoft.nebula.exchange.utils.{HDFSUtils, NebulaUtils}
+import com.vesoft.nebula.meta.PropertyType
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types.{IntegerType, LongType, StringType}
 
@@ -44,7 +44,7 @@ trait Processor extends Serializable {
 
     if (row.isNullAt(index)) return null
 
-    fieldTypeMap(field) match {
+    PropertyType.valueOf(String.valueOf(fieldTypeMap(field))) match {
       case PropertyType.STRING | PropertyType.FIXED_STRING => {
         var value = row.get(index).toString
         if (value.equals(DEFAULT_EMPTY_VALUE)) {
@@ -76,7 +76,7 @@ trait Processor extends Serializable {
       return nullVal
     }
 
-    fieldTypeMap(field) match {
+    PropertyType.valueOf(String.valueOf(fieldTypeMap(field))) match {
       case PropertyType.UNKNOWN =>
         throw new IllegalArgumentException("date type in nebula is UNKNOWN.")
       case PropertyType.STRING | PropertyType.FIXED_STRING => {

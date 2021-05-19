@@ -5,7 +5,7 @@
     <parent>
         <artifactId>nebula-spark</artifactId>
         <groupId>com.vesoft</groupId>
-        <version>2.0.0</version>
+        <version>2.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -14,7 +14,7 @@
 
     <properties>
         <spark.version>2.4.4</spark.version>
-        <nebula.version>2.0.0</nebula.version>
+        <nebula.version>2.0.0-SNAPSHOT</nebula.version>
         <compiler.source.version>1.8</compiler.source.version>
         <compiler.target.version>1.8</compiler.target.version>
         <scalatest.version>3.2.3</scalatest.version>
