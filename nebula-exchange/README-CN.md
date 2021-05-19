@@ -9,18 +9,18 @@ Exchange 2.0 仅支持 Nebula Graph 2.x。
 
 ## 如何获取
 
-1. 编译打包 Exchange 2.0。
+1. 编译打包最新的 Exchange。
 
     ```bash
-    $ git clone -b v2.0.0 https://github.com/vesoft-inc/nebula-spark-utils.git
+    $ git clone https://github.com/vesoft-inc/nebula-spark-utils.git
     $ cd nebula-spark-utils/nebula-exchange
     $ mvn clean package -Dmaven.test.skip=true -Dgpg.skip -Dmaven.javadoc.skip=true
     ```
 
-    编译打包完成后，可以在 nebula-spark-utils/nebula-exchange/target/ 目录下看到 nebula-exchange-2.0.0.jar 文件。
+    编译打包完成后，可以在 nebula-spark-utils/nebula-exchange/target/ 目录下看到 nebula-exchange-2.0-SNAPSHOT.jar 文件。
 2. 在 Maven 远程仓库下载
     
-    https://repo1.maven.org/maven2/com/vesoft/nebula-exchange/2.0.0/
+    https://repo1.maven.org/maven2/com/vesoft/nebula-exchange/
 ## 使用说明
 
 特性 & 注意事项：
@@ -29,7 +29,7 @@ Exchange 2.0 仅支持 Nebula Graph 2.x。
 
 *2. Exchange 2.0 新增 null、Date、DateTime、Time 类型数据的导入（ DateTime 是 UTC 时区，非 Local time）。*
 
-*3. Exchange 2.0 支持 Hive on Spark 以外的 Hive 数据源，需在配置文件中配置 Hive 源，具体配置示例参考 [server_application.conf](https://github.com/vesoft-inc/nebula-spark-utils/blob/main/nebula-exchange/src/main/resources/server_application.conf) 中 Hive 的配置。*
+*3. Exchange 2.0 支持 Hive on Spark 以外的 Hive 数据源，需在配置文件中配置 Hive 源，具体配置示例参考 [application.conf](https://github.com/vesoft-inc/nebula-spark-utils/tree/master/nebula-exchange/src/main/resources/application.conf) 中 Hive 的配置。*
 
 *4. Exchange 2.0 将导入失败的 INSERT 语句进行落盘，存于配置文件的 error/output 路径中。*
 
@@ -51,6 +51,8 @@ $SPARK_HOME/bin/spark-submit --class com.vesoft.nebula.exchange.Exchange \
 nebula-exchange-2.0.0.jar \
 -c application.conf
 ```
+
+关于 Nebula Exchange 的更多说明，请参考 Exchange 2.0 的[使用手册](https://docs.nebula-graph.com.cn/2.0.1/nebula-exchange/about-exchange/ex-ug-what-is-exchange/) 。
 
 ## 贡献
 
