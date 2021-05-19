@@ -30,6 +30,16 @@ If your source is HIVE, import command is:
 $SPARK_HOME/bin/spark-submit --class com.vesoft.nebula.exchange.Exchange --master local nebula-exchange-2.0.0.jar -c /path/to/application.conf -h
 ```
 
+Note：Submit Exchange with Yarn-Cluster mode, please use following command：
+```
+$SPARK_HOME/bin/spark-submit --class com.vesoft.nebula.exchange.Exchange \
+--master yarn-cluster \
+--files application.conf \
+--conf spark.driver.extraClassPath=./ \
+--conf spark.executor.extraClassPath=./ \
+nebula-exchange-2.0.0.jar \
+-c application.conf
+```
 For more details about Exchange, please refer to [Exchange 1.0](https://github.com/vesoft-inc/nebula-java/tree/v1.0/tools/exchange) .
 
 

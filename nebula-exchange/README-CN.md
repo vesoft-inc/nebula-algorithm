@@ -41,6 +41,17 @@ $SPARK_HOME/bin/spark-submit --class com.vesoft.nebula.exchange.Exchange --maste
 ```
 如果数据源有HIVE，则导入命令最后还需要加 `-h` 表示启用HIVE数据源。
 
+注：在Yarn-Cluster模式下提交 Exchange，请使用如下提交命令：
+```
+$SPARK_HOME/bin/spark-submit --class com.vesoft.nebula.exchange.Exchange \
+--master yarn-cluster \
+--files application.conf \
+--conf spark.driver.extraClassPath=./ \
+--conf spark.executor.extraClassPath=./ \
+nebula-exchange-2.0.0.jar \
+-c application.conf
+```
+
 ## 贡献
 
 Nebula Exchange 2.0 是一个完全开源的项目，欢迎开源爱好者通过以下方式参与：
