@@ -136,7 +136,7 @@ object NebulaExecutor {
     val propValue = record.get(index, types(index))
 
     val fieldName = schema.fields(index).name
-    PropertyType.valueOf(String.valueOf(fieldTypeMap(fieldName))) match {
+    PropertyType.findByValue(fieldTypeMap(fieldName)) match {
       case PropertyType.STRING | PropertyType.FIXED_STRING =>
         NebulaUtils.escapeUtil(propValue.toString).mkString("\"", "", "\"")
       case PropertyType.DATE     => "date(\"" + propValue + "\")"

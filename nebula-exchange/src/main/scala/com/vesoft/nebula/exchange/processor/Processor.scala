@@ -44,7 +44,7 @@ trait Processor extends Serializable {
 
     if (row.isNullAt(index)) return null
 
-    PropertyType.valueOf(String.valueOf(fieldTypeMap(field))) match {
+    PropertyType.findByValue(fieldTypeMap(field)) match {
       case PropertyType.STRING | PropertyType.FIXED_STRING => {
         var value = row.get(index).toString
         if (value.equals(DEFAULT_EMPTY_VALUE)) {
@@ -76,7 +76,7 @@ trait Processor extends Serializable {
       return nullVal
     }
 
-    PropertyType.valueOf(String.valueOf(fieldTypeMap(field))) match {
+    PropertyType.findByValue(fieldTypeMap(field)) match {
       case PropertyType.UNKNOWN =>
         throw new IllegalArgumentException("date type in nebula is UNKNOWN.")
       case PropertyType.STRING | PropertyType.FIXED_STRING => {
