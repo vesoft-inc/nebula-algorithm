@@ -63,12 +63,11 @@ class VerticesProcessor(data: DataFrame,
   private[this] lazy val LOG = Logger.getLogger(this.getClass)
 
   private def processEachPartition(iterator: Iterator[Vertex]): Unit = {
-    val graphProvider = new GraphProvider(config.databaseConfig.getGraphAddress)
+    val graphProvider =
+      new GraphProvider(config.databaseConfig.getGraphAddress, config.connectionConfig.timeout)
 
     val writer = new NebulaGraphClientWriter(config.databaseConfig,
                                              config.userConfig,
-                                             config.connectionConfig,
-                                             config.executionConfig.retry,
                                              config.rateConfig,
                                              tagConfig,
                                              graphProvider)
@@ -106,7 +105,9 @@ class VerticesProcessor(data: DataFrame,
     val address = config.databaseConfig.getMetaAddress
     val space   = config.databaseConfig.space
 
-    val metaProvider    = new MetaProvider(address)
+    val timeout         = config.connectionConfig.timeout
+    val retry           = config.connectionConfig.retry
+    val metaProvider    = new MetaProvider(address, timeout, retry)
     val fieldTypeMap    = NebulaUtils.getDataSourceFieldType(tagConfig, space, metaProvider)
     val isVidStringType = metaProvider.getVidType(space) == VidType.STRING
     val partitionNum    = metaProvider.getPartNumber(space)

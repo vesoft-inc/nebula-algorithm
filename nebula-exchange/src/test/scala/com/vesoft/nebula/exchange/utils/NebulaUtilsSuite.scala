@@ -82,7 +82,7 @@ class NebulaUtilsSuite {
     val space   = "test_string"
     val address = new ListBuffer[HostAndPort]()
     address.append(HostAndPort.fromParts("127.0.0.1", 9559))
-    val metaProvider = new MetaProvider(address.toList)
+    val metaProvider = new MetaProvider(address.toList, 6000, 1)
 
     val map: Map[String, Int] =
       NebulaUtils.getDataSourceFieldType(sourceConfig, space, metaProvider)

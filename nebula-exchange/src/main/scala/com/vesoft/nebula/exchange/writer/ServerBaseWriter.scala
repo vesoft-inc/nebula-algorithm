@@ -118,8 +118,6 @@ abstract class ServerBaseWriter extends Writer {
   */
 class NebulaGraphClientWriter(dataBaseConfigEntry: DataBaseConfigEntry,
                               userConfigEntry: UserConfigEntry,
-                              connectionConfigEntry: ConnectionConfigEntry,
-                              executionRetry: Int,
                               rateConfig: RateConfigEntry,
                               config: SchemaConfigEntry,
                               graphProvider: GraphProvider)
@@ -131,8 +129,6 @@ class NebulaGraphClientWriter(dataBaseConfigEntry: DataBaseConfigEntry,
       && dataBaseConfigEntry.getMetaAddress.nonEmpty
       && dataBaseConfigEntry.space.trim.nonEmpty)
   require(userConfigEntry.user.trim.nonEmpty && userConfigEntry.password.trim.nonEmpty)
-  require(connectionConfigEntry.timeout > 0 && connectionConfigEntry.retry > 0)
-  require(executionRetry > 0)
 
   val session     = graphProvider.getGraphClient(userConfigEntry)
   val rateLimiter = RateLimiter.create(rateConfig.limit)
