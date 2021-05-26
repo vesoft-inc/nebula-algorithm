@@ -10,7 +10,7 @@ import java.util.concurrent.{CountDownLatch, TimeUnit}
 
 import com.google.common.base.Optional
 import com.google.common.util.concurrent.{FutureCallback, RateLimiter}
-import com.vesoft.nebula.graph.ErrorCode
+import com.vesoft.nebula.ErrorCode
 import com.vesoft.nebula.exchange.config.{
   ConnectionConfigEntry,
   DataBaseConfigEntry,
@@ -194,15 +194,15 @@ class NebulaWriterCallback(latch: CountDownLatch,
 
   override def onSuccess(results: java.util.List[Optional[Integer]]): Unit = {
     if (pathAndOffset.isDefined) {
-      if (results.asScala.forall(_.get() == ErrorCode.SUCCEEDED))
+      if (results.asScala.forall(_.get() == ErrorCode.SUCCEEDED.getValue))
         HDFSUtils.saveContent(pathAndOffset.get._1, pathAndOffset.get._2.toString)
       else
         throw new RuntimeException(
-          s"Some error code: ${results.asScala.filter(_.get() != ErrorCode.SUCCEEDED).head} appear")
+          s"Some error code: ${results.asScala.filter(_.get() != ErrorCode.SUCCEEDED.getValue).head} appear")
     }
     for (result <- results.asScala) {
       latch.countDown()
-      if (result.get() == ErrorCode.SUCCEEDED) {
+      if (result.get() == ErrorCode.SUCCEEDED.getValue) {
         batchSuccess.add(1)
       } else {
         LOG.error(s"batch insert error with code ${result.get()}, batch size is ${results.size()}")

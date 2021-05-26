@@ -49,7 +49,7 @@ class MetaProvider(addresses: List[HostAndPort]) extends AutoCloseable with Seri
 
     val columns = tagSchema.getColumns
     for (colDef <- columns.asScala) {
-      schema.put(new String(colDef.getName), colDef.getType.getType)
+      schema.put(new String(colDef.getName), colDef.getType.getType.getValue)
     }
     schema.toMap
   }
@@ -60,7 +60,7 @@ class MetaProvider(addresses: List[HostAndPort]) extends AutoCloseable with Seri
 
     val columns = edgeSchema.getColumns
     for (colDef <- columns.asScala) {
-      schema.put(new String(colDef.getName), colDef.getType.getType)
+      schema.put(new String(colDef.getName), colDef.getType.getType.getValue)
     }
     schema.toMap
   }
