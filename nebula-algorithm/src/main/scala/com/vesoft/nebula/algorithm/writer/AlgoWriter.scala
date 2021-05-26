@@ -8,7 +8,7 @@ package com.vesoft.nebula.algorithm.writer
 
 import com.vesoft.nebula.connector.connector.NebulaDataFrameWriter
 import com.vesoft.nebula.connector.{NebulaConnectionConfig, WriteNebulaVertexConfig}
-import com.vesoft.nebula.algorithm.config.Configs
+import com.vesoft.nebula.algorithm.config.{AlgoConstants, Configs}
 import org.apache.spark.sql.DataFrame
 
 abstract class AlgoWriter(data: DataFrame, configs: Configs) {
@@ -35,7 +35,7 @@ class NebulaWriter(data: DataFrame, configs: Configs) extends AlgoWriter(data, c
       .builder()
       .withSpace(space)
       .withTag(tag)
-      .withVidField("_id")
+      .withVidField(AlgoConstants.ALGO_ID_COL)
       .withVidAsProp(false)
       .withBatch(1000)
       .build()
