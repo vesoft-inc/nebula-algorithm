@@ -30,7 +30,7 @@ jobs:
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-maven-
 
-    - name: download neo4j-contrib dependency
+    - name: download neo4j-contrib & graphframes dependency
       run: |
         wget https://oss-cdn.nebula-graph.com.cn/jar-packages/neo4j-contrib.zip
         wget https://oss-cdn.nebula-graph.com.cn/jar-packages/graphframes.zip
