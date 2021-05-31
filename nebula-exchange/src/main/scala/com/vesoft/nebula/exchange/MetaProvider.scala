@@ -20,7 +20,9 @@ import scala.collection.mutable.ListBuffer
 /**
   * MetaProvider provide nebula graph meta query operations.
   */
-class MetaProvider(addresses: List[HostAndPort]) extends AutoCloseable with Serializable {
+class MetaProvider(addresses: List[HostAndPort], timeout: Int, retry: Int)
+    extends AutoCloseable
+    with Serializable {
   private[this] lazy val LOG = Logger.getLogger(this.getClass)
 
   val address: ListBuffer[HostAddress] = new ListBuffer[HostAddress]
@@ -49,7 +51,7 @@ class MetaProvider(addresses: List[HostAndPort]) extends AutoCloseable with Seri
 
     val columns = tagSchema.getColumns
     for (colDef <- columns.asScala) {
-      schema.put(new String(colDef.getName), colDef.getType.getType)
+      schema.put(new String(colDef.getName), colDef.getType.getType.getValue)
     }
     schema.toMap
   }
@@ -60,7 +62,7 @@ class MetaProvider(addresses: List[HostAndPort]) extends AutoCloseable with Seri
 
     val columns = edgeSchema.getColumns
     for (colDef <- columns.asScala) {
-      schema.put(new String(colDef.getName), colDef.getType.getType)
+      schema.put(new String(colDef.getName), colDef.getType.getType.getValue)
     }
     schema.toMap
   }

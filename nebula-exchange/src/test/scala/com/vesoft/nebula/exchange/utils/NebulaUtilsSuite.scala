@@ -82,22 +82,22 @@ class NebulaUtilsSuite {
     val space   = "test_string"
     val address = new ListBuffer[HostAndPort]()
     address.append(HostAndPort.fromParts("127.0.0.1", 9559))
-    val metaProvider = new MetaProvider(address.toList)
+    val metaProvider = new MetaProvider(address.toList, 6000, 1)
 
     val map: Map[String, Int] =
       NebulaUtils.getDataSourceFieldType(sourceConfig, space, metaProvider)
-    assert(map("col1") == PropertyType.STRING)
-    assert(map("col2") == PropertyType.FIXED_STRING)
-    assert(map("col3") == PropertyType.INT8)
-    assert(map("col4") == PropertyType.INT16)
-    assert(map("col5") == PropertyType.INT32)
-    assert(map("col6") == PropertyType.INT64)
-    assert(map("col7") == PropertyType.DATE)
-    assert(map("col8") == PropertyType.DATETIME)
-    assert(map("col9") == PropertyType.TIMESTAMP)
-    assert(map("col10") == PropertyType.BOOL)
-    assert(map("col11") == PropertyType.DOUBLE)
-    assert(map("col12") == PropertyType.FLOAT)
+    assert(map("col1") == PropertyType.STRING.getValue)
+    assert(map("col2") == PropertyType.FIXED_STRING.getValue)
+    assert(map("col3") == PropertyType.INT8.getValue)
+    assert(map("col4") == PropertyType.INT16.getValue)
+    assert(map("col5") == PropertyType.INT32.getValue)
+    assert(map("col6") == PropertyType.INT64.getValue)
+    assert(map("col7") == PropertyType.DATE.getValue)
+    assert(map("col8") == PropertyType.DATETIME.getValue)
+    assert(map("col9") == PropertyType.TIMESTAMP.getValue)
+    assert(map("col10") == PropertyType.BOOL.getValue)
+    assert(map("col11") == PropertyType.DOUBLE.getValue)
+    assert(map("col12") == PropertyType.FLOAT.getValue)
   }
 
   @Test

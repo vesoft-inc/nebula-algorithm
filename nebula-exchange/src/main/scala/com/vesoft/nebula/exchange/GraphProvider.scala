@@ -19,7 +19,9 @@ import scala.collection.mutable.ListBuffer
 /**
   * GraphProvider for Nebula Graph Service
   */
-class GraphProvider(addresses: List[HostAndPort]) extends AutoCloseable with Serializable {
+class GraphProvider(addresses: List[HostAndPort], timeout: Int)
+    extends AutoCloseable
+    with Serializable {
   private[this] lazy val LOG = Logger.getLogger(this.getClass)
 
   @transient val nebulaPoolConfig = new NebulaPoolConfig
@@ -29,6 +31,8 @@ class GraphProvider(addresses: List[HostAndPort]) extends AutoCloseable with Ser
     address.append(new HostAddress(addr.getHostText, addr.getPort))
   }
   val randAddr = scala.util.Random.shuffle(address)
+
+  nebulaPoolConfig.setTimeout(timeout)
   pool.init(randAddr.asJava, nebulaPoolConfig)
 
   def getGraphClient(userConfigEntry: UserConfigEntry): Session = {

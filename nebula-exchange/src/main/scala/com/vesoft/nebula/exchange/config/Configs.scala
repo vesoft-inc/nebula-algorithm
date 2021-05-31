@@ -186,10 +186,10 @@ case class Configs(databaseConfig: DataBaseConfigEntry,
 object Configs {
   private[this] val LOG = Logger.getLogger(this.getClass)
 
-  private[this] val DEFAULT_CONNECTION_TIMEOUT   = 3000
+  private[this] val DEFAULT_CONNECTION_TIMEOUT   = Integer.MAX_VALUE
   private[this] val DEFAULT_CONNECTION_RETRY     = 3
   private[this] val DEFAULT_EXECUTION_RETRY      = 3
-  private[this] val DEFAULT_EXECUTION_TIMEOUT    = 3000
+  private[this] val DEFAULT_EXECUTION_TIMEOUT    = Integer.MAX_VALUE
   private[this] val DEFAULT_EXECUTION_INTERVAL   = 3000
   private[this] val DEFAULT_ERROR_OUTPUT_PATH    = "/tmp/nebula.writer.errors/"
   private[this] val DEFAULT_ERROR_MAX_BATCH_SIZE = Int.MaxValue
