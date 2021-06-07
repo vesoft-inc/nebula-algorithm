@@ -7,18 +7,18 @@ Exchange 2.0 only supports Nebula Graph 2.0 . If you want to import data for Neb
 
 ## How to get
 
-1. Package Exchange 2.0。
+1. Package latest Exchange。
 
     ```bash
-    $ git clone -b v2.0.0 https://github.com/vesoft-inc/nebula-spark-utils.git
+    $ git clone https://github.com/vesoft-inc/nebula-spark-utils.git
     $ cd nebula-spark-utils/nebula-exchange
     $ mvn clean package -Dmaven.test.skip=true -Dgpg.skip -Dmaven.javadoc.skip=true
     ```
 
-    After the packaging, you can see the newly generated nebula-exchange-2.0.0.jar under the nebula-spark-utils/nebula-exchange/target/ directory.
+    After the packaging, you can see the newly generated nebula-exchange-2.0-SNAPSHOT.jar under the nebula-spark-utils/nebula-exchange/target/ directory.
 2. Download from Maven repository
    
-   https://repo1.maven.org/maven2/com/vesoft/nebula-exchange/2.0.0/
+   https://repo1.maven.org/maven2/com/vesoft/nebula-exchange/
 ## How to use
 
 Import command:
@@ -30,7 +30,18 @@ If your source is HIVE, import command is:
 $SPARK_HOME/bin/spark-submit --class com.vesoft.nebula.exchange.Exchange --master local nebula-exchange-2.0.0.jar -c /path/to/application.conf -h
 ```
 
-For more details about Exchange, please refer to [Exchange 1.0](https://github.com/vesoft-inc/nebula-java/tree/v1.0/tools/exchange) .
+Note：Submit Exchange with Yarn-Cluster mode, please use following command：
+```
+$SPARK_HOME/bin/spark-submit --class com.vesoft.nebula.exchange.Exchange \
+--master yarn-cluster \
+--files application.conf \
+--conf spark.driver.extraClassPath=./ \
+--conf spark.executor.extraClassPath=./ \
+nebula-exchange-2.0.0.jar \
+-c application.conf
+```
+
+For more details about Exchange, please refer to [Exchange 2.0](https://docs.nebula-graph.io/2.0.1/16.eco-tools/1.nebula-exchange/) .
 
 
 ## New Features
