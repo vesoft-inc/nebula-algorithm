@@ -254,7 +254,7 @@ class WriteNebulaEdgeConfig(space: String,
   def getSrcPolicy = if (srcPolicy == null) "" else srcPolicy
   def getDstField  = dstField
   def getDstPolicy = if (dstPolicy == null) "" else dstPolicy
-  def getRankField = rankField
+  def getRankField = if (rankField == null) "" else rankField
 
   def getSrcAsProp  = srcAsProp
   def getDstAsProp  = dstAsProp
