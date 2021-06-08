@@ -88,7 +88,7 @@ class NebulaDataSource
     } else {
       val srcVertexFiled = nebulaOptions.srcVertexField
       val dstVertexField = nebulaOptions.dstVertexField
-      val rankExist      = nebulaOptions.rankField != null
+      val rankExist      = !nebulaOptions.rankField.isEmpty
       val edgeFieldsIndex = {
         var srcIndex: Int  = -1
         var dstIndex: Int  = -1
