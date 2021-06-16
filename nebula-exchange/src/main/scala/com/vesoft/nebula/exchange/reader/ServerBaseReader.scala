@@ -82,13 +82,15 @@ class MySQLReader(override val session: SparkSession, mysqlConfig: MySQLSourceCo
   override def read(): DataFrame = {
     val url =
       s"jdbc:mysql://${mysqlConfig.host}:${mysqlConfig.port}/${mysqlConfig.database}?useUnicode=true&characterEncoding=utf-8"
-    session.read
+    val df = session.read
       .format("jdbc")
       .option("url", url)
       .option("dbtable", mysqlConfig.table)
       .option("user", mysqlConfig.user)
       .option("password", mysqlConfig.password)
       .load()
+    df.createOrReplaceTempView(mysqlConfig.table)
+    session.sql(sentence)
   }
 }
 
