@@ -11,6 +11,18 @@ import org.apache.hadoop.fs.{FileSystem, Path}
 import scala.collection.mutable.ArrayBuffer
 
 object ErrorHandler {
+
+  /**
+    * clean all the failed data for error path before reload.
+    */
+  def clear(path: String): Unit = {
+    val fileSystem = FileSystem.get(new Configuration())
+    fileSystem.removeAcl(new Path(path))
+  }
+
+  /**
+    * save the failed execute statement.
+    */
   def save(buffer: ArrayBuffer[String], path: String): Unit = {
     val fileSystem = FileSystem.get(new Configuration())
     val errors     = fileSystem.create(new Path(path))

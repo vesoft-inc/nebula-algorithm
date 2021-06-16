@@ -8,6 +8,8 @@ package com.vesoft.nebula.exchange.processor
 
 import com.vesoft.nebula.exchange.{ErrorHandler, GraphProvider}
 import com.vesoft.nebula.exchange.config.Configs
+import com.vesoft.nebula.exchange.writer.NebulaGraphClientWriter
+import org.apache.log4j.Logger
 import org.apache.spark.TaskContext
 import org.apache.spark.sql.{DataFrame, Row}
 import org.apache.spark.util.LongAccumulator
@@ -19,6 +21,7 @@ class ReloadProcessor(data: DataFrame,
                       batchSuccess: LongAccumulator,
                       batchFailure: LongAccumulator)
     extends Processor {
+  private val LOG = Logger.getLogger(this.getClass)
 
   override def process(): Unit = {
     data.foreachPartition(processEachPartition(_))
@@ -27,27 +30,37 @@ class ReloadProcessor(data: DataFrame,
   private def processEachPartition(iterator: Iterator[Row]): Unit = {
     val graphProvider =
       new GraphProvider(config.databaseConfig.getGraphAddress, config.connectionConfig.timeout)
-    val session = graphProvider.getGraphClient(config.userConfig)
-    if (session == null) {
-      throw new IllegalArgumentException("connect to graph failed.")
-    }
+
+    val writer = new NebulaGraphClientWriter(config.databaseConfig,
+                                             config.userConfig,
+                                             config.rateConfig,
+                                             null,
+                                             graphProvider)
 
     val errorBuffer = ArrayBuffer[String]()
+    ErrorHandler.clear(config.errorConfig.errorPath)
 
-    iterator.foreach(row => {
-      val exec   = row.getString(0)
-      val result = session.execute(exec)
-      if (result == null || !result.isSucceeded) {
-        errorBuffer.append(exec)
-        batchFailure.add(1)
-      } else {
+    writer.prepare()
+    // batch write tags
+    val startTime = System.currentTimeMillis
+    iterator.foreach { row =>
+      val failStatement = writer.writeNgql(row.getString(0))
+      if (failStatement == null) {
         batchSuccess.add(1)
+      } else {
+        errorBuffer.append(failStatement)
+        batchFailure.add(1)
       }
-    })
+    }
     if (errorBuffer.nonEmpty) {
       ErrorHandler.save(errorBuffer,
                         s"${config.errorConfig.errorPath}/reload.${TaskContext.getPartitionId()}")
       errorBuffer.clear()
     }
+    LOG.info(
+      s"spark partition for vertex reload time:" +
+        s"${TaskContext.getPartitionId()}-${System.currentTimeMillis() - startTime}")
+    writer.close()
+    graphProvider.close()
   }
 }
