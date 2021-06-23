@@ -25,6 +25,7 @@ object SourceCategory extends Enumeration {
   val JANUS_GRAPH = Value("JANUS GRAPH")
   val MYSQL       = Value("MYSQL")
   val HBASE       = Value("HBASE")
+  val MAXCOMPUTE  = Value("MAXCOMPUTE")
 
   val SOCKET = Value("SOCKET")
   val KAFKA  = Value("KAFKA")
@@ -216,4 +217,26 @@ case class HBaseSourceConfigEntry(override val category: SourceCategory.Value,
   override def toString: String = {
     s"HBase source host: $host, port: $port, table: $table"
   }
+}
+
+/**
+  * MaxComputeConfigEntry
+  */
+case class MaxComputeConfigEntry(override val category: SourceCategory.Value,
+                                 odpsUrl: String,
+                                 tunnelUrl: String,
+                                 table: String,
+                                 project: String,
+                                 accessKeyId: String,
+                                 accessKeySecret: String)
+    extends ServerDataSourceConfigEntry() {
+  require(
+    !odpsUrl.trim.isEmpty && !tunnelUrl.trim.isEmpty && !table.trim.isEmpty && !project.trim.isEmpty && !accessKeyId.trim.isEmpty && !accessKeySecret.trim.isEmpty)
+
+  override def sentence: String = null
+
+  override def toString: String = {
+    s"MaxCompute source odpsUrl: $odpsUrl, tunnelUrl: $tunnelUrl, table: $table, project: $project, keyId: $accessKeyId, keySecret: $accessKeySecret"
+  }
+
 }
