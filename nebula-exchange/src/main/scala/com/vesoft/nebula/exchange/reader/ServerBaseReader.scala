@@ -269,7 +269,7 @@ class MaxcomputeReader(override val session: SparkSession, maxComputeConfig: Max
 
   override def read(): DataFrame = {
     val df = session.read
-      .format("org.apache.spark.aliyun.maxcompute.datasource")
+      .format("org.apache.spark.aliyun.odps.datasource")
       .option("odpsUrl", maxComputeConfig.odpsUrl)
       .option("tunnelUrl", maxComputeConfig.tunnelUrl)
       .option("table", maxComputeConfig.table)

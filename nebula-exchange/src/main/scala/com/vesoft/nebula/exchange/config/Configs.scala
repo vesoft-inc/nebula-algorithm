@@ -613,10 +613,10 @@ object Configs {
       case SourceCategory.MAXCOMPUTE => {
         MaxComputeConfigEntry(
           SourceCategory.MAXCOMPUTE,
-          config.getString("table"),
-          config.getString("project"),
           config.getString("odpsUrl"),
           config.getString("tunnelUrl"),
+          config.getString("table"),
+          config.getString("project"),
           config.getString("accessKeyId"),
           config.getString("accessKeySecret")
         )
