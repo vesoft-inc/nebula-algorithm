@@ -37,6 +37,9 @@ object ErrorHandler {
     }
   }
 
+  /**
+    * check if path exists
+    */
   def existError(path: String): Boolean = {
     val fileSystem = FileSystem.get(new Configuration())
     fileSystem.exists(new Path(path))
