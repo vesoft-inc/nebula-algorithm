@@ -611,6 +611,11 @@ object Configs {
                                config.getString("columnFamily"),
                                fields.toSet.toList)
       case SourceCategory.MAXCOMPUTE => {
+        val sentence = if (config.hasPath("sentence")) {
+          config.getString("sentence")
+        } else {
+          null
+        }
         MaxComputeConfigEntry(
           SourceCategory.MAXCOMPUTE,
           config.getString("odpsUrl"),
@@ -618,7 +623,8 @@ object Configs {
           config.getString("table"),
           config.getString("project"),
           config.getString("accessKeyId"),
-          config.getString("accessKeySecret")
+          config.getString("accessKeySecret"),
+          sentence
         )
       }
       case _ =>

@@ -265,7 +265,7 @@ class HBaseReader(override val session: SparkSession, hbaseConfig: HBaseSourceCo
   * MaxCompute Reader
   */
 class MaxcomputeReader(override val session: SparkSession, maxComputeConfig: MaxComputeConfigEntry)
-    extends ServerBaseReader(session, null) {
+    extends ServerBaseReader(session, maxComputeConfig.sentence) {
 
   override def read(): DataFrame = {
     val df = session.read
@@ -277,6 +277,12 @@ class MaxcomputeReader(override val session: SparkSession, maxComputeConfig: Max
       .option("accessKeyId", maxComputeConfig.accessKeyId)
       .option("accessKeySecret", maxComputeConfig.accessKeySecret)
       .load()
-    df
+    import session._
+    if (maxComputeConfig.sentence == null) {
+      df
+    } else {
+      df.createOrReplaceTempView(s"${maxComputeConfig.table}")
+      session.sql(maxComputeConfig.sentence)
+    }
   }
 }
