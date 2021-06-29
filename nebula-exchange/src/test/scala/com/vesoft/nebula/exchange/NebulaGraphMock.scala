@@ -9,11 +9,13 @@ package scala.com.vesoft.nebula.exchange
 import com.vesoft.nebula.client.graph.NebulaPoolConfig
 import com.vesoft.nebula.client.graph.data.HostAddress
 import com.vesoft.nebula.client.graph.net.NebulaPool
+import org.apache.log4j.Logger
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
 
 class NebulaGraphMock {
+  private[this] val LOG = Logger.getLogger(this.getClass)
 
   @transient val nebulaPoolConfig = new NebulaPoolConfig
   @transient val pool: NebulaPool = new NebulaPool
@@ -26,16 +28,17 @@ class NebulaGraphMock {
   def mockStringIdGraph(): Unit = {
     val session = pool.getSession("root", "nebula", true)
 
-    val createSpace = "CREATE SPACE IF NOT EXISTS test_string(partition_num=10);" +
+    val createSpace = "CREATE SPACE IF NOT EXISTS test_string(partition_num=10,vid_type=fixed_string(8));" +
       "USE test_string;" + "CREATE TAG IF NOT EXISTS person(col1 string, col2 fixed_string(8), col3 int8, col4 int16, col5 int32, col6 int64, col7 date, col8 datetime, col9 timestamp, col10 bool, col11 double, col12 float, col13 time);" +
       "CREATE EDGE IF NOT EXISTS friend(col1 string, col2 fixed_string(8), col3 int8, col4 int16, col5 int32, col6 int64, col7 date, col8 datetime, col9 timestamp, col10 bool, col11 double, col12 float, col13 time);";
     val createResp = session.execute(createSpace)
     if (!createResp.isSucceeded) {
       close()
+      LOG.error("create string type space failed," + createResp.getErrorMessage)
       sys.exit(-1)
     }
 
-    Thread.sleep(3000)
+    Thread.sleep(10000)
     val insertTag =
       "INSERT VERTEX person(col1, col2, col3, col4, col5, col6, col7, col8, col9, col10, col11, col12, col13) VALUES " +
         " \"1\":(\"person1\", \"person1\", 11, 200, 1000, 188888, date(\"2021-01-01\"), datetime(\"2021-01-01T12:00:00\"),timestamp(\"2021-01-01T12:00:00\"), true, 1.0, 2.0, time(\"12:01:01\"))," +
@@ -52,11 +55,13 @@ class NebulaGraphMock {
         " \"12\":(\"person12\", \"person11\", 22, 1300, 12000, 1288888, date(\"2021-01-12\"), datetime(\"2021-01-12T12:00:00\"),timestamp(\"2021-01-12T12:00:00\"), true, 1.0, 2.0, time(\"12:01:01\"))," +
         " \"-1\":(\"person00\", \"person00\", 23, 1400, 13000, 1388888, date(\"2021-01-13\"), datetime(\"2021-01-12T12:00:00\"),timestamp(\"2021-01-12T12:00:00\"), true, 1.0, 2.0, time(\"12:01:01\"))," +
         " \"-2\":(\"person01\", \"person01\", 24, 1500, 14000, 1488888, date(\"2021-01-14\"), datetime(\"2021-01-12T12:00:00\"),timestamp(\"2021-01-12T12:00:00\"), true, 1.0, 2.0, time(\"12:01:01\"))," +
+        " \"-3\":(\"person02\", \"person02\", 24, 1500, 14000, 1488888, date(\"2021-01-14\"), datetime(\"2021-01-12T12:00:00\"),timestamp(\"2021-01-12T12:00:00\"), true, 1.0, 2.0, time(\"12:01:01\"))," +
         " \"19\":(\"person19\", \"person22\", 25, 1500, 14000, 1488888, date(\"2021-01-14\"), datetime(\"2021-01-12T12:00:00\"),timestamp(\"2021-01-12T12:00:00\"), true, 1.0, 2.0, time(\"12:01:01\"))," +
         " \"22\":(\"person22\", \"person22\", 26, 1500, 14000, 1488888, date(\"2021-01-14\"), datetime(\"2021-01-12T12:00:00\"),timestamp(\"2021-01-12T12:00:00\"), true, 1.0, 2.0, time(\"12:01:01\"))"
     val insertTagResp = session.execute(insertTag)
     if (!insertTagResp.isSucceeded) {
       close()
+      LOG.error("insert vertex for string type space failed," + insertTagResp.getErrorMessage)
       sys.exit(-1)
     }
 
@@ -78,6 +83,7 @@ class NebulaGraphMock {
     val insertEdgeResp = session.execute(insertEdge)
     if (!insertEdgeResp.isSucceeded) {
       close()
+      LOG.error("insert edge for string type space failed," + insertEdgeResp.getErrorMessage)
       sys.exit(-1)
     }
   }
@@ -91,9 +97,11 @@ class NebulaGraphMock {
     val createResp = session.execute(createSpace)
     if (!createResp.isSucceeded) {
       close()
+      LOG.error("create int type space failed," + createResp.getErrorMessage)
       sys.exit(-1)
     }
 
+    Thread.sleep(10000)
     val insertTag =
       "INSERT VERTEX person(col1, col2, col3, col4, col5, col6, col7, col8, col9, col10, col11, col12, col13) VALUES " +
         " 1:(\"person1\", \"person1\", 11, 200, 1000, 188888, date(\"2021-01-01\"), datetime(\"2021-01-01T12:00:00\"),timestamp(\"2021-01-01T12:00:00\"), true, 1.0, 2.0, time(\"12:01:01\"))," +
@@ -107,10 +115,16 @@ class NebulaGraphMock {
         " 9:(\"person9\", \"person9\", 19, 1000, 9000, 988888, date(\"2021-01-09\"), datetime(\"2021-01-09T12:00:00\"),timestamp(\"2021-01-09T12:00:00\"), false, 1.0, 2.0, time(\"12:01:01\"))," +
         " 10:(\"person10\", \"person10\", 20, 1100, 10000, 1088888, date(\"2021-01-10\"), datetime(\"2021-01-10T12:00:00\"),timestamp(\"2021-01-10T12:00:00\"), true, 1.0, 2.0, time(\"12:01:01\"))," +
         " 11:(\"person11\", \"person11\", 21, 1200, 11000, 1188888, date(\"2021-01-11\"), datetime(\"2021-01-11T12:00:00\"),timestamp(\"2021-01-11T12:00:00\"), false, 1.0, 2.0, time(\"12:01:01\"))," +
-        " 12:(\"person12\", \"person11\", 22, 1300, 12000, 1288888, date(\"2021-01-12\"), datetime(\"2021-01-12T12:00:00\"),timestamp(\"2021-01-12T12:00:00\"), true, 1.0, 2.0, time(\"12:01:01\"))"
+        " 12:(\"person12\", \"person11\", 22, 1300, 12000, 1288888, date(\"2021-01-12\"), datetime(\"2021-01-12T12:00:00\"),timestamp(\"2021-01-12T12:00:00\"), true, 1.0, 2.0, time(\"12:01:01\"))," +
+        " -1:(\"person00\", \"person00\", 23, 1400, 13000, 1388888, date(\"2021-01-13\"), datetime(\"2021-01-12T12:00:00\"),timestamp(\"2021-01-12T12:00:00\"), true, 1.0, 2.0, time(\"12:01:01\"))," +
+        " -2:(\"person01\", \"person01\", 24, 1500, 14000, 1488888, date(\"2021-01-14\"), datetime(\"2021-01-12T12:00:00\"),timestamp(\"2021-01-12T12:00:00\"), true, 1.0, 2.0, time(\"12:01:01\"))," +
+        " -3:(\"person02\", \"person02\", 24, 1500, 14000, 1488888, date(\"2021-01-14\"), datetime(\"2021-01-12T12:00:00\"),timestamp(\"2021-01-12T12:00:00\"), true, 1.0, 2.0, time(\"12:01:01\"))," +
+        " 19:(\"person19\", \"person22\", 25, 1500, 14000, 1488888, date(\"2021-01-14\"), datetime(\"2021-01-12T12:00:00\"),timestamp(\"2021-01-12T12:00:00\"), true, 1.0, 2.0, time(\"12:01:01\"))," +
+        " 22:(\"person22\", \"person22\", 26, 1500, 14000, 1488888, date(\"2021-01-14\"), datetime(\"2021-01-12T12:00:00\"),timestamp(\"2021-01-12T12:00:00\"), true, 1.0, 2.0, time(\"12:01:01\"))"
     val insertTagResp = session.execute(insertTag)
     if (!insertTagResp.isSucceeded) {
       close()
+      LOG.error("insert vertex for int type space failed," + insertTagResp.getErrorMessage)
       sys.exit(-1)
     }
 
@@ -130,6 +144,7 @@ class NebulaGraphMock {
     val insertEdgeResp = session.execute(insertEdge)
     if (!insertEdgeResp.isSucceeded) {
       close()
+      LOG.error("insert edge for int type space failed," + insertEdgeResp.getErrorMessage)
       sys.exit(-1)
     }
   }

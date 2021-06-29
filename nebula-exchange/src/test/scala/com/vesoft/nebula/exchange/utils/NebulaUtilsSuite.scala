@@ -15,6 +15,7 @@ import com.vesoft.nebula.exchange.config.TagConfigEntry
 import com.vesoft.nebula.exchange.utils.NebulaUtils
 import com.vesoft.nebula.exchange.{KeyPolicy, MetaProvider, VidType}
 import com.vesoft.nebula.meta.PropertyType
+import org.apache.log4j.Logger
 import org.junit.{After, Before, Test}
 
 import scala.collection.JavaConverters._
@@ -22,6 +23,8 @@ import scala.collection.mutable.ListBuffer
 import scala.com.vesoft.nebula.exchange.NebulaGraphMock
 
 class NebulaUtilsSuite {
+  private[this] val LOG = Logger.getLogger(this.getClass)
+
   @transient val nebulaPoolConfig = new NebulaPoolConfig
   @transient val pool: NebulaPool = new NebulaPool
   val address                     = new ListBuffer[HostAddress]()
@@ -68,16 +71,16 @@ class NebulaUtilsSuite {
                             "col11",
                             "col12")
     val label = "person"
-    val sourceConfig = new TagConfigEntry(label,
-                                          null,
-                                          null,
-                                          sourceFields,
-                                          nebulaFields,
-                                          null,
-                                          Some(KeyPolicy.UUID),
-                                          1,
-                                          1,
-                                          Some(""))
+    val sourceConfig = TagConfigEntry(label,
+                                      null,
+                                      null,
+                                      sourceFields,
+                                      nebulaFields,
+                                      "id",
+                                      Some(KeyPolicy.UUID),
+                                      1,
+                                      1,
+                                      Some(""))
 
     val space   = "test_string"
     val address = new ListBuffer[HostAndPort]()
@@ -104,8 +107,14 @@ class NebulaUtilsSuite {
   def getPartitionId(): Unit = {
     val storageClient = new StorageClient("127.0.0.1", 9559)
     storageClient.connect()
-    for (i <- 1 to 12) {
-      val vid            = Integer.toString(i)
+    for (i <- 1 to 17) {
+      val vid =
+        if (i <= 12) Integer.toString(i)
+        else if (i == 13) "-1"
+        else if (i == 14) "-2"
+        else if (i == 15) "-3"
+        else if (i == 16) "19"
+        else "22"
       val partitionId    = NebulaUtils.getPartitionId(vid, 10, VidType.STRING)
       val scanResultIter = storageClient.scanVertex("test_string", partitionId, "person")
       var containVertex  = false
@@ -118,11 +127,20 @@ class NebulaUtilsSuite {
           }
         }
       }
+      if (!containVertex) {
+        LOG.error("vid={},partId={}", vid, partitionId)
+      }
       assert(containVertex)
     }
 
-    for (i <- 1 to 12) {
-      val vid            = Integer.toString(i)
+    for (i <- 1 to 17) {
+      val vid =
+        if (i <= 12) Integer.toString(i)
+        else if (i == 13) "-1"
+        else if (i == 14) "-2"
+        else if (i == 15) "-3"
+        else if (i == 16) "19"
+        else "22"
       val partitionId    = NebulaUtils.getPartitionId(vid, 10, VidType.INT)
       val scanResultIter = storageClient.scanVertex("test_int", partitionId, "person")
       var containVertex  = false
@@ -134,6 +152,9 @@ class NebulaUtilsSuite {
             containVertex = true
           }
         }
+      }
+      if (!containVertex) {
+        LOG.error("vid={},partId={}", vid, partitionId)
       }
       assert(containVertex)
     }
@@ -148,7 +169,6 @@ class NebulaUtilsSuite {
     assert(!NebulaUtils.isNumic("aaa"))
     assert(!NebulaUtils.isNumic("0123aaa"))
     assert(!NebulaUtils.isNumic("123a8"))
-
   }
 
   @Test
@@ -157,9 +177,9 @@ class NebulaUtilsSuite {
     fields.append("col1")
     fields.append("col2")
     fields.append("col3")
-    val escapeName = NebulaUtils.escapePropName(fields.toList);
-    assert("`col1`".equals(escapeName(0)))
-    assert("`col2`".equals(escapeName(1)))
-    assert("`col3`".equals(escapeName(2)))
+    val escapeName = NebulaUtils.escapePropName(fields.toList)
+    assert("`col1`".equals(escapeName.head))
+    assert("`col2`".equals(escapeName.tail.head))
+    assert("`col3`".equals(escapeName.tail.tail.head))
   }
 }
