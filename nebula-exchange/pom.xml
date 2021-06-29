@@ -98,9 +98,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <!-- <version>2.7</version> -->
                 <configuration>
-                    <skipTests>true</skipTests>
+                    <includes>
+                        <include>**/*Test.*</include>
+                        <include>**/*Suite.*</include>
+                    </includes>
                 </configuration>
             </plugin>
             <plugin>
@@ -700,6 +702,10 @@
         </dependency>
     </dependencies>
     <repositories>
+        <repository>
+            <id>SparkPackagesRepo</id>
+            <url>https://repos.spark-packages.org</url>
+        </repository>
         <repository>
             <id>bintray-streamnative-maven</id>
             <name>bintray</name>

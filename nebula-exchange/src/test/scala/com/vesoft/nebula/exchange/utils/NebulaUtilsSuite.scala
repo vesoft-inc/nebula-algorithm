@@ -15,6 +15,7 @@ import com.vesoft.nebula.exchange.config.TagConfigEntry
 import com.vesoft.nebula.exchange.utils.NebulaUtils
 import com.vesoft.nebula.exchange.{KeyPolicy, MetaProvider, VidType}
 import com.vesoft.nebula.meta.PropertyType
+import org.apache.log4j.Logger
 import org.junit.{After, Before, Test}
 
 import scala.collection.JavaConverters._
@@ -22,6 +23,8 @@ import scala.collection.mutable.ListBuffer
 import scala.com.vesoft.nebula.exchange.NebulaGraphMock
 
 class NebulaUtilsSuite {
+  private[this] val LOG = Logger.getLogger(this.getClass)
+
   @transient val nebulaPoolConfig = new NebulaPoolConfig
   @transient val pool: NebulaPool = new NebulaPool
   val address                     = new ListBuffer[HostAddress]()
@@ -68,16 +71,16 @@ class NebulaUtilsSuite {
                             "col11",
                             "col12")
     val label = "person"
-    val sourceConfig = new TagConfigEntry(label,
-                                          null,
-                                          null,
-                                          sourceFields,
-                                          nebulaFields,
-                                          null,
-                                          Some(KeyPolicy.UUID),
-                                          1,
-                                          1,
-                                          Some(""))
+    val sourceConfig = TagConfigEntry(label,
+                                      null,
+                                      null,
+                                      sourceFields,
+                                      nebulaFields,
+                                      "id",
+                                      Some(KeyPolicy.UUID),
+                                      1,
+                                      1,
+                                      Some(""))
 
     val space   = "test_string"
     val address = new ListBuffer[HostAndPort]()
@@ -124,6 +127,9 @@ class NebulaUtilsSuite {
           }
         }
       }
+      if (!containVertex) {
+        LOG.error("vid={},partId={}", vid, partitionId)
+      }
       assert(containVertex)
     }
 
@@ -146,6 +152,9 @@ class NebulaUtilsSuite {
             containVertex = true
           }
         }
+      }
+      if (!containVertex) {
+        LOG.error("vid={},partId={}", vid, partitionId)
       }
       assert(containVertex)
     }
