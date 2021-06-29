@@ -104,8 +104,14 @@ class NebulaUtilsSuite {
   def getPartitionId(): Unit = {
     val storageClient = new StorageClient("127.0.0.1", 9559)
     storageClient.connect()
-    for (i <- 1 to 12) {
-      val vid            = Integer.toString(i)
+    for (i <- 1 to 17) {
+      val vid =
+        if (i <= 12) Integer.toString(i)
+        else if (i == 13) "-1"
+        else if (i == 14) "-2"
+        else if (i == 15) "-3"
+        else if (i == 16) "19"
+        else "22"
       val partitionId    = NebulaUtils.getPartitionId(vid, 10, VidType.STRING)
       val scanResultIter = storageClient.scanVertex("test_string", partitionId, "person")
       var containVertex  = false
@@ -121,8 +127,14 @@ class NebulaUtilsSuite {
       assert(containVertex)
     }
 
-    for (i <- 1 to 12) {
-      val vid            = Integer.toString(i)
+    for (i <- 1 to 17) {
+      val vid =
+        if (i <= 12) Integer.toString(i)
+        else if (i == 13) "-1"
+        else if (i == 14) "-2"
+        else if (i == 15) "-3"
+        else if (i == 16) "19"
+        else "22"
       val partitionId    = NebulaUtils.getPartitionId(vid, 10, VidType.INT)
       val scanResultIter = storageClient.scanVertex("test_int", partitionId, "person")
       var containVertex  = false
@@ -148,7 +160,6 @@ class NebulaUtilsSuite {
     assert(!NebulaUtils.isNumic("aaa"))
     assert(!NebulaUtils.isNumic("0123aaa"))
     assert(!NebulaUtils.isNumic("123a8"))
-
   }
 
   @Test
@@ -157,9 +168,9 @@ class NebulaUtilsSuite {
     fields.append("col1")
     fields.append("col2")
     fields.append("col3")
-    val escapeName = NebulaUtils.escapePropName(fields.toList);
-    assert("`col1`".equals(escapeName(0)))
-    assert("`col2`".equals(escapeName(1)))
-    assert("`col3`".equals(escapeName(2)))
+    val escapeName = NebulaUtils.escapePropName(fields.toList)
+    assert("`col1`".equals(escapeName.head))
+    assert("`col2`".equals(escapeName.tail.head))
+    assert("`col3`".equals(escapeName.tail.tail.head))
   }
 }
