@@ -701,6 +701,10 @@
     </dependencies>
     <repositories>
         <repository>
+            <id>SparkPackagesRepo</id>
+            <url>https://repos.spark-packages.org</url>
+        </repository>
+        <repository>
             <id>bintray-streamnative-maven</id>
             <name>bintray</name>
             <url>https://dl.bintray.com/streamnative/maven</url>
