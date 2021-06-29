@@ -229,13 +229,17 @@ case class MaxComputeConfigEntry(override val category: SourceCategory.Value,
                                  project: String,
                                  accessKeyId: String,
                                  accessKeySecret: String,
+                                 partitionSpec: String,
                                  override val sentence: String)
     extends ServerDataSourceConfigEntry {
   require(
-    !odpsUrl.trim.isEmpty && !tunnelUrl.trim.isEmpty && !table.trim.isEmpty && !project.trim.isEmpty && !accessKeyId.trim.isEmpty && !accessKeySecret.trim.isEmpty)
+    !odpsUrl.trim.isEmpty && !tunnelUrl.trim.isEmpty && !table.trim.isEmpty && !project.trim.isEmpty
+      && !accessKeyId.trim.isEmpty && !accessKeySecret.trim.isEmpty)
 
   override def toString: String = {
-    s"MaxCompute source odpsUrl: $odpsUrl, tunnelUrl: $tunnelUrl, table: $table, project: $project, keyId: $accessKeyId, keySecret: $accessKeySecret"
+    s"MaxCompute source {odpsUrl: $odpsUrl, tunnelUrl: $tunnelUrl, table: $table, project: $project, " +
+      s"keyId: $accessKeyId, keySecret: $accessKeySecret, partitionSpec:$partitionSpec, " +
+      s"sentence:$sentence}"
   }
 
 }

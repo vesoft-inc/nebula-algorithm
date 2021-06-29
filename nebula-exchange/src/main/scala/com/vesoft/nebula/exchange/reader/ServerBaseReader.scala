@@ -268,7 +268,7 @@ class MaxcomputeReader(override val session: SparkSession, maxComputeConfig: Max
     extends ServerBaseReader(session, maxComputeConfig.sentence) {
 
   override def read(): DataFrame = {
-    val df = session.read
+    var dfReader = session.read
       .format("org.apache.spark.aliyun.odps.datasource")
       .option("odpsUrl", maxComputeConfig.odpsUrl)
       .option("tunnelUrl", maxComputeConfig.tunnelUrl)
@@ -276,7 +276,13 @@ class MaxcomputeReader(override val session: SparkSession, maxComputeConfig: Max
       .option("project", maxComputeConfig.project)
       .option("accessKeyId", maxComputeConfig.accessKeyId)
       .option("accessKeySecret", maxComputeConfig.accessKeySecret)
-      .load()
+
+    // if use partition read
+    if (maxComputeConfig.partitionSpec != null) {
+      dfReader = dfReader.option("partitionSpec", maxComputeConfig.partitionSpec)
+    }
+
+    val df = dfReader.load()
     import session._
     if (maxComputeConfig.sentence == null) {
       df
