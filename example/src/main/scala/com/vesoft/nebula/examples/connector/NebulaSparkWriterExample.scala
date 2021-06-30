@@ -9,6 +9,7 @@ package com.vesoft.nebula.examples.connector
 import com.facebook.thrift.protocol.TCompactProtocol
 import com.vesoft.nebula.connector.{
   NebulaConnectionConfig,
+  WriteMode,
   WriteNebulaEdgeConfig,
   WriteNebulaVertexConfig
 }
@@ -33,11 +34,11 @@ object NebulaSparkWriterExample {
       .config(sparkConf)
       .getOrCreate()
 
-    writeVertex(spark)
-    writeEdge(spark)
+//    writeVertex(spark)
+//    writeEdge(spark)
 
     updateVertex(spark)
-    updateEdge(spark)
+    //updateEdge(spark)
 
     spark.close()
     sys.exit()
@@ -125,7 +126,7 @@ object NebulaSparkWriterExample {
       .withVidField("id")
       .withVidAsProp(false)
       .withBatch(1000)
-      .withWriteMode("update")
+      .withWriteMode(WriteMode.UPDATE)
       .build()
     df.write.nebula(config, nebulaWriteVertexConfig).writeVertices()
   }
@@ -159,7 +160,7 @@ object NebulaSparkWriterExample {
       .withDstAsProperty(false)
       .withRankAsProperty(false)
       .withBatch(1000)
-      .withWriteMode("update")
+      .withWriteMode(WriteMode.UPDATE)
       .build()
     df.write.nebula(config, nebulaWriteEdgeConfig).writeEdges()
   }
