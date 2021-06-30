@@ -6,8 +6,11 @@
 
 package com.vesoft.nebula.exchange
 
+import java.io.File
+
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FileSystem, Path}
+
 import scala.collection.mutable.ArrayBuffer
 
 object ErrorHandler {
@@ -16,8 +19,22 @@ object ErrorHandler {
     * clean all the failed data for error path before reload.
     */
   def clear(path: String): Unit = {
-    val fileSystem = FileSystem.get(new Configuration())
-    fileSystem.removeAcl(new Path(path))
+    if (path.startsWith("hdfs://")) {
+      val fileSystem = FileSystem.get(new Configuration())
+      fileSystem.removeAcl(new Path(path))
+    } else {
+      val directory = new File(path)
+      if (directory.exists()) {
+        val content: Array[String] = directory.list()
+        for (fileName <- content) {
+          if (!fileName.startsWith("reload.")) {
+            val tmp = new File(path, fileName)
+            tmp.delete()
+          }
+        }
+      }
+    }
+
   }
 
   /**

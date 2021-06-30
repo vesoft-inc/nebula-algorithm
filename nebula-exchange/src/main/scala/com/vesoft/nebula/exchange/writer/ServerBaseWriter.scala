@@ -181,9 +181,9 @@ class NebulaGraphClientWriter(dataBaseConfigEntry: DataBaseConfigEntry,
       if (result.isSucceeded) {
         return null
       }
-      LOG.error(s"rewrite ngql failed for ${result.getErrorMessage}")
+      LOG.error(s"reimport ngql failed for ${result.getErrorMessage}")
     } else {
-      LOG.error(s"rewrite ngql failed because write speed is too fast")
+      LOG.error(s"reimport ngql failed because write speed is too fast")
     }
     LOG.info(ngql)
     ngql

@@ -21,10 +21,12 @@ class ReloadProcessor(data: DataFrame,
                       batchSuccess: LongAccumulator,
                       batchFailure: LongAccumulator)
     extends Processor {
-  private val LOG = Logger.getLogger(this.getClass)
+  @transient
+  private[this] lazy val LOG = Logger.getLogger(this.getClass)
 
   override def process(): Unit = {
     data.foreachPartition(processEachPartition(_))
+    ErrorHandler.clear(config.errorConfig.errorPath)
   }
 
   private def processEachPartition(iterator: Iterator[Row]): Unit = {
@@ -38,10 +40,9 @@ class ReloadProcessor(data: DataFrame,
                                              graphProvider)
 
     val errorBuffer = ArrayBuffer[String]()
-    ErrorHandler.clear(config.errorConfig.errorPath)
 
     writer.prepare()
-    // batch write tags
+    // batch write
     val startTime = System.currentTimeMillis
     iterator.foreach { row =>
       val failStatement = writer.writeNgql(row.getString(0))
@@ -57,9 +58,8 @@ class ReloadProcessor(data: DataFrame,
                         s"${config.errorConfig.errorPath}/reload.${TaskContext.getPartitionId()}")
       errorBuffer.clear()
     }
-    LOG.info(
-      s"spark partition for vertex reload time:" +
-        s"${TaskContext.getPartitionId()}-${System.currentTimeMillis() - startTime}")
+    LOG.info(s"data reload in partition ${TaskContext
+      .getPartitionId()} cost ${System.currentTimeMillis() - startTime}ms")
     writer.close()
     graphProvider.close()
   }
