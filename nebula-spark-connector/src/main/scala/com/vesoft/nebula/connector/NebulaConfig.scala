@@ -197,8 +197,8 @@ object WriteNebulaVertexConfig {
       this
     }
 
-    def withWriteMode(writeMode: String): WriteVertexConfigBuilder = {
-      this.writeMode = writeMode
+    def withWriteMode(writeMode: WriteMode.Value): WriteVertexConfigBuilder = {
+      this.writeMode = writeMode.toString
       this
     }
 
@@ -401,8 +401,8 @@ object WriteNebulaEdgeConfig {
       this
     }
 
-    def withWriteMode(writeMode: String): WriteEdgeConfigBuilder = {
-      this.writeMode = writeMode
+    def withWriteMode(writeMode: WriteMode.Value): WriteEdgeConfigBuilder = {
+      this.writeMode = writeMode.toString
       this
     }
 
