@@ -15,4 +15,8 @@ object NebulaTemplate {
   private[connector] val EDGE_VALUE_WITHOUT_RANKING_TEMPLATE = "%s->%s: (%s)"
   private[connector] val EDGE_VALUE_TEMPLATE                 = "%s->%s@%d: (%s)"
   private[connector] val USE_TEMPLATE                        = "USE %s"
+
+  private[connector] val UPDATE_VERTEX_TEMPLATE = "UPDATE %s ON `%s` %s SET %s"
+  private[connector] val UPDATE_EDGE_TEMPLATE   = "UPDATE %s ON `%s` %s->%s@%d SET %s"
+  private[connector] val UPDATE_VALUE_TEMPLATE  = "`%s`=%s"
 }

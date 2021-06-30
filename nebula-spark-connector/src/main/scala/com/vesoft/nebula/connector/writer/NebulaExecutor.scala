@@ -11,12 +11,17 @@ import com.vesoft.nebula.connector.NebulaTemplate.{
   EDGE_VALUE_TEMPLATE,
   EDGE_VALUE_WITHOUT_RANKING_TEMPLATE,
   ENDPOINT_TEMPLATE,
+  UPDATE_EDGE_TEMPLATE,
+  UPDATE_VALUE_TEMPLATE,
+  UPDATE_VERTEX_TEMPLATE,
   VERTEX_VALUE_TEMPLATE,
   VERTEX_VALUE_TEMPLATE_WITH_POLICY
 }
 import com.vesoft.nebula.connector.connector.{
   EdgeRank,
+  NebulaEdge,
   NebulaEdges,
+  NebulaVertex,
   NebulaVertices,
   PropertyNames,
   PropertyValues
@@ -26,6 +31,7 @@ import com.vesoft.nebula.meta.PropertyType
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.types.StructType
 
+import scala.collection.JavaConversions.seqAsJavaList
 import scala.collection.mutable.ListBuffer
 
 object NebulaExecutor {
@@ -262,6 +268,50 @@ object NebulaExecutor {
       }
       .mkString(", ")
     BATCH_INSERT_TEMPLATE.format(DataTypeEnum.EDGE.toString, edgeName, edges.propertyNames, values)
+  }
+
+  /**
+    * construct update statement for vertex
+    */
+  def toUpdateExecuteStatement(tagName: String,
+                               propertyNames: PropertyNames,
+                               vertex: NebulaVertex): String = {
+    var index = 0
+    UPDATE_VERTEX_TEMPLATE.format(
+      DataTypeEnum.VERTEX.toString.toUpperCase,
+      tagName,
+      vertex.vertexIDSlice,
+      vertex.values
+        .map { value =>
+          val updateValue = UPDATE_VALUE_TEMPLATE.format(propertyNames.get(index), value)
+          index += 1
+          updateValue
+        }
+        .mkString(",")
+    )
+  }
+
+  /**
+    * construct update statement for edge
+    */
+  def toUpdateExecuteStatement(edgeName: String,
+                               propertyNames: PropertyNames,
+                               edge: NebulaEdge): String = {
+    var index = 0
+    UPDATE_EDGE_TEMPLATE.format(
+      DataTypeEnum.EDGE.toString.toUpperCase,
+      edgeName,
+      edge.source,
+      edge.target,
+      edge.rank.get,
+      edge.values
+        .map { value =>
+          val updateValue = UPDATE_VALUE_TEMPLATE.format(propertyNames.get(index), value)
+          index += 1
+          updateValue
+        }
+        .mkString(",")
+    )
   }
 
   /**

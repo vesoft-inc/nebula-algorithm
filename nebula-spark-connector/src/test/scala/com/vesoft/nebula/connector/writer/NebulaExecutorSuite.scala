@@ -7,6 +7,8 @@
 package com.vesoft.nebula.connector.writer
 
 import com.vesoft.nebula.connector.KeyPolicy
+import com.vesoft.nebula.connector.connector.{NebulaEdge, NebulaEdges, NebulaVertex, NebulaVertices}
+import org.apache.spark.api.java.Optional
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions.GenericInternalRow
 import org.apache.spark.sql.types.{
@@ -119,4 +121,95 @@ class NebulaExecutorSuite extends AnyFunSuite with BeforeAndAfterAll {
     assert(propNames1.isEmpty)
   }
 
+  test("test toExecuteSentence for vertex") {
+    val vertices: ListBuffer[NebulaVertex] = new ListBuffer[NebulaVertex]
+    val tagName                            = "person"
+    val propNames = List("col_string",
+                         "col_fixed_string",
+                         "col_bool",
+                         "col_int",
+                         "col_int64",
+                         "col_double",
+                         "col_date")
+
+    val props1 = List("\"Tom\"", "\"Tom\"", true, 10, 100L, 1.0, "2021-11-12")
+    val props2 = List("\"Bob\"", "\"Bob\"", false, 20, 200L, 2.0, "2021-05-01")
+    vertices.append(NebulaVertex("\"vid1\"", props1))
+    vertices.append(NebulaVertex("\"vid2\"", props2))
+
+    val nebulaVertices  = NebulaVertices(propNames, vertices.toList, None)
+    val vertexStatement = NebulaExecutor.toExecuteSentence(tagName, nebulaVertices)
+
+    val expectStatement = "INSERT vertex `person`(`col_string`,`col_fixed_string`,`col_bool`," +
+      "`col_int`,`col_int64`,`col_double`,`col_date`) VALUES \"vid1\": (" + props1.mkString(", ") +
+      "), \"vid2\": (" + props2.mkString(", ") + ")"
+    assert(expectStatement.equals(vertexStatement))
+  }
+
+  test("test toExecuteSentence for edge") {
+    val edges: ListBuffer[NebulaEdge] = new ListBuffer[NebulaEdge]
+    val edgeName                      = "friend"
+    val propNames = List("col_string",
+                         "col_fixed_string",
+                         "col_bool",
+                         "col_int",
+                         "col_int64",
+                         "col_double",
+                         "col_date")
+    val props1 = List("\"Tom\"", "\"Tom\"", true, 10, 100L, 1.0, "2021-11-12")
+    val props2 = List("\"Bob\"", "\"Bob\"", false, 20, 200L, 2.0, "2021-05-01")
+    edges.append(NebulaEdge("\"vid1\"", "\"vid2\"", Some(1L), props1))
+    edges.append(NebulaEdge("\"vid2\"", "\"vid1\"", Some(2L), props2))
+
+    val nebulaEdges   = NebulaEdges(propNames, edges.toList, None, None)
+    val edgeStatement = NebulaExecutor.toExecuteSentence(edgeName, nebulaEdges)
+
+    val expectStatement = "INSERT edge `friend`(`col_string`,`col_fixed_string`,`col_bool`,`col_int`" +
+      ",`col_int64`,`col_double`,`col_date`) VALUES \"vid1\"->\"vid2\"@1: (" + props1.mkString(", ") +
+      "), \"vid2\"->\"vid1\"@2: (" + props2.mkString(", ") + ")"
+    assert(expectStatement.equals(edgeStatement))
+  }
+
+  test("test toUpdateExecuteSentence for vertex") {
+    val props = List("\"name\"", "\"name\"", true, 10, 100L, 1.0, "2021-11-12")
+    val propNames = List("col_string",
+                         "col_fixed_string",
+                         "col_bool",
+                         "col_int",
+                         "col_int64",
+                         "col_double",
+                         "col_date")
+
+    val vertexId     = "\"vid1\""
+    val nebulaVertex = NebulaVertex(vertexId, props)
+    val updateVertexStatement =
+      NebulaExecutor.toUpdateExecuteStatement("person", propNames, nebulaVertex)
+    val expectVertexUpdate =
+      "UPDATE VERTEX ON `person` \"vid1\" SET `col_string`=\"name\",`col_fixed_string`=\"name\"," +
+        "`col_bool`=true,`col_int`=10,`col_int64`=100,`col_double`=1.0,`col_date`=2021-11-12;"
+    assert(expectVertexUpdate.equals(updateVertexStatement))
+  }
+
+  test("test toUpdateExecuteSentence for edge") {
+    val props = List("\"name\"", "\"name\"", true, 10, 100L, 1.0, "2021-11-12")
+    val propNames = List("col_string",
+                         "col_fixed_string",
+                         "col_bool",
+                         "col_int",
+                         "col_int64",
+                         "col_double",
+                         "col_date")
+
+    val source     = "\"source\""
+    val target     = "\"target\""
+    val rank       = Some(0L)
+    val nebulaEdge = NebulaEdge(source, target, rank, props)
+    val updateEdgeStatement =
+      NebulaExecutor.toUpdateExecuteStatement("friend", propNames, nebulaEdge)
+    val expectEdgeUpdate =
+      "UPDATE EDGE ON `friend` \"source\"->\"target\"@0 SET `col_string`=\"name\"," +
+        "`col_fixed_string`=\"name\",`col_bool`=true,`col_int`=10,`col_int64`=100," +
+        "`col_double`=1.0,`col_date`=2021-11-12;"
+    assert(expectEdgeUpdate.equals(updateEdgeStatement))
+  }
 }
