@@ -6,41 +6,47 @@
 
 package com.vesoft.nebula.exchange
 
-import java.io.File
-
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FileSystem, Path}
+import org.apache.log4j.Logger
 
 import scala.collection.mutable.ArrayBuffer
 
 object ErrorHandler {
+  @transient
+  private[this] val LOG = Logger.getLogger(this.getClass)
 
   /**
     * clean all the failed data for error path before reload.
+    *
+    * @param path path to clean
     */
   def clear(path: String): Unit = {
-    if (path.startsWith("hdfs://")) {
-      val fileSystem = FileSystem.get(new Configuration())
-      fileSystem.removeAcl(new Path(path))
-    } else {
-      val directory = new File(path)
-      if (directory.exists()) {
-        val content: Array[String] = directory.list()
-        for (fileName <- content) {
-          if (!fileName.startsWith("reload.")) {
-            val tmp = new File(path, fileName)
-            tmp.delete()
-          }
+    try {
+      val fileSystem  = FileSystem.get(new Configuration())
+      val filesStatus = fileSystem.listStatus(new Path(path))
+      for (file <- filesStatus) {
+        if (!file.getPath.getName.startsWith("reload.")) {
+          fileSystem.delete(file.getPath, true)
         }
       }
+    } catch {
+      case e: Throwable => {
+        LOG.error(s"$path cannot be clean, but this error does not affect the import result, " +
+                    s"you can only focus on the reload files.",
+                  e)
+      }
     }
-
   }
 
   /**
     * save the failed execute statement.
+    *
+    * @param buffer buffer saved failed ngql
+    * @param path path to write these buffer ngql
     */
   def save(buffer: ArrayBuffer[String], path: String): Unit = {
+    LOG.info(s"create reload path $path")
     val fileSystem = FileSystem.get(new Configuration())
     val errors     = fileSystem.create(new Path(path))
 
@@ -56,6 +62,9 @@ object ErrorHandler {
 
   /**
     * check if path exists
+    *
+    * @param path error path
+    *@return true if path exists
     */
   def existError(path: String): Boolean = {
     val fileSystem = FileSystem.get(new Configuration())
