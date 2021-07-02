@@ -26,7 +26,6 @@ class ReloadProcessor(data: DataFrame,
 
   override def process(): Unit = {
     data.foreachPartition(processEachPartition(_))
-    ErrorHandler.clear(config.errorConfig.errorPath)
   }
 
   private def processEachPartition(iterator: Iterator[Row]): Unit = {
