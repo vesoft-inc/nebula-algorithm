@@ -105,59 +105,41 @@ class NebulaUtilsSuite {
 
   @Test
   def getPartitionId(): Unit = {
-    val storageClient = new StorageClient("127.0.0.1", 9559)
-    storageClient.connect()
-    for (i <- 1 to 17) {
-      val vid =
-        if (i <= 12) Integer.toString(i)
-        else if (i == 13) "-1"
-        else if (i == 14) "-2"
-        else if (i == 15) "-3"
-        else if (i == 16) "19"
-        else "22"
-      val partitionId    = NebulaUtils.getPartitionId(vid, 10, VidType.STRING)
-      val scanResultIter = storageClient.scanVertex("test_string", partitionId, "person")
-      var containVertex  = false
-      while (scanResultIter.hasNext) {
-        val scanResult = scanResultIter.next()
-        val map        = scanResult.getVidVertices
-        for (value <- map.keySet().asScala if !containVertex) {
-          if (value.asString().equals(vid)) {
-            containVertex = true
-          }
-        }
-      }
-      if (!containVertex) {
-        LOG.error("vid={},partId={}", vid, partitionId)
-      }
-      assert(containVertex)
-    }
+    // for String type vid
+    assert(NebulaUtils.getPartitionId("1", 10, VidType.STRING) == 6)
+    assert(NebulaUtils.getPartitionId("2", 10, VidType.STRING) == 1)
+    assert(NebulaUtils.getPartitionId("3", 10, VidType.STRING) == 4)
+    assert(NebulaUtils.getPartitionId("4", 10, VidType.STRING) == 7)
+    assert(NebulaUtils.getPartitionId("5", 10, VidType.STRING) == 10)
+    assert(NebulaUtils.getPartitionId("6", 10, VidType.STRING) == 2)
+    assert(NebulaUtils.getPartitionId("7", 10, VidType.STRING) == 3)
+    assert(NebulaUtils.getPartitionId("8", 10, VidType.STRING) == 7)
+    assert(NebulaUtils.getPartitionId("9", 10, VidType.STRING) == 5)
+    assert(NebulaUtils.getPartitionId("10", 10, VidType.STRING) == 4)
+    assert(NebulaUtils.getPartitionId("11", 10, VidType.STRING) == 9)
+    assert(NebulaUtils.getPartitionId("12", 10, VidType.STRING) == 4)
+    assert(NebulaUtils.getPartitionId("-1", 10, VidType.STRING) == 1)
+    assert(NebulaUtils.getPartitionId("-2", 10, VidType.STRING) == 6)
+    assert(NebulaUtils.getPartitionId("-3", 10, VidType.STRING) == 1)
+    assert(NebulaUtils.getPartitionId("19", 10, VidType.STRING) == 9)
+    assert(NebulaUtils.getPartitionId("22", 10, VidType.STRING) == 8)
 
-    for (i <- 1 to 17) {
-      val vid =
-        if (i <= 12) Integer.toString(i)
-        else if (i == 13) "-1"
-        else if (i == 14) "-2"
-        else if (i == 15) "-3"
-        else if (i == 16) "19"
-        else "22"
-      val partitionId    = NebulaUtils.getPartitionId(vid, 10, VidType.INT)
-      val scanResultIter = storageClient.scanVertex("test_int", partitionId, "person")
-      var containVertex  = false
-      while (scanResultIter.hasNext) {
-        val scanResult = scanResultIter.next()
-        val map        = scanResult.getVidVertices
-        for (value <- map.keySet().asScala if !containVertex) {
-          if (value.asLong() == vid.toLong) {
-            containVertex = true
-          }
-        }
-      }
-      if (!containVertex) {
-        LOG.error("vid={},partId={}", vid, partitionId)
-      }
-      assert(containVertex)
-    }
+    // for int type vid
+    assert(NebulaUtils.getPartitionId("1", 10, VidType.INT) == 2)
+    assert(NebulaUtils.getPartitionId("2", 10, VidType.INT) == 3)
+    assert(NebulaUtils.getPartitionId("3", 10, VidType.INT) == 4)
+    assert(NebulaUtils.getPartitionId("4", 10, VidType.INT) == 5)
+    assert(NebulaUtils.getPartitionId("5", 10, VidType.INT) == 6)
+    assert(NebulaUtils.getPartitionId("6", 10, VidType.INT) == 7)
+    assert(NebulaUtils.getPartitionId("7", 10, VidType.INT) == 8)
+    assert(NebulaUtils.getPartitionId("8", 10, VidType.INT) == 9)
+    assert(NebulaUtils.getPartitionId("9", 10, VidType.INT) == 10)
+    assert(NebulaUtils.getPartitionId("10", 10, VidType.INT) == 1)
+    assert(NebulaUtils.getPartitionId("11", 10, VidType.INT) == 2)
+    assert(NebulaUtils.getPartitionId("12", 10, VidType.INT) == 3)
+    assert(NebulaUtils.getPartitionId("-1", 10, VidType.INT) == 6)
+    assert(NebulaUtils.getPartitionId("-2", 10, VidType.INT) == 5)
+    assert(NebulaUtils.getPartitionId("-3", 10, VidType.INT) == 4)
   }
 
   @Test
