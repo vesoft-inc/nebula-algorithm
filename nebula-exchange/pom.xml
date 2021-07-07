@@ -700,6 +700,16 @@
             <artifactId>scala-xml</artifactId>
             <version>${scala-xml.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.aliyun.odps</groupId>
+            <artifactId>odps-spark-datasource_2.11</artifactId>
+            <version>3.3.8-public</version>
+        </dependency>
+        <dependency>
+            <groupId>com.aliyun.emr</groupId>
+            <artifactId>emr-maxcompute_2.11</artifactId>
+            <version>2.2.0</version>
+        </dependency>
     </dependencies>
     <repositories>
         <repository>

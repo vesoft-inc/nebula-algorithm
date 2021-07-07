@@ -472,17 +472,18 @@ object Configs {
     */
   private[this] def toSourceCategory(category: String): SourceCategory.Value = {
     category.trim.toUpperCase match {
-      case "PARQUET" => SourceCategory.PARQUET
-      case "ORC"     => SourceCategory.ORC
-      case "JSON"    => SourceCategory.JSON
-      case "CSV"     => SourceCategory.CSV
-      case "HIVE"    => SourceCategory.HIVE
-      case "NEO4J"   => SourceCategory.NEO4J
-      case "KAFKA"   => SourceCategory.KAFKA
-      case "MYSQL"   => SourceCategory.MYSQL
-      case "PULSAR"  => SourceCategory.PULSAR
-      case "HBASE"   => SourceCategory.HBASE
-      case _         => throw new IllegalArgumentException(s"${category} not support")
+      case "PARQUET"    => SourceCategory.PARQUET
+      case "ORC"        => SourceCategory.ORC
+      case "JSON"       => SourceCategory.JSON
+      case "CSV"        => SourceCategory.CSV
+      case "HIVE"       => SourceCategory.HIVE
+      case "NEO4J"      => SourceCategory.NEO4J
+      case "KAFKA"      => SourceCategory.KAFKA
+      case "MYSQL"      => SourceCategory.MYSQL
+      case "PULSAR"     => SourceCategory.PULSAR
+      case "HBASE"      => SourceCategory.HBASE
+      case "MAXCOMPUTE" => SourceCategory.MAXCOMPUTE
+      case _            => throw new IllegalArgumentException(s"${category} not support")
     }
   }
 
@@ -609,6 +610,31 @@ object Configs {
                                config.getString("table"),
                                config.getString("columnFamily"),
                                fields.toSet.toList)
+      case SourceCategory.MAXCOMPUTE => {
+        val partitionSpec = if (config.hasPath("partitionSpec")) {
+          config.getString("partitionSpec")
+        } else {
+          null
+        }
+
+        val sentence = if (config.hasPath("sentence")) {
+          config.getString("sentence")
+        } else {
+          null
+        }
+
+        MaxComputeConfigEntry(
+          SourceCategory.MAXCOMPUTE,
+          config.getString("odpsUrl"),
+          config.getString("tunnelUrl"),
+          config.getString("table"),
+          config.getString("project"),
+          config.getString("accessKeyId"),
+          config.getString("accessKeySecret"),
+          partitionSpec,
+          sentence
+        )
+      }
       case _ =>
         throw new IllegalArgumentException("Unsupported data source")
     }

@@ -17,6 +17,7 @@ import com.vesoft.nebula.exchange.config.{
   HiveSourceConfigEntry,
   JanusGraphSourceConfigEntry,
   KafkaSourceConfigEntry,
+  MaxComputeConfigEntry,
   MySQLSourceConfigEntry,
   Neo4JSourceConfigEntry,
   PulsarSourceConfigEntry,
@@ -31,13 +32,14 @@ import com.vesoft.nebula.exchange.reader.{
   JSONReader,
   JanusGraphReader,
   KafkaReader,
+  MaxcomputeReader,
   MySQLReader,
   Neo4JReader,
   ORCReader,
-  ParquetReader
+  ParquetReader,
+  PulsarReader
 }
 import com.vesoft.nebula.exchange.processor.ReloadProcessor
-import com.vesoft.nebula.exchange.reader.PulsarReader
 import org.apache.log4j.Logger
 import org.apache.spark.SparkConf
 
@@ -277,6 +279,10 @@ object Exchange {
       case SourceCategory.HBASE =>
         val hbaseSourceConfigEntry = config.asInstanceOf[HBaseSourceConfigEntry]
         val reader                 = new HBaseReader(session, hbaseSourceConfigEntry)
+        Some(reader.read())
+      case SourceCategory.MAXCOMPUTE =>
+        val maxComputeConfigEntry = config.asInstanceOf[MaxComputeConfigEntry]
+        val reader                = new MaxcomputeReader(session, maxComputeConfigEntry)
         Some(reader.read())
       case _ => {
         LOG.error(s"Data source ${config.category} not supported")
