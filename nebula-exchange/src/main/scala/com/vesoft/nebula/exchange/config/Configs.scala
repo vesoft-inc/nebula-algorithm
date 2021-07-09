@@ -645,7 +645,7 @@ object Configs {
         ClickHouseConfigEntry(SourceCategory.CLICKHOUSE,
                               config.getString("url"),
                               config.getString("user"),
-                              config.getString("passwd"),
+                              config.getString("password"),
                               partition,
                               config.getString("sentence"))
       }
