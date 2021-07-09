@@ -8,6 +8,7 @@ package com.vesoft.nebula.exchange.reader
 
 import com.google.common.collect.Maps
 import com.vesoft.nebula.exchange.config.{
+  ClickHouseConfigEntry,
   HBaseSourceConfigEntry,
   HiveSourceConfigEntry,
   JanusGraphSourceConfigEntry,
@@ -290,5 +291,26 @@ class MaxcomputeReader(override val session: SparkSession, maxComputeConfig: Max
       df.createOrReplaceTempView(s"${maxComputeConfig.table}")
       session.sql(maxComputeConfig.sentence)
     }
+  }
+}
+
+/**
+  * Clickhouse reader
+  */
+class ClickhouseReader(override val session: SparkSession,
+                       clickHouseConfigEntry: ClickHouseConfigEntry)
+    extends ServerBaseReader(session, clickHouseConfigEntry.sentence) {
+  Class.forName("ru.yandex.clickhouse.ClickHouseDriver")
+  override def read(): DataFrame = {
+    val df = session.read
+      .format("jdbc")
+      .option("driver", "ru.yandex.clickhouse.ClickHouseDriver")
+      .option("url", clickHouseConfigEntry.url)
+      .option("user", clickHouseConfigEntry.user)
+      .option("password", clickHouseConfigEntry.passwd)
+      .option("numPartitions", clickHouseConfigEntry.numPartition)
+      .option("query", clickHouseConfigEntry.sentence)
+      .load()
+    df
   }
 }
