@@ -30,3 +30,10 @@ object OperaType extends Enumeration {
   val READ  = Value("read")
   val WRITE = Value("write")
 }
+
+object WriteMode extends Enumeration {
+
+  type Mode = Value
+  val INSERT = Value("insert")
+  val UPDATE = Value("update")
+}

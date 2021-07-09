@@ -93,19 +93,20 @@ class NebulaOptions(@transient val parameters: CaseInsensitiveMap[String])(
   }
 
   /** write parameters */
-  var graphAddress: String   = _
-  var vidPolicy: String      = _
-  var srcPolicy: String      = _
-  var dstPolicy: String      = _
-  var vertexField: String    = _
-  var srcVertexField: String = _
-  var dstVertexField: String = _
-  var rankField: String      = _
-  var batch: Int             = _
-  var vidAsProp: Boolean     = _
-  var srcAsProp: Boolean     = _
-  var dstAsProp: Boolean     = _
-  var rankAsProp: Boolean    = _
+  var graphAddress: String       = _
+  var vidPolicy: String          = _
+  var srcPolicy: String          = _
+  var dstPolicy: String          = _
+  var vertexField: String        = _
+  var srcVertexField: String     = _
+  var dstVertexField: String     = _
+  var rankField: String          = _
+  var batch: Int                 = _
+  var vidAsProp: Boolean         = _
+  var srcAsProp: Boolean         = _
+  var dstAsProp: Boolean         = _
+  var rankAsProp: Boolean        = _
+  var writeMode: WriteMode.Value = _
 
   if (operaType == OperaType.WRITE) {
     require(parameters.isDefinedAt(GRAPH_ADDRESS),
@@ -139,6 +140,8 @@ class NebulaOptions(@transient val parameters: CaseInsensitiveMap[String])(
     srcAsProp = parameters.getOrElse(SRC_AS_PROP, false).toString.toBoolean
     dstAsProp = parameters.getOrElse(DST_AS_PROP, false).toString.toBoolean
     rankAsProp = parameters.getOrElse(RANK_AS_PROP, false).toString.toBoolean
+    writeMode =
+      WriteMode.withName(parameters.getOrElse(WRITE_MODE, DEFAULT_WRITE_MODE).toString.toLowerCase)
   }
 
   def getReturnCols: List[String] = {
@@ -215,6 +218,7 @@ object NebulaOptions {
   val SRC_AS_PROP: String  = "srcAsProp"
   val DST_AS_PROP: String  = "dstAsProp"
   val RANK_AS_PROP: String = "rankAsProp"
+  val WRITE_MODE: String   = "writeMode"
 
   val DEFAULT_TIMEOUT: Int            = 3000
   val DEFAULT_CONNECTION_TIMEOUT: Int = 3000
@@ -229,6 +233,8 @@ object NebulaOptions {
   val DEFAULT_RATE_TIME_OUT: Long = 100
   val DEFAULT_POLICY: String      = null
   val DEFAULT_BATCH: Int          = 1000
+
+  val DEFAULT_WRITE_MODE = WriteMode.INSERT
 
   val EMPTY_STRING: String = ""
 }

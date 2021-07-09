@@ -7,7 +7,7 @@
 package com.vesoft.nebula.connector.writer
 
 import com.vesoft.nebula.connector.connector.{NebulaVertex, NebulaVertices}
-import com.vesoft.nebula.connector.{KeyPolicy, NebulaOptions}
+import com.vesoft.nebula.connector.{KeyPolicy, NebulaOptions, WriteMode}
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.sources.v2.writer.{DataWriter, WriterCommitMessage}
 import org.apache.spark.sql.types.StructType
@@ -54,7 +54,17 @@ class NebulaVertexWriter(nebulaOptions: NebulaOptions, vertexIndex: Int, schema:
 
   def execute(): Unit = {
     val nebulaVertices = NebulaVertices(propNames, vertices.toList, policy)
-    val exec           = NebulaExecutor.toExecuteSentence(nebulaOptions.label, nebulaVertices)
+    val exec = if (nebulaOptions.writeMode == WriteMode.INSERT) {
+      NebulaExecutor.toExecuteSentence(nebulaOptions.label, nebulaVertices)
+    } else {
+      nebulaVertices.values
+        .map { vertex =>
+          NebulaExecutor.toUpdateExecuteStatement(nebulaOptions.label,
+                                                  nebulaVertices.propNames,
+                                                  vertex)
+        }
+        .mkString(";")
+    }
     vertices.clear()
     submit(exec)
   }

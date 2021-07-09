@@ -11,6 +11,7 @@ import com.vesoft.nebula.exchange.config.{
   HBaseSourceConfigEntry,
   HiveSourceConfigEntry,
   JanusGraphSourceConfigEntry,
+  MaxComputeConfigEntry,
   MySQLSourceConfigEntry,
   Neo4JSourceConfigEntry,
   ServerDataSourceConfigEntry
@@ -257,5 +258,37 @@ class HBaseReader(override val session: SparkSession, hbaseConfig: HBaseSourceCo
       fields.map(field => DataTypes.createStructField(field, DataTypes.StringType, true)))
     val dataFrame = session.createDataFrame(rowRDD, schema)
     dataFrame
+  }
+}
+
+/**
+  * MaxCompute Reader
+  */
+class MaxcomputeReader(override val session: SparkSession, maxComputeConfig: MaxComputeConfigEntry)
+    extends ServerBaseReader(session, maxComputeConfig.sentence) {
+
+  override def read(): DataFrame = {
+    var dfReader = session.read
+      .format("org.apache.spark.aliyun.odps.datasource")
+      .option("odpsUrl", maxComputeConfig.odpsUrl)
+      .option("tunnelUrl", maxComputeConfig.tunnelUrl)
+      .option("table", maxComputeConfig.table)
+      .option("project", maxComputeConfig.project)
+      .option("accessKeyId", maxComputeConfig.accessKeyId)
+      .option("accessKeySecret", maxComputeConfig.accessKeySecret)
+
+    // if use partition read
+    if (maxComputeConfig.partitionSpec != null) {
+      dfReader = dfReader.option("partitionSpec", maxComputeConfig.partitionSpec)
+    }
+
+    val df = dfReader.load()
+    import session._
+    if (maxComputeConfig.sentence == null) {
+      df
+    } else {
+      df.createOrReplaceTempView(s"${maxComputeConfig.table}")
+      session.sql(maxComputeConfig.sentence)
+    }
   }
 }
