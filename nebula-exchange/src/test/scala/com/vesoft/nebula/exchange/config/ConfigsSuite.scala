@@ -10,6 +10,7 @@ import java.io.File
 
 import com.vesoft.nebula.exchange.config.{
   Configs,
+  DataBaseConfigEntry,
   FileBaseSourceConfigEntry,
   FileDataSourceConfigEntry,
   HBaseSourceConfigEntry,
@@ -20,9 +21,12 @@ import com.vesoft.nebula.exchange.config.{
   SourceCategory
 }
 import com.vesoft.nebula.exchange.{Argument, KeyPolicy}
+import org.apache.log4j.Logger
 import org.junit.Test
 
 class ConfigsSuite {
+  private[this] val LOG = Logger.getLogger(this.getClass)
+
   @Test
   def configsSuite(): Unit = {
     val args    = List("-c", "src/test/resources/application.conf", "-h", "-d")
@@ -234,6 +238,59 @@ class ConfigsSuite {
           assert(partition == 10)
         }
         case _ => {}
+      }
+    }
+  }
+
+  @Test
+  def DataBaseConfigsSuite(): Unit = {
+    // correct config
+    val graphAddress = List("127.0.0.1:9669", "127.0.0.1:9670")
+    val metaAddress  = List("127.0.0.1:9559", "127.0.0.1:9560")
+    val space        = "test"
+    DataBaseConfigEntry(graphAddress, space, metaAddress)
+
+    // empty space
+    try {
+      DataBaseConfigEntry(graphAddress, "", metaAddress)
+    } catch {
+      case e: IllegalArgumentException => {
+        LOG.error("we expect here, ", e)
+        assert(true)
+      }
+      case e: Throwable => {
+        LOG.error("DataBaseConfigSuite failed, ", e)
+        assert(false)
+      }
+    }
+
+    // wrong graph address
+    val wrongGraphAddress = List("127.0.0.1:9669,127.0.0.1:9670")
+    try {
+      DataBaseConfigEntry(wrongGraphAddress, space, metaAddress)
+    } catch {
+      case e: IllegalArgumentException => {
+        LOG.error("we expect here, ", e)
+        assert(true)
+      }
+      case e: Throwable => {
+        LOG.error("DataBaseConfigSuite failed, ", e)
+        assert(false)
+      }
+    }
+
+    // wrong meta Address
+    val wrongMetaAddress = List("127.0.0.1:9559，127.0.0.1:9560")
+    try {
+      DataBaseConfigEntry(graphAddress, space, wrongMetaAddress)
+    } catch {
+      case e: IllegalArgumentException => {
+        LOG.error("we expect here, ", e)
+        assert(true)
+      }
+      case e: Throwable => {
+        LOG.error("DataBaseConfigSuite failed, ", e)
+        assert(false)
       }
     }
   }
