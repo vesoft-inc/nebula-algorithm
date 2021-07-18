@@ -164,6 +164,20 @@ object SingleSourceShortestPathConfig{
   }
 }
 
+/**
+ * Closeness
+ */
+case class ClosenessConfig(sourceId: VertexId)
+
+object ClosenessConfig{
+  var sourceId: Long = _
+  def getClosenessConfig(configs: Configs):ClosenessConfig={
+    val closenessConfig=configs.algorithmConfig.map
+    sourceId=closenessConfig("algorithm.singlesourceshortestpath.sourceid").toLong
+    ClosenessConfig(sourceId)
+  }
+}
+
 case class AlgoConfig(configs: Configs)
 
 object AlgoConfig {
