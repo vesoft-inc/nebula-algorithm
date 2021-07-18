@@ -150,6 +150,20 @@ object BetweennessConfig {
   }
 }
 
+/**
+ * SingleSourceShortestPath
+ */
+case class SingleSourceShortestPathConfig(sourceId: VertexId)
+
+object SingleSourceShortestPathConfig{
+  var sourceId: Long = _
+  def getSingleSourceShortestPathConfig(configs: Configs):SingleSourceShortestPathConfig={
+    val sspConfig=configs.algorithmConfig.map
+    sourceId=sspConfig("algorithm.singlesourceshortestpath.sourceid").toLong
+    SingleSourceShortestPathConfig(sourceId)
+  }
+}
+
 case class AlgoConfig(configs: Configs)
 
 object AlgoConfig {
