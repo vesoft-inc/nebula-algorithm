@@ -26,6 +26,7 @@ object SourceCategory extends Enumeration {
   val MYSQL       = Value("MYSQL")
   val HBASE       = Value("HBASE")
   val MAXCOMPUTE  = Value("MAXCOMPUTE")
+  val CLICKHOUSE  = Value("CLICKHOUSE")
 
   val SOCKET = Value("SOCKET")
   val KAFKA  = Value("KAFKA")
@@ -242,4 +243,19 @@ case class MaxComputeConfigEntry(override val category: SourceCategory.Value,
       s"sentence:$sentence}"
   }
 
+}
+
+/**
+  * ClickHouseConfigEntry
+  */
+case class ClickHouseConfigEntry(override val category: SourceCategory.Value,
+                                 url: String,
+                                 user: String,
+                                 passwd: String,
+                                 numPartition: String,
+                                 override val sentence: String)
+    extends ServerDataSourceConfigEntry {
+  override def toString: String = {
+    s"ClickHouse source {url:$url, user:$user, passwd:$passwd, numPartition:$numPartition, sentence:$sentence}"
+  }
 }

@@ -483,6 +483,7 @@ object Configs {
       case "PULSAR"     => SourceCategory.PULSAR
       case "HBASE"      => SourceCategory.HBASE
       case "MAXCOMPUTE" => SourceCategory.MAXCOMPUTE
+      case "CLICKHOUSE" => SourceCategory.CLICKHOUSE
       case _            => throw new IllegalArgumentException(s"${category} not support")
     }
   }
@@ -634,6 +635,19 @@ object Configs {
           partitionSpec,
           sentence
         )
+      }
+      case SourceCategory.CLICKHOUSE => {
+        val partition: String = if (config.hasPath("numPartition")) {
+          config.getString("numPartition")
+        } else {
+          "1"
+        }
+        ClickHouseConfigEntry(SourceCategory.CLICKHOUSE,
+                              config.getString("url"),
+                              config.getString("user"),
+                              config.getString("password"),
+                              partition,
+                              config.getString("sentence"))
       }
       case _ =>
         throw new IllegalArgumentException("Unsupported data source")

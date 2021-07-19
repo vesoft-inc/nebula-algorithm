@@ -710,6 +710,11 @@
             <artifactId>emr-maxcompute_2.11</artifactId>
             <version>2.2.0</version>
         </dependency>
+        <dependency>
+            <groupId>ru.yandex.clickhouse</groupId>
+            <artifactId>clickhouse-jdbc</artifactId>
+            <version>0.2.5</version>
+        </dependency>
     </dependencies>
     <repositories>
         <repository>

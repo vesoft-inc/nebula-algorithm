@@ -10,6 +10,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 import java.io.File
 
 import com.vesoft.nebula.exchange.config.{
+  ClickHouseConfigEntry,
   Configs,
   DataSourceConfigEntry,
   FileBaseSourceConfigEntry,
@@ -27,6 +28,7 @@ import com.vesoft.nebula.exchange.config.{
 import com.vesoft.nebula.exchange.processor.{EdgeProcessor, VerticesProcessor}
 import com.vesoft.nebula.exchange.reader.{
   CSVReader,
+  ClickhouseReader,
   HBaseReader,
   HiveReader,
   JSONReader,
@@ -278,6 +280,11 @@ object Exchange {
         val maxComputeConfigEntry = config.asInstanceOf[MaxComputeConfigEntry]
         val reader                = new MaxcomputeReader(session, maxComputeConfigEntry)
         Some(reader.read())
+      case SourceCategory.CLICKHOUSE => {
+        val clickhouseConfigEntry = config.asInstanceOf[ClickHouseConfigEntry]
+        val reader                = new ClickhouseReader(session, clickhouseConfigEntry)
+        Some(reader.read())
+      }
       case _ => {
         LOG.error(s"Data source ${config.category} not supported")
         None
