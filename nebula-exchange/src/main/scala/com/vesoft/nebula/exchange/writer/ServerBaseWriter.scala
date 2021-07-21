@@ -142,7 +142,7 @@ class NebulaGraphClientWriter(dataBaseConfigEntry: DataBaseConfigEntry,
       throw new RuntimeException("Switch Failed")
     }
 
-    LOG.info(s"Connection to ${dataBaseConfigEntry.metaAddresses}")
+    LOG.info(s"Connection to ${dataBaseConfigEntry.graphAddress}")
   }
 
   override def writeVertices(vertices: Vertices): String = {
