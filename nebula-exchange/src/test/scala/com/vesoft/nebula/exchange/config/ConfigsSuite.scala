@@ -23,6 +23,7 @@ import com.vesoft.nebula.exchange.config.{
 import com.vesoft.nebula.exchange.{Argument, KeyPolicy}
 import org.apache.log4j.Logger
 import org.junit.Test
+import org.scalatest.Assertions.assertThrows
 
 class ConfigsSuite {
   private[this] val LOG = Logger.getLogger(this.getClass)
@@ -242,56 +243,53 @@ class ConfigsSuite {
     }
   }
 
+  /**
+    * correct config
+    */
   @Test
-  def DataBaseConfigsSuite(): Unit = {
-    // correct config
+  def dataBaseConfigSuite(): Unit = {
     val graphAddress = List("127.0.0.1:9669", "127.0.0.1:9670")
     val metaAddress  = List("127.0.0.1:9559", "127.0.0.1:9560")
     val space        = "test"
     DataBaseConfigEntry(graphAddress, space, metaAddress)
+  }
 
-    // empty space
-    try {
+  /**
+    * empty space
+    */
+  @Test
+  def dataBaseConfigEmptySpaceSuite: Unit = {
+    val graphAddress = List("127.0.0.1:9669", "127.0.0.1:9670")
+    val metaAddress  = List("127.0.0.1:9559", "127.0.0.1:9560")
+    assertThrows[IllegalArgumentException] {
       DataBaseConfigEntry(graphAddress, "", metaAddress)
-    } catch {
-      case e: IllegalArgumentException => {
-        LOG.error("we expect here, ", e)
-        assert(true)
-      }
-      case e: Throwable => {
-        LOG.error("DataBaseConfigSuite failed, ", e)
-        assert(false)
-      }
     }
+  }
 
-    // wrong graph address
+  /**
+    * wrong graph address
+    */
+  @Test
+  def dataBaseConfigWrongGraphSuite: Unit = {
     val wrongGraphAddress = List("127.0.0.1:9669,127.0.0.1:9670")
-    try {
-      DataBaseConfigEntry(wrongGraphAddress, space, metaAddress)
-    } catch {
-      case e: IllegalArgumentException => {
-        LOG.error("we expect here, ", e)
-        assert(true)
-      }
-      case e: Throwable => {
-        LOG.error("DataBaseConfigSuite failed, ", e)
-        assert(false)
-      }
-    }
+    val space             = "test"
+    val metaAddress       = List("127.0.0.1:9559", "127.0.0.1:9560")
 
-    // wrong meta Address
+    assertThrows[IllegalArgumentException] {
+      DataBaseConfigEntry(wrongGraphAddress, space, metaAddress)
+    }
+  }
+
+  /**
+    * wrong meta Address
+    */
+  @Test
+  def dataBaseConfigWrongMetaSuite: Unit = {
+    val graphAddress     = List("127.0.0.1:9669", "127.0.0.1:9670")
+    val space            = "test"
     val wrongMetaAddress = List("127.0.0.1:9559，127.0.0.1:9560")
-    try {
+    assertThrows[IllegalArgumentException] {
       DataBaseConfigEntry(graphAddress, space, wrongMetaAddress)
-    } catch {
-      case e: IllegalArgumentException => {
-        LOG.error("we expect here, ", e)
-        assert(true)
-      }
-      case e: Throwable => {
-        LOG.error("DataBaseConfigSuite failed, ", e)
-        assert(false)
-      }
     }
   }
 }
