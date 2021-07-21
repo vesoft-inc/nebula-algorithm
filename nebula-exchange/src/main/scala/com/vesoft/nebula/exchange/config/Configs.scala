@@ -36,9 +36,20 @@ object Type extends Enumeration {
 case class DataBaseConfigEntry(graphAddress: List[String],
                                space: String,
                                metaAddresses: List[String]) {
-  require(graphAddress.nonEmpty)
-  require(metaAddresses.nonEmpty)
-  require(space.trim.nonEmpty)
+  require(graphAddress.nonEmpty, "nebula.address.graph cannot be empty")
+  require(metaAddresses.nonEmpty, "nebula.address.meta cannot be empty")
+  require(space.trim.nonEmpty, "nebula.space cannot be empty")
+
+  for (address <- graphAddress) {
+    require(
+      !address.contains(",") && !address.contains("，"),
+      "nebula.address.graph has wrong format, please make sure the format is [\"ip1:port1\",\"ip2:port2\"]")
+  }
+  for (address <- metaAddresses) {
+    require(
+      !address.contains(",") && !address.contains("，"),
+      "nebula.address.meta has wrong format,,please make sure the format is [\"ip1:port1\",\"ip2:port2\"]")
+  }
 
   override def toString: String = super.toString
 
