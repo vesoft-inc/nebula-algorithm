@@ -167,14 +167,14 @@ object SingleSourceShortestPathConfig{
 /**
  * Closeness
  */
-case class ClosenessConfig(sourceId: VertexId)
+case class ClosenessConfig(landmarks: Seq[VertexId])
 
 object ClosenessConfig{
-  var sourceId: Long = _
+  var landmarks: Seq[Long] = _
   def getClosenessConfig(configs: Configs):ClosenessConfig={
     val closenessConfig=configs.algorithmConfig.map
-    sourceId=closenessConfig("algorithm.singlesourceshortestpath.sourceid").toLong
-    ClosenessConfig(sourceId)
+    landmarks=closenessConfig("algorithm.closeness.landmarks").split(",").toSeq.map(_.toLong)
+    ClosenessConfig(landmarks)
   }
 }
 

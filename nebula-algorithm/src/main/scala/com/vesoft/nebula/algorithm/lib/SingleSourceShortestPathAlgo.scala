@@ -1,3 +1,9 @@
+/* Copyright (c) 2021 vesoft inc. All rights reserved.
+ *
+ * This source code is licensed under Apache 2.0 License,
+ * attached with Common Clause Condition 1.0, found in the LICENSES directory.
+ */
+
 package com.vesoft.nebula.algorithm.lib
 
 import com.vesoft.nebula.algorithm.config.{AlgoConstants, SingleSourceShortestPathConfig}
@@ -35,7 +41,7 @@ object SingleSourceShortestPathAlgo {
    * execute SingleSourceShortestPath algorithm
    */
   def execute(graph: Graph[None.type, Double],
-              sourceId: graphx.VertexId)={
+              sourceId: graphx.VertexId):Graph[Double,Double]={
     val initialGraph = graph.mapVertices((id, _) =>
       if (id == sourceId) 0.0 else Double.PositiveInfinity)
     val ssspGraph = initialGraph.pregel(Double.PositiveInfinity)(
