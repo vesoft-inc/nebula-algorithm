@@ -56,20 +56,20 @@ class ProcessorSuite extends Processor {
     ))
   val row = new GenericRowWithSchema(values.toArray, schema)
   val map = Map(
-    "col1"  -> PropertyType.STRING.getValue,
-    "col2"  -> PropertyType.FIXED_STRING.getValue,
-    "col3"  -> PropertyType.INT8.getValue,
-    "col4"  -> PropertyType.INT16.getValue,
-    "col5"  -> PropertyType.INT32.getValue,
-    "col6"  -> PropertyType.INT64.getValue,
-    "col7"  -> PropertyType.DATE.getValue,
-    "col8"  -> PropertyType.DATETIME.getValue,
-    "col9"  -> PropertyType.TIME.getValue,
-    "col10" -> PropertyType.TIMESTAMP.getValue,
-    "col11" -> PropertyType.BOOL.getValue,
-    "col12" -> PropertyType.DOUBLE.getValue,
-    "col13" -> PropertyType.FLOAT.getValue,
-    "col14" -> PropertyType.STRING.getValue
+    "col1"  -> PropertyType.STRING,
+    "col2"  -> PropertyType.FIXED_STRING,
+    "col3"  -> PropertyType.INT8,
+    "col4"  -> PropertyType.INT16,
+    "col5"  -> PropertyType.INT32,
+    "col6"  -> PropertyType.INT64,
+    "col7"  -> PropertyType.DATE,
+    "col8"  -> PropertyType.DATETIME,
+    "col9"  -> PropertyType.TIME,
+    "col10" -> PropertyType.TIMESTAMP,
+    "col11" -> PropertyType.BOOL,
+    "col12" -> PropertyType.DOUBLE,
+    "col13" -> PropertyType.FLOAT,
+    "col14" -> PropertyType.STRING
   )
 
   @Test

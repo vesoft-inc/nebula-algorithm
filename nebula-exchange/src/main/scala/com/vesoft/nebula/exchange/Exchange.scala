@@ -212,7 +212,6 @@ object Exchange {
       LOG.info(s"batchFailure.reimport: ${batchFailure.value}")
     }
     spark.close()
-    sys.exit(0)
   }
 
   /**

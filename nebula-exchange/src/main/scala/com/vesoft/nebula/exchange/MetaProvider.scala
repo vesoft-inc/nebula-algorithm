@@ -51,7 +51,7 @@ class MetaProvider(addresses: List[HostAndPort], timeout: Int, retry: Int)
 
     val columns = tagSchema.getColumns
     for (colDef <- columns.asScala) {
-      schema.put(new String(colDef.getName), colDef.getType.getType.getValue)
+      schema.put(new String(colDef.getName), colDef.getType.getType)
     }
     schema.toMap
   }
@@ -62,7 +62,7 @@ class MetaProvider(addresses: List[HostAndPort], timeout: Int, retry: Int)
 
     val columns = edgeSchema.getColumns
     for (colDef <- columns.asScala) {
-      schema.put(new String(colDef.getName), colDef.getType.getType.getValue)
+      schema.put(new String(colDef.getName), colDef.getType.getType)
     }
     schema.toMap
   }
