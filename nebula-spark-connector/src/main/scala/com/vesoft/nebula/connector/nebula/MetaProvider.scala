@@ -47,7 +47,7 @@ class MetaProvider(addresses: List[Address]) extends AutoCloseable {
 
     val columns = tagSchema.getColumns
     for (colDef <- columns.asScala) {
-      schema.put(new String(colDef.getName), colDef.getType.getType.getValue)
+      schema.put(new String(colDef.getName), colDef.getType.getType)
     }
     schema.toMap
   }
@@ -58,7 +58,7 @@ class MetaProvider(addresses: List[Address]) extends AutoCloseable {
 
     val columns = edgeSchema.getColumns
     for (colDef <- columns.asScala) {
-      schema.put(new String(colDef.getName), colDef.getType.getType.getValue)
+      schema.put(new String(colDef.getName), colDef.getType.getType)
     }
     schema.toMap
   }
