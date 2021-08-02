@@ -48,7 +48,7 @@ case class DataBaseConfigEntry(graphAddress: List[String],
   for (address <- metaAddresses) {
     require(
       !address.contains(",") && !address.contains("，"),
-      "nebula.address.meta has wrong format,,please make sure the format is [\"ip1:port1\",\"ip2:port2\"]")
+      "nebula.address.meta has wrong format, please make sure the format is [\"ip1:port1\",\"ip2:port2\"]")
   }
 
   override def toString: String = super.toString
