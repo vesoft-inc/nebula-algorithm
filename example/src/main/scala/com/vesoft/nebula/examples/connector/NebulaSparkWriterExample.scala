@@ -34,14 +34,13 @@ object NebulaSparkWriterExample {
       .config(sparkConf)
       .getOrCreate()
 
-//    writeVertex(spark)
-//    writeEdge(spark)
+    writeVertex(spark)
+    writeEdge(spark)
 
     updateVertex(spark)
-    //updateEdge(spark)
+    updateEdge(spark)
 
     spark.close()
-    sys.exit()
   }
 
   /**
