@@ -23,10 +23,10 @@ Nebula Spark Connector 2.0 仅支持 Nebula Graph 2.x。如果您正在使用 Ne
 * Spark Reader 支持无属性读取，支持全属性读取
 * Spark Reader 支持将 Nebula Graph 数据读取成 Graphx 的 VertexRD 和 EdgeRDD，支持非 Long 型 vertexId
 * Nebula Spark Connector 2.0 统一了 SparkSQL 的扩展数据源，统一采用 DataSourceV2 进行 Nebula Graph 数据扩展
-
+* Nebula Spark Connector 2.1.0 增加了 `UPDATE` 写入模式，相关说明参考[Update Vertex](https://docs.nebula-graph.com.cn/2.0.1/3.ngql-guide/12.vertex-statements/2.update-vertex/) 。
 ## 使用说明
 
-  将 DataFrame 作为点写入 Nebula Graph :
+  将 DataFrame 作为点 `INSERT` 写入 Nebula Graph :
   ```
     val config = NebulaConnectionConfig
       .builder()
@@ -43,6 +43,25 @@ Nebula Spark Connector 2.0 仅支持 Nebula Graph 2.x。如果您正在使用 Ne
       .build()
     df.write.nebula(config, nebulaWriteVertexConfig).writeVertices()
   ```
+  将 DataFrame 作为点 `UPDATE` 写入 Nebula Graph ：
+  ```
+      val config = NebulaConnectionConfig
+        .builder()
+        .withMetaAddress("127.0.0.1:9559")
+        .withGraphAddress("127.0.0.1:9669")
+        .build()
+      val nebulaWriteVertexConfig = WriteNebulaVertexConfig
+        .builder()
+        .withSpace("test")
+        .withTag("person")
+        .withVidField("id")
+        .withVidAsProp(true)
+        .withBatch(1000)
+        .withWriteMode(WriteMode.UPDATE)
+        .build()
+      df.write.nebula(config, nebulaWriteVertexConfig).writeVertices()
+   ```
+
   读取 Nebula Graph 的点数据: 
   ```
     val config = NebulaConnectionConfig
