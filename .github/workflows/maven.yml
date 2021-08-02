@@ -37,7 +37,7 @@ jobs:
         wget https://oss-cdn.nebula-graph.com.cn/jar-packages/streamnative.zip
         unzip -o -d ~/.m2/repository/ neo4j-contrib.zip
         unzip -o -d ~/.m2/repository/ graphframes.zip
-        unzip -o -d ~/.m2/repository/io streamnative.zip
+        unzip -o -d ~/.m2/repository/io/ streamnative.zip
 
     - name: Install nebula-graph
       run: |
