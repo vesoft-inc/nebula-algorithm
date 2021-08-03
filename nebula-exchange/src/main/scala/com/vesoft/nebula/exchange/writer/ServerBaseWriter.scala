@@ -137,9 +137,9 @@ class NebulaGraphClientWriter(dataBaseConfigEntry: DataBaseConfigEntry,
 
   def prepare(): Unit = {
     val switchResult = graphProvider.switchSpace(session, dataBaseConfigEntry.space)
-    if (!switchResult) {
+    if (!switchResult.isSucceeded) {
       this.close()
-      throw new RuntimeException("Switch Failed")
+      throw new RuntimeException("Switch Failed for " + switchResult.getErrorMessage)
     }
 
     LOG.info(s"Connection to ${dataBaseConfigEntry.graphAddress}")
