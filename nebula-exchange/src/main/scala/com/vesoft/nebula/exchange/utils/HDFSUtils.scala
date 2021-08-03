@@ -6,12 +6,15 @@
 
 package com.vesoft.nebula.exchange.utils
 
+import java.io.File
 import java.nio.charset.Charset
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FileSystem, Path}
+import org.apache.log4j.Logger
 import scala.io.Source
 
 object HDFSUtils {
+  private[this] val LOG = Logger.getLogger(this.getClass)
 
   def getFileSystem(namenode: String = null): FileSystem = {
     val conf = new Configuration()
@@ -63,6 +66,17 @@ object HDFSUtils {
   }
 
   def upload(localPath: String, remotePath: String, namenode: String = null): Unit = {
+    try {
+      val localFile = new File(localPath)
+      if (!localFile.exists() || localFile.length() <= 0) {
+        return
+      }
+    } catch {
+      case e: Throwable =>
+        LOG.warn("check for empty local file error, but you can ignore this check error. " +
+                   "If there is empty sst file in your hdfs, please delete it manually",
+                 e)
+    }
     val system = getFileSystem(namenode)
     try {
       system.copyFromLocalFile(new Path(localPath), new Path(remotePath))
