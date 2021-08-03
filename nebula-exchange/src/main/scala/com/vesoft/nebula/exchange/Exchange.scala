@@ -8,7 +8,6 @@ package com.vesoft.nebula.exchange
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import java.io.File
-
 import com.vesoft.nebula.exchange.config.{
   ClickHouseConfigEntry,
   Configs,
@@ -136,6 +135,8 @@ object Exchange {
 
         val data = createDataSource(spark, tagConfig.dataSourceConfigEntry)
         if (data.isDefined && !c.dry) {
+          val count     = data.get.count()
+          val startTime = System.currentTimeMillis()
           val batchSuccess =
             spark.sparkContext.longAccumulator(s"batchSuccess.${tagConfig.name}")
           val batchFailure =
@@ -150,6 +151,10 @@ object Exchange {
             batchSuccess,
             batchFailure)
           processor.process()
+          val costTime = ((System.currentTimeMillis() - startTime) / 1000).formatted("%.2f")
+          LOG.info(
+            s"data source count: ${count}, " +
+              s"import for tag ${tagConfig.name} cost time: ${costTime} s")
           if (tagConfig.dataSinkConfigEntry.category == SinkCategory.CLIENT) {
             LOG.info(s"Client-Import: batchSuccess.${tagConfig.name}: ${batchSuccess.value}")
             LOG.info(s"Client-Import: batchFailure.${tagConfig.name}: ${batchFailure.value}")
@@ -174,6 +179,8 @@ object Exchange {
         LOG.info(s"nebula keys: ${nebulaKeys.mkString(", ")}")
         val data = createDataSource(spark, edgeConfig.dataSourceConfigEntry)
         if (data.isDefined && !c.dry) {
+          val count        = data.get.count()
+          val startTime    = System.currentTimeMillis()
           val batchSuccess = spark.sparkContext.longAccumulator(s"batchSuccess.${edgeConfig.name}")
           val batchFailure = spark.sparkContext.longAccumulator(s"batchFailure.${edgeConfig.name}")
 
@@ -187,6 +194,10 @@ object Exchange {
             batchFailure
           )
           processor.process()
+          val costTime = ((System.currentTimeMillis() - startTime) / 1000).formatted("%.2f")
+          LOG.info(
+            s"data source count: ${count}, " +
+              s"import for edge ${edgeConfig.name} cost time: ${costTime} s")
           if (edgeConfig.dataSinkConfigEntry.category == SinkCategory.CLIENT) {
             LOG.info(s"Client-Import: batchSuccess.${edgeConfig.name}: ${batchSuccess.value}")
             LOG.info(s"Client-Import: batchFailure.${edgeConfig.name}: ${batchFailure.value}")
@@ -205,9 +216,12 @@ object Exchange {
       val batchSuccess = spark.sparkContext.longAccumulator(s"batchSuccess.reimport")
       val batchFailure = spark.sparkContext.longAccumulator(s"batchFailure.reimport")
       val data         = spark.read.text(configs.errorConfig.errorPath)
-      data.count()
-      val processor = new ReloadProcessor(data, configs, batchSuccess, batchFailure)
+      val count        = data.count()
+      val startTime    = System.currentTimeMillis()
+      val processor    = new ReloadProcessor(data, configs, batchSuccess, batchFailure)
       processor.process()
+      val costTime = ((System.currentTimeMillis() - startTime) / 1000).formatted("%.2f")
+      LOG.info(s"reimport ngql count: ${count}, cost time: ${costTime}")
       LOG.info(s"batchSuccess.reimport: ${batchSuccess.value}")
       LOG.info(s"batchFailure.reimport: ${batchFailure.value}")
     }
