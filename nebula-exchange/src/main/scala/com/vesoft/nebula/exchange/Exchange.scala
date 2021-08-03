@@ -220,8 +220,8 @@ object Exchange {
       val startTime    = System.currentTimeMillis()
       val processor    = new ReloadProcessor(data, configs, batchSuccess, batchFailure)
       processor.process()
-      val costTIme = ((System.currentTimeMillis() - startTime) / 1000).formatted("%.2f")
-      LOG.info(s"reimport ngql count: ${count}, cost time: ${costTIme}")
+      val costTime = ((System.currentTimeMillis() - startTime) / 1000).formatted("%.2f")
+      LOG.info(s"reimport ngql count: ${count}, cost time: ${costTime}")
       LOG.info(s"batchSuccess.reimport: ${batchSuccess.value}")
       LOG.info(s"batchFailure.reimport: ${batchFailure.value}")
     }
