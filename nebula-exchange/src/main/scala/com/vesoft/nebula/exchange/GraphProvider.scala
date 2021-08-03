@@ -47,11 +47,11 @@ class GraphProvider(addresses: List[HostAndPort], timeout: Int)
     pool.close()
   }
 
-  def switchSpace(session: Session, space: String): Boolean = {
+  def switchSpace(session: Session, space: String): ResultSet = {
     val switchStatment = s"use $space"
     LOG.info(s"switch space $space")
     val result = submit(session, switchStatment)
-    result.isSucceeded
+    result
   }
 
   def submit(session: Session, statement: String): ResultSet = {
