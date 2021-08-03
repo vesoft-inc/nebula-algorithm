@@ -6,6 +6,7 @@
 
 package com.vesoft.nebula.exchange.utils
 
+import java.io.File
 import java.nio.charset.Charset
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FileSystem, Path}
@@ -63,6 +64,14 @@ object HDFSUtils {
   }
 
   def upload(localPath: String, remotePath: String, namenode: String = null): Unit = {
+    try {
+      val localFile = new File(localPath)
+      if (!localFile.exists() || localFile.length() <= 0) {
+        return
+      }
+    } catch {
+      case e: Throwable => e.printStackTrace()
+    }
     val system = getFileSystem(namenode)
     try {
       system.copyFromLocalFile(new Path(localPath), new Path(remotePath))
