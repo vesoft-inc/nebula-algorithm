@@ -6,7 +6,7 @@
 
 package com.vesoft.nebula.algorithm.lib
 
-import com.vesoft.nebula.algorithm.config.{AlgoConstants, ClosenessConfig}
+import com.vesoft.nebula.algorithm.config.AlgoConstants
 import com.vesoft.nebula.algorithm.utils.NebulaUtil
 import org.apache.log4j.Logger
 import org.apache.spark.graphx
@@ -34,12 +34,9 @@ object ClosenessAlgo {
    */
   def apply(spark: SparkSession,
             dataset: Dataset[Row],
-            closenessConfig: ClosenessConfig,
             hasWeight:Boolean):DataFrame={
     val graph: Graph[None.type, Double] = NebulaUtil.loadInitGraph(dataset, hasWeight)
-    execute(graph, closenessConfig.landmarks)
-
-    val closenessRDD = execute(graph, closenessConfig.landmarks)
+    val closenessRDD = execute(graph)
     val schema = StructType(
       List(
         StructField(AlgoConstants.ALGO_ID_COL, LongType, nullable = false),
@@ -52,11 +49,9 @@ object ClosenessAlgo {
   /**
    * execute Closeness algorithm
    */
-  def execute(graph: Graph[None.type, Double],
-              landmarks: Seq[graphx.VertexId]):RDD[Row]={
-    val spGraph = graph.mapVertices { (vid, attr) =>
-      if (landmarks.contains(vid)) makeMap(vid -> 0.0) else makeMap()
-    }
+  def execute(graph: Graph[None.type, Double]):RDD[Row]={
+    val spGraph = graph.mapVertices((vid, _) => makeMap(vid -> 0.0))
+
 
     val initialMessage = makeMap()
 

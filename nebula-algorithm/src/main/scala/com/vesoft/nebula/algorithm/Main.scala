@@ -7,7 +7,7 @@
 package com.vesoft.nebula.algorithm
 
 import com.vesoft.nebula.algorithm.config.Configs.Argument
-import com.vesoft.nebula.algorithm.config.{AlgoConfig, BetweennessConfig, CcConfig, ClosenessConfig, Configs, KCoreConfig, LPAConfig, LouvainConfig, PRConfig, ShortestPathConfig, SingleSourceShortestPathConfig, SparkConfig}
+import com.vesoft.nebula.algorithm.config.{AlgoConfig, BetweennessConfig, CcConfig, Configs, KCoreConfig, LPAConfig, LouvainConfig, PRConfig, ShortestPathConfig, SingleSourceShortestPathConfig, SparkConfig}
 import com.vesoft.nebula.algorithm.lib.{BetweennessCentralityAlgo, ClosenessAlgo, ConnectedComponentsAlgo, DegreeStaticAlgo, KCoreAlgo, LabelPropagationAlgo, LouvainAlgo, PageRankAlgo, ShortestPathAlgo, SingleSourceShortestPathAlgo, StronglyConnectedComponentsAlgo, TriangleCountAlgo}
 import com.vesoft.nebula.algorithm.reader.{CsvReader, JsonReader, NebulaReader}
 import com.vesoft.nebula.algorithm.writer.{CsvWriter, NebulaWriter, TextWriter}
@@ -143,8 +143,7 @@ object Main {
           SingleSourceShortestPathAlgo(spark, dataSet, singleSourceShortestPathConfig, hasWeight)
         }
         case "closeness"=>{
-          val closenessConfig=ClosenessConfig.getClosenessConfig(configs)
-          ClosenessAlgo(spark,dataSet,closenessConfig,hasWeight)
+          ClosenessAlgo(spark,dataSet,hasWeight)
         }
         case _ => throw new UnknownParameterException("unknown executeAlgo name.")
       }

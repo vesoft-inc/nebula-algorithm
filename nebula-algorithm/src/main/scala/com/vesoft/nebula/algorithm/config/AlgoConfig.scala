@@ -164,20 +164,6 @@ object SingleSourceShortestPathConfig{
   }
 }
 
-/**
- * Closeness
- */
-case class ClosenessConfig(landmarks: Seq[VertexId])
-
-object ClosenessConfig{
-  var landmarks: Seq[Long] = _
-  def getClosenessConfig(configs: Configs):ClosenessConfig={
-    val closenessConfig=configs.algorithmConfig.map
-    landmarks=closenessConfig("algorithm.closeness.landmarks").split(",").toSeq.map(_.toLong)
-    ClosenessConfig(landmarks)
-  }
-}
-
 case class AlgoConfig(configs: Configs)
 
 object AlgoConfig {
