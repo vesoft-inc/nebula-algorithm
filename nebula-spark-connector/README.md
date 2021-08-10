@@ -23,10 +23,11 @@ Nebula Spark Connector 2.0 only supports Nebula Graph 2.x. If you are using Nebu
 * Spark Reader Supports non-property, all-property, and specific-properties read.
 * Spark Reader Supports reading data from Nebula Graph to Graphx as VertexRD and EdgeRDD, it also supports String type vertexId.
 * Nebula Spark Connector 2.0 uniformly uses SparkSQL's DataSourceV2 for data source expansion.
+* Nebula Spark Connector 2.1.0 support UPDATE write mode to NebulaGraph, see [Update Vertex](https://docs.nebula-graph.io/2.0.1/3.ngql-guide/12.vertex-statements/2.update-vertex/) .
 
 ## How to Use
 
-  Write DataFrame into Nebula Graph as Vertices:
+  Write DataFrame `INSERT` into Nebula Graph as Vertices:
   ```
     val config = NebulaConnectionConfig
       .builder()
@@ -40,6 +41,24 @@ Nebula Spark Connector 2.0 only supports Nebula Graph 2.x. If you are using Nebu
       .withVidField("id")
       .withVidAsProp(true)
       .withBatch(1000)
+      .build()
+    df.write.nebula(config, nebulaWriteVertexConfig).writeVertices()
+  ```
+  Write DataFrame `UPDATE` into Nebula Graph as Vertices:
+  ```
+    val config = NebulaConnectionConfig
+      .builder()
+      .withMetaAddress("127.0.0.1:9559")
+      .withGraphAddress("127.0.0.1:9669")
+      .build()
+    val nebulaWriteVertexConfig: WriteNebulaVertexConfig = WriteNebulaVertexConfig
+      .builder()
+      .withSpace("test")
+      .withTag("person")
+      .withVidField("id")
+      .withVidAsProp(true)
+      .withBatch(1000)
+      .withWriteMode(WriteMode.UPDATE)
       .build()
     df.write.nebula(config, nebulaWriteVertexConfig).writeVertices()
   ```

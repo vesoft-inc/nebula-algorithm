@@ -186,7 +186,7 @@ class NebulaExecutorSuite extends AnyFunSuite with BeforeAndAfterAll {
       NebulaExecutor.toUpdateExecuteStatement("person", propNames, nebulaVertex)
     val expectVertexUpdate =
       "UPDATE VERTEX ON `person` \"vid1\" SET `col_string`=\"name\",`col_fixed_string`=\"name\"," +
-        "`col_bool`=true,`col_int`=10,`col_int64`=100,`col_double`=1.0,`col_date`=2021-11-12;"
+        "`col_bool`=true,`col_int`=10,`col_int64`=100,`col_double`=1.0,`col_date`=2021-11-12"
     assert(expectVertexUpdate.equals(updateVertexStatement))
   }
 
@@ -209,7 +209,7 @@ class NebulaExecutorSuite extends AnyFunSuite with BeforeAndAfterAll {
     val expectEdgeUpdate =
       "UPDATE EDGE ON `friend` \"source\"->\"target\"@0 SET `col_string`=\"name\"," +
         "`col_fixed_string`=\"name\",`col_bool`=true,`col_int`=10,`col_int64`=100," +
-        "`col_double`=1.0,`col_date`=2021-11-12;"
+        "`col_double`=1.0,`col_date`=2021-11-12"
     assert(expectEdgeUpdate.equals(updateEdgeStatement))
   }
 }

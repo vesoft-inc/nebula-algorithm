@@ -25,6 +25,8 @@ object SourceCategory extends Enumeration {
   val JANUS_GRAPH = Value("JANUS GRAPH")
   val MYSQL       = Value("MYSQL")
   val HBASE       = Value("HBASE")
+  val MAXCOMPUTE  = Value("MAXCOMPUTE")
+  val CLICKHOUSE  = Value("CLICKHOUSE")
 
   val SOCKET = Value("SOCKET")
   val KAFKA  = Value("KAFKA")
@@ -234,8 +236,45 @@ case class TigerGraphSourceConfigEntry(override val category: SourceCategory.Val
   require(
     url.trim.length != 0 && username.trim.length > 0 && sentence.trim.length > 0
   )
+
   override def toString: String = {
     s"TigerGraph source url: ${url}, sentence: ${sentence}, " +
       s"username: ${username}, password: ${password}"
+  }
+}
+case class MaxComputeConfigEntry(override val category: SourceCategory.Value,
+                                 odpsUrl: String,
+                                 tunnelUrl: String,
+                                 table: String,
+                                 project: String,
+                                 accessKeyId: String,
+                                 accessKeySecret: String,
+                                 partitionSpec: String,
+                                 override val sentence: String)
+  extends ServerDataSourceConfigEntry {
+  require(
+    !odpsUrl.trim.isEmpty && !tunnelUrl.trim.isEmpty && !table.trim.isEmpty && !project.trim.isEmpty
+      && !accessKeyId.trim.isEmpty && !accessKeySecret.trim.isEmpty)
+
+  override def toString: String = {
+    s"MaxCompute source {odpsUrl: $odpsUrl, tunnelUrl: $tunnelUrl, table: $table, project: $project, " +
+      s"keyId: $accessKeyId, keySecret: $accessKeySecret, partitionSpec:$partitionSpec, " +
+      s"sentence:$sentence}"
+  }
+
+}
+
+/**
+ * ClickHouseConfigEntry
+ */
+case class ClickHouseConfigEntry(override val category: SourceCategory.Value,
+                                 url: String,
+                                 user: String,
+                                 passwd: String,
+                                 numPartition: String,
+                                 override val sentence: String)
+  extends ServerDataSourceConfigEntry {
+  override def toString: String = {
+    s"ClickHouse source {url:$url, user:$user, passwd:$passwd, numPartition:$numPartition, sentence:$sentence}"
   }
 }

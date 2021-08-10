@@ -7,7 +7,7 @@
 package com.vesoft.nebula.exchange.reader
 
 import com.google.common.collect.Maps
-import com.vesoft.nebula.exchange.config.{HBaseSourceConfigEntry, HiveSourceConfigEntry, JanusGraphSourceConfigEntry, MySQLSourceConfigEntry, Neo4JSourceConfigEntry, ServerDataSourceConfigEntry, TigerGraphSourceConfigEntry}
+import com.vesoft.nebula.exchange.config.{ClickHouseConfigEntry, HBaseSourceConfigEntry, HiveSourceConfigEntry, JanusGraphSourceConfigEntry, MaxComputeConfigEntry, MySQLSourceConfigEntry, Neo4JSourceConfigEntry, ServerDataSourceConfigEntry, TigerGraphSourceConfigEntry}
 import com.vesoft.nebula.exchange.utils.{HDFSUtils, Neo4jUtils}
 import org.apache.hadoop.hbase.HBaseConfiguration
 import org.apache.hadoop.hbase.client.Result
@@ -266,6 +266,58 @@ class TigerGraphReader(override val session: SparkSession, tigergraphConfig:Tige
         "dbtable" ->tigergraphConfig.sentence
           )
     ).load()
+    df
+  }
+}
+/**
+  * MaxCompute Reader
+  */
+class MaxcomputeReader(override val session: SparkSession, maxComputeConfig: MaxComputeConfigEntry)
+    extends ServerBaseReader(session, maxComputeConfig.sentence) {
+
+  override def read(): DataFrame = {
+    var dfReader = session.read
+      .format("org.apache.spark.aliyun.odps.datasource")
+      .option("odpsUrl", maxComputeConfig.odpsUrl)
+      .option("tunnelUrl", maxComputeConfig.tunnelUrl)
+      .option("table", maxComputeConfig.table)
+      .option("project", maxComputeConfig.project)
+      .option("accessKeyId", maxComputeConfig.accessKeyId)
+      .option("accessKeySecret", maxComputeConfig.accessKeySecret)
+
+    // if use partition read
+    if (maxComputeConfig.partitionSpec != null) {
+      dfReader = dfReader.option("partitionSpec", maxComputeConfig.partitionSpec)
+    }
+
+    val df = dfReader.load()
+    import session._
+    if (maxComputeConfig.sentence == null) {
+      df
+    } else {
+      df.createOrReplaceTempView(s"${maxComputeConfig.table}")
+      session.sql(maxComputeConfig.sentence)
+    }
+  }
+}
+
+/**
+  * Clickhouse reader
+  */
+class ClickhouseReader(override val session: SparkSession,
+                       clickHouseConfigEntry: ClickHouseConfigEntry)
+    extends ServerBaseReader(session, clickHouseConfigEntry.sentence) {
+  Class.forName("ru.yandex.clickhouse.ClickHouseDriver")
+  override def read(): DataFrame = {
+    val df = session.read
+      .format("jdbc")
+      .option("driver", "ru.yandex.clickhouse.ClickHouseDriver")
+      .option("url", clickHouseConfigEntry.url)
+      .option("user", clickHouseConfigEntry.user)
+      .option("password", clickHouseConfigEntry.passwd)
+      .option("numPartitions", clickHouseConfigEntry.numPartition)
+      .option("query", clickHouseConfigEntry.sentence)
+      .load()
     df
   }
 }

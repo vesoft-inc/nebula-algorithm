@@ -93,6 +93,7 @@ class NebulaEdgeWriter(nebulaOptions: NebulaOptions,
     if (edges.nonEmpty) {
       execute()
     }
+    graphProvider.close()
     NebulaCommitMessage.apply(failedExecs.toList)
   }
 

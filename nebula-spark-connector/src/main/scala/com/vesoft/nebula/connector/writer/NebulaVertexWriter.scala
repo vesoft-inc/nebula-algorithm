@@ -73,6 +73,7 @@ class NebulaVertexWriter(nebulaOptions: NebulaOptions, vertexIndex: Int, schema:
     if (vertices.nonEmpty) {
       execute()
     }
+    graphProvider.close()
     NebulaCommitMessage(failedExecs.toList)
   }
 

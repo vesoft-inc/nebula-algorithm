@@ -9,9 +9,9 @@ package com.vesoft.nebula.exchange
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 import java.io.File
-import com.vesoft.nebula.exchange.config.{Configs, DataSourceConfigEntry, FileBaseSourceConfigEntry, HBaseSourceConfigEntry, HiveSourceConfigEntry, JanusGraphSourceConfigEntry, KafkaSourceConfigEntry, MySQLSourceConfigEntry, Neo4JSourceConfigEntry, PulsarSourceConfigEntry, SinkCategory, SourceCategory, TigerGraphSourceConfigEntry}
+import com.vesoft.nebula.exchange.config.{ClickHouseConfigEntry, Configs, DataSourceConfigEntry, FileBaseSourceConfigEntry, HBaseSourceConfigEntry, HiveSourceConfigEntry, JanusGraphSourceConfigEntry, KafkaSourceConfigEntry, MaxComputeConfigEntry, MySQLSourceConfigEntry, Neo4JSourceConfigEntry, PulsarSourceConfigEntry, SinkCategory, SourceCategory, TigerGraphSourceConfigEntry}
 import com.vesoft.nebula.exchange.processor.{EdgeProcessor, VerticesProcessor}
-import com.vesoft.nebula.exchange.reader.{CSVReader, HBaseReader, HiveReader, JSONReader, JanusGraphReader, KafkaReader, MySQLReader, Neo4JReader, ORCReader, ParquetReader, PulsarReader, TigerGraphReader}
+import com.vesoft.nebula.exchange.reader.{CSVReader, ClickhouseReader, HBaseReader, HiveReader, JSONReader, JanusGraphReader, KafkaReader, MaxcomputeReader, MySQLReader, Neo4JReader, ORCReader, ParquetReader, PulsarReader, TigerGraphReader}
 import com.vesoft.nebula.exchange.processor.ReloadProcessor
 import org.apache.log4j.Logger
 import org.apache.spark.SparkConf
@@ -92,6 +92,9 @@ object Exchange {
       sys.exit(0)
     }
 
+    // record the failed batch number
+    var failures: Long = 0L
+
     // import tags
     if (configs.tagsConfig.nonEmpty) {
       for (tagConfig <- configs.tagsConfig) {
@@ -104,6 +107,8 @@ object Exchange {
 
         val data = createDataSource(spark, tagConfig.dataSourceConfigEntry)
         if (data.isDefined && !c.dry) {
+          val count     = data.get.count()
+          val startTime = System.currentTimeMillis()
           val batchSuccess =
             spark.sparkContext.longAccumulator(s"batchSuccess.${tagConfig.name}")
           val batchFailure =
@@ -118,9 +123,14 @@ object Exchange {
             batchSuccess,
             batchFailure)
           processor.process()
+          val costTime = ((System.currentTimeMillis() - startTime) / 1000.0).formatted("%.2f")
+          LOG.info(
+            s"data source count: ${count}, " +
+              s"import for tag ${tagConfig.name} cost time: ${costTime} s")
           if (tagConfig.dataSinkConfigEntry.category == SinkCategory.CLIENT) {
             LOG.info(s"Client-Import: batchSuccess.${tagConfig.name}: ${batchSuccess.value}")
             LOG.info(s"Client-Import: batchFailure.${tagConfig.name}: ${batchFailure.value}")
+            failures += batchFailure.value
           } else {
             LOG.info(s"SST-Import: failure.${tagConfig.name}: ${batchFailure.value}")
           }
@@ -141,6 +151,8 @@ object Exchange {
         LOG.info(s"nebula keys: ${nebulaKeys.mkString(", ")}")
         val data = createDataSource(spark, edgeConfig.dataSourceConfigEntry)
         if (data.isDefined && !c.dry) {
+          val count        = data.get.count()
+          val startTime    = System.currentTimeMillis()
           val batchSuccess = spark.sparkContext.longAccumulator(s"batchSuccess.${edgeConfig.name}")
           val batchFailure = spark.sparkContext.longAccumulator(s"batchFailure.${edgeConfig.name}")
 
@@ -154,9 +166,14 @@ object Exchange {
             batchFailure
           )
           processor.process()
+          val costTime = ((System.currentTimeMillis() - startTime) / 1000.0).formatted("%.2f")
+          LOG.info(
+            s"data source count: ${count}, " +
+              s"import for edge ${edgeConfig.name} cost time: ${costTime} s")
           if (edgeConfig.dataSinkConfigEntry.category == SinkCategory.CLIENT) {
             LOG.info(s"Client-Import: batchSuccess.${edgeConfig.name}: ${batchSuccess.value}")
             LOG.info(s"Client-Import: batchFailure.${edgeConfig.name}: ${batchFailure.value}")
+            failures += batchFailure.value
           } else {
             LOG.info(s"SST-Import: failure.${edgeConfig.name}: ${batchFailure.value}")
           }
@@ -167,17 +184,20 @@ object Exchange {
     }
 
     // reimport for failed tags and edges
-    if (ErrorHandler.existError(configs.errorConfig.errorPath)) {
+    if (failures > 0 && ErrorHandler.existError(configs.errorConfig.errorPath)) {
       val batchSuccess = spark.sparkContext.longAccumulator(s"batchSuccess.reimport")
       val batchFailure = spark.sparkContext.longAccumulator(s"batchFailure.reimport")
       val data         = spark.read.text(configs.errorConfig.errorPath)
+      val count        = data.count()
+      val startTime    = System.currentTimeMillis()
       val processor    = new ReloadProcessor(data, configs, batchSuccess, batchFailure)
       processor.process()
+      val costTime = ((System.currentTimeMillis() - startTime) / 1000.0).formatted("%.2f")
+      LOG.info(s"reimport ngql count: ${count}, cost time: ${costTime}")
       LOG.info(s"batchSuccess.reimport: ${batchSuccess.value}")
       LOG.info(s"batchFailure.reimport: ${batchFailure.value}")
     }
     spark.close()
-    sys.exit(0)
   }
 
   /**
@@ -251,6 +271,15 @@ object Exchange {
         val tigerGraphSourceConfigEntry=config.asInstanceOf[TigerGraphSourceConfigEntry]
         val reader=new TigerGraphReader(session,tigerGraphSourceConfigEntry)
         Some(reader.read())
+      case SourceCategory.MAXCOMPUTE =>
+        val maxComputeConfigEntry = config.asInstanceOf[MaxComputeConfigEntry]
+        val reader                = new MaxcomputeReader(session, maxComputeConfigEntry)
+        Some(reader.read())
+      case SourceCategory.CLICKHOUSE => {
+        val clickhouseConfigEntry = config.asInstanceOf[ClickHouseConfigEntry]
+        val reader                = new ClickhouseReader(session, clickhouseConfigEntry)
+        Some(reader.read())
+      }
       case _ => {
         LOG.error(s"Data source ${config.category} not supported")
         None

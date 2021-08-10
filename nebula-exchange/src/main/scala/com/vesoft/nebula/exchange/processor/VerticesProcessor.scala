@@ -93,9 +93,8 @@ class VerticesProcessor(data: DataFrame,
         s"${config.errorConfig.errorPath}/${tagConfig.name}.${TaskContext.getPartitionId()}")
       errorBuffer.clear()
     }
-    LOG.info(
-      s"spark partition for vertex cost time:" +
-        s"${TaskContext.getPartitionId()}-${System.currentTimeMillis() - startTime}")
+    LOG.info(s"tag ${tagConfig.name} import in spark partition ${TaskContext
+      .getPartitionId()} cost ${System.currentTimeMillis() - startTime} ms")
     writer.close()
     graphProvider.close()
   }
