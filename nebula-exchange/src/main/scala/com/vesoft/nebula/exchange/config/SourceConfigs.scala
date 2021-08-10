@@ -29,6 +29,8 @@ object SourceCategory extends Enumeration {
   val SOCKET = Value("SOCKET")
   val KAFKA  = Value("KAFKA")
   val PULSAR = Value("PULSAR")
+
+  val TIGER_GRAPH = Value("TIGER GRAPH")
 }
 
 class SourceCategory
@@ -215,5 +217,25 @@ case class HBaseSourceConfigEntry(override val category: SourceCategory.Value,
 
   override def toString: String = {
     s"HBase source host: $host, port: $port, table: $table"
+  }
+}
+
+/**
+ *  TigerGraphSourceConfigEntry
+ *
+ */
+case class TigerGraphSourceConfigEntry(override val category: SourceCategory.Value,
+                                       url:String,
+                                       username:String,
+                                       password:String,
+                                       override val sentence:String
+                                      )
+  extends ServerDataSourceConfigEntry {
+  require(
+    url.trim.length != 0 && username.trim.length > 0 && sentence.trim.length > 0
+  )
+  override def toString: String = {
+    s"TigerGraph source url: ${url}, sentence: ${sentence}, " +
+      s"username: ${username}, password: ${password}"
   }
 }

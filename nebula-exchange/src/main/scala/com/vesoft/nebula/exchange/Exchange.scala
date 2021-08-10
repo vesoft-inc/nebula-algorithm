@@ -7,37 +7,12 @@
 package com.vesoft.nebula.exchange
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import java.io.File
 
-import com.vesoft.nebula.exchange.config.{
-  Configs,
-  DataSourceConfigEntry,
-  FileBaseSourceConfigEntry,
-  HBaseSourceConfigEntry,
-  HiveSourceConfigEntry,
-  JanusGraphSourceConfigEntry,
-  KafkaSourceConfigEntry,
-  MySQLSourceConfigEntry,
-  Neo4JSourceConfigEntry,
-  PulsarSourceConfigEntry,
-  SinkCategory,
-  SourceCategory
-}
+import java.io.File
+import com.vesoft.nebula.exchange.config.{Configs, DataSourceConfigEntry, FileBaseSourceConfigEntry, HBaseSourceConfigEntry, HiveSourceConfigEntry, JanusGraphSourceConfigEntry, KafkaSourceConfigEntry, MySQLSourceConfigEntry, Neo4JSourceConfigEntry, PulsarSourceConfigEntry, SinkCategory, SourceCategory, TigerGraphSourceConfigEntry}
 import com.vesoft.nebula.exchange.processor.{EdgeProcessor, VerticesProcessor}
-import com.vesoft.nebula.exchange.reader.{
-  CSVReader,
-  HBaseReader,
-  HiveReader,
-  JSONReader,
-  JanusGraphReader,
-  KafkaReader,
-  MySQLReader,
-  Neo4JReader,
-  ORCReader,
-  ParquetReader
-}
+import com.vesoft.nebula.exchange.reader.{CSVReader, HBaseReader, HiveReader, JSONReader, JanusGraphReader, KafkaReader, MySQLReader, Neo4JReader, ORCReader, ParquetReader, PulsarReader, TigerGraphReader}
 import com.vesoft.nebula.exchange.processor.ReloadProcessor
-import com.vesoft.nebula.exchange.reader.PulsarReader
 import org.apache.log4j.Logger
 import org.apache.spark.SparkConf
 
@@ -271,6 +246,10 @@ object Exchange {
       case SourceCategory.HBASE =>
         val hbaseSourceConfigEntry = config.asInstanceOf[HBaseSourceConfigEntry]
         val reader                 = new HBaseReader(session, hbaseSourceConfigEntry)
+        Some(reader.read())
+      case SourceCategory.TIGER_GRAPH=>
+        val tigerGraphSourceConfigEntry=config.asInstanceOf[TigerGraphSourceConfigEntry]
+        val reader=new TigerGraphReader(session,tigerGraphSourceConfigEntry)
         Some(reader.read())
       case _ => {
         LOG.error(s"Data source ${config.category} not supported")

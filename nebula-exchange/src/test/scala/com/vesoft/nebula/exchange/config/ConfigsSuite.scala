@@ -7,18 +7,7 @@
 package scala.com.vesoft.nebula.exchange.config
 
 import java.io.File
-
-import com.vesoft.nebula.exchange.config.{
-  Configs,
-  FileBaseSourceConfigEntry,
-  FileDataSourceConfigEntry,
-  HBaseSourceConfigEntry,
-  HiveSourceConfigEntry,
-  MySQLSourceConfigEntry,
-  Neo4JSourceConfigEntry,
-  SinkCategory,
-  SourceCategory
-}
+import com.vesoft.nebula.exchange.config.{Configs, FileBaseSourceConfigEntry, FileDataSourceConfigEntry, HBaseSourceConfigEntry, HiveSourceConfigEntry, MySQLSourceConfigEntry, Neo4JSourceConfigEntry, SinkCategory, SourceCategory, TigerGraphSourceConfigEntry}
 import com.vesoft.nebula.exchange.{Argument, KeyPolicy}
 import org.junit.Test
 
@@ -151,6 +140,16 @@ class ConfigsSuite {
           assert(mysql.database.equals("database"))
           assert(mysql.table.equals("table"))
         }
+        case SourceCategory.TIGER_GRAPH=>{
+          val tigergraph=tagConfig.dataSourceConfigEntry.asInstanceOf[TigerGraphSourceConfigEntry]
+          assert(label.equals("tag9"))
+          assert(tigergraph.url.equals("jdbc:tg:http://127.0.0.1:14240"))
+          assert(tigergraph.username.equals("tigergraph"))
+          assert(tigergraph.password.equals("tigergraph"))
+          assert(tigergraph.sentence.equals("interpreted() INTERPRET QUERY () FOR GRAPH graph {V = {vertex_type.*};ans=SELECT s FROM V:s;PRINT ans;}"))
+          assert(batch == 1000)
+          assert(partition == 10)
+        }
         case _ => {}
       }
     }
@@ -230,6 +229,16 @@ class ConfigsSuite {
           assert(hbase.columnFamily.equals("hbase-table-cloumnfamily"))
           assert(hbase.host.equals("127.0.0.1"))
           assert(hbase.port.equals("2181"))
+          assert(batch == 1000)
+          assert(partition == 10)
+        }
+        case SourceCategory.TIGER_GRAPH=>{
+          val tigergraph=edgeConfig.dataSourceConfigEntry.asInstanceOf[TigerGraphSourceConfigEntry]
+          assert(label.equals("edge8"))
+          assert(tigergraph.url.equals("jdbc:tg:http://127.0.0.1:14240"))
+          assert(tigergraph.username.equals("tigergraph"))
+          assert(tigergraph.password.equals("tigergraph"))
+          assert(tigergraph.sentence.equals("interpreted() INTERPRET QUERY () FOR GRAPH graph {SetAccum<Edge> @@EdgeSet;vs={vertex_type.*};ans=SELECT t FROM vs-(edge_type:e)->vertex_type:t ACCUM @@EdgeSet+=e;PRINT @@EdgeSet;}"))
           assert(batch == 1000)
           assert(partition == 10)
         }

@@ -482,6 +482,7 @@ object Configs {
       case "MYSQL"   => SourceCategory.MYSQL
       case "PULSAR"  => SourceCategory.PULSAR
       case "HBASE"   => SourceCategory.HBASE
+      case "TIGERGRAPH"=>SourceCategory.TIGER_GRAPH
       case _         => throw new IllegalArgumentException(s"${category} not support")
     }
   }
@@ -609,6 +610,14 @@ object Configs {
                                config.getString("table"),
                                config.getString("columnFamily"),
                                fields.toSet.toList)
+      case SourceCategory.TIGER_GRAPH=>
+        TigerGraphSourceConfigEntry(
+          SourceCategory.TIGER_GRAPH,
+          config.getString("url"),
+          config.getString("username"),
+          config.getString("password"),
+          config.getString("sentence")
+        )
       case _ =>
         throw new IllegalArgumentException("Unsupported data source")
     }

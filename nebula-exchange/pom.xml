@@ -696,6 +696,14 @@
             <version>${hbase.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.tigergraph</groupId>
+            <artifactId>tg-jdbc-driver</artifactId>
+            <version>1.2</version>
+            <type>jar</type>
+            <scope>system</scope>
+            <systemPath>${pom.basedir}/src/main/resources/lib/tg-jdbc-driver-1.2.jar</systemPath>
+        </dependency>
+        <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-xml</artifactId>
             <version>${scala-xml.version}</version>

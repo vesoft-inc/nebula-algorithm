@@ -7,14 +7,7 @@
 package com.vesoft.nebula.exchange.reader
 
 import com.google.common.collect.Maps
-import com.vesoft.nebula.exchange.config.{
-  HBaseSourceConfigEntry,
-  HiveSourceConfigEntry,
-  JanusGraphSourceConfigEntry,
-  MySQLSourceConfigEntry,
-  Neo4JSourceConfigEntry,
-  ServerDataSourceConfigEntry
-}
+import com.vesoft.nebula.exchange.config.{HBaseSourceConfigEntry, HiveSourceConfigEntry, JanusGraphSourceConfigEntry, MySQLSourceConfigEntry, Neo4JSourceConfigEntry, ServerDataSourceConfigEntry, TigerGraphSourceConfigEntry}
 import com.vesoft.nebula.exchange.utils.{HDFSUtils, Neo4jUtils}
 import org.apache.hadoop.hbase.HBaseConfiguration
 import org.apache.hadoop.hbase.client.Result
@@ -27,10 +20,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema
 import org.apache.spark.sql.types.{DataTypes, StructType}
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
-import org.apache.tinkerpop.gremlin.process.computer.clustering.peerpressure.{
-  ClusterCountMapReduce,
-  PeerPressureVertexProgram
-}
+import org.apache.tinkerpop.gremlin.process.computer.clustering.peerpressure.{ClusterCountMapReduce, PeerPressureVertexProgram}
 import org.apache.tinkerpop.gremlin.spark.process.computer.SparkGraphComputer
 import org.apache.tinkerpop.gremlin.spark.structure.io.PersistedOutputRDD
 import org.apache.tinkerpop.gremlin.structure.util.GraphFactory
@@ -257,5 +247,25 @@ class HBaseReader(override val session: SparkSession, hbaseConfig: HBaseSourceCo
       fields.map(field => DataTypes.createStructField(field, DataTypes.StringType, true)))
     val dataFrame = session.createDataFrame(rowRDD, schema)
     dataFrame
+  }
+}
+
+/**
+ * TigerGraphReader extends [[ServerBaseReader]]
+ *
+ */
+class TigerGraphReader(override val session: SparkSession, tigergraphConfig:TigerGraphSourceConfigEntry)
+  extends ServerBaseReader(session,null){
+  override def read(): DataFrame = {
+    val df = session.read.format("jdbc").options(
+      Map(
+        "driver" -> "com.tigergraph.jdbc.Driver",
+        "url" -> tigergraphConfig.url,
+        "username" -> tigergraphConfig.username,
+        "password" -> tigergraphConfig.password,
+        "dbtable" ->tigergraphConfig.sentence
+          )
+    ).load()
+    df
   }
 }
