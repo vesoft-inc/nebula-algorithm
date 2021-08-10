@@ -364,4 +364,5 @@ object AlgoConstants {
   val TRIANGLECOUNT_RESULT_COL: String = "tranglecount"
   val SINGLESOURCESHORTESTPATH_RESULT_COL:String = "singlesourceshortestpath"
   val CLOSENESS_RESULT_COL:String ="closeness"
+  val HANP_RESULT_COL:String="hanp"
 }
