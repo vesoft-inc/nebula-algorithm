@@ -31,6 +31,8 @@ object SourceCategory extends Enumeration {
   val SOCKET = Value("SOCKET")
   val KAFKA  = Value("KAFKA")
   val PULSAR = Value("PULSAR")
+
+  val TIGER_GRAPH = Value("TIGER GRAPH")
 }
 
 class SourceCategory
@@ -221,8 +223,25 @@ case class HBaseSourceConfigEntry(override val category: SourceCategory.Value,
 }
 
 /**
-  * MaxComputeConfigEntry
-  */
+ *  TigerGraphSourceConfigEntry
+ *
+ */
+case class TigerGraphSourceConfigEntry(override val category: SourceCategory.Value,
+                                       url:String,
+                                       username:String,
+                                       password:String,
+                                       override val sentence:String
+                                      )
+  extends ServerDataSourceConfigEntry {
+  require(
+    url.trim.length != 0 && username.trim.length > 0 && sentence.trim.length > 0
+  )
+
+  override def toString: String = {
+    s"TigerGraph source url: ${url}, sentence: ${sentence}, " +
+      s"username: ${username}, password: ${password}"
+  }
+}
 case class MaxComputeConfigEntry(override val category: SourceCategory.Value,
                                  odpsUrl: String,
                                  tunnelUrl: String,
@@ -232,7 +251,7 @@ case class MaxComputeConfigEntry(override val category: SourceCategory.Value,
                                  accessKeySecret: String,
                                  partitionSpec: String,
                                  override val sentence: String)
-    extends ServerDataSourceConfigEntry {
+  extends ServerDataSourceConfigEntry {
   require(
     !odpsUrl.trim.isEmpty && !tunnelUrl.trim.isEmpty && !table.trim.isEmpty && !project.trim.isEmpty
       && !accessKeyId.trim.isEmpty && !accessKeySecret.trim.isEmpty)
@@ -246,15 +265,15 @@ case class MaxComputeConfigEntry(override val category: SourceCategory.Value,
 }
 
 /**
-  * ClickHouseConfigEntry
-  */
+ * ClickHouseConfigEntry
+ */
 case class ClickHouseConfigEntry(override val category: SourceCategory.Value,
                                  url: String,
                                  user: String,
                                  passwd: String,
                                  numPartition: String,
                                  override val sentence: String)
-    extends ServerDataSourceConfigEntry {
+  extends ServerDataSourceConfigEntry {
   override def toString: String = {
     s"ClickHouse source {url:$url, user:$user, passwd:$passwd, numPartition:$numPartition, sentence:$sentence}"
   }

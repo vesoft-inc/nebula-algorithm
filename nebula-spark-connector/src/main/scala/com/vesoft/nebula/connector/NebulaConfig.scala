@@ -226,6 +226,8 @@ object WriteNebulaVertexConfig {
           || vidPolicy.equalsIgnoreCase(KeyPolicy.UUID.toString),
         "config vidPolicy is illegal, please don't set vidPolicy or set vidPolicy \"HASH\" or \"UUID\""
       )
+      assert(user != null && !user.isEmpty, "user is empty")
+      assert(passwd != null && !passwd.isEmpty, "passwd is empty")
       try {
         WriteMode.withName(writeMode.toLowerCase())
       } catch {
@@ -442,6 +444,8 @@ object WriteNebulaEdgeConfig {
         "config dstPolicy is illegal, please don't set dstPolicy or set dstPolicy \"HASH\" or \"UUID\""
       )
       assert(batch > 0, s"config batch must be positive, your batch is $batch.")
+      assert(user != null && !user.isEmpty, "user is empty")
+      assert(passwd != null && !passwd.isEmpty, "passwd is empty")
       try {
         WriteMode.withName(writeMode.toLowerCase)
       } catch {

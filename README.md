@@ -8,6 +8,8 @@ There are the version correspondence between Nebula Spark utils and Nebula:
 |:-----------------------:|:------------------------------:|:------------------------:|:--------------:|
 |       2.0.0             |           2.0.0                |       2.0.0              |  2.0.0, 2.0.1  |
 |       2.0.1             |           2.0.1                |        --                |  2.0.0, 2.0.1  |
+|       2.1.0             |           2.1.0                |       2.1.0              |  2.0.0, 2.0.1  |
+|       2.5.0             |           2.5.0                |       2.5.0              |     2.5.0      |
 |     2.0-SNAPSHOT        |         2.0-SNAPSHOT           |       2.0-SNAPSHOT       |   v2-nightly   |
 
 If the Nebula version and the uitls' version are not in the same line, then they are incompatible.

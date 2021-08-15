@@ -36,9 +36,20 @@ object Type extends Enumeration {
 case class DataBaseConfigEntry(graphAddress: List[String],
                                space: String,
                                metaAddresses: List[String]) {
-  require(graphAddress.nonEmpty)
-  require(metaAddresses.nonEmpty)
-  require(space.trim.nonEmpty)
+  require(graphAddress.nonEmpty, "nebula.address.graph cannot be empty")
+  require(metaAddresses.nonEmpty, "nebula.address.meta cannot be empty")
+  require(space.trim.nonEmpty, "nebula.space cannot be empty")
+
+  for (address <- graphAddress) {
+    require(
+      !address.contains(",") && !address.contains("，"),
+      "nebula.address.graph has wrong format, please make sure the format is [\"ip1:port1\",\"ip2:port2\"]")
+  }
+  for (address <- metaAddresses) {
+    require(
+      !address.contains(",") && !address.contains("，"),
+      "nebula.address.meta has wrong format,,please make sure the format is [\"ip1:port1\",\"ip2:port2\"]")
+  }
 
   override def toString: String = super.toString
 
@@ -472,16 +483,17 @@ object Configs {
     */
   private[this] def toSourceCategory(category: String): SourceCategory.Value = {
     category.trim.toUpperCase match {
-      case "PARQUET"    => SourceCategory.PARQUET
-      case "ORC"        => SourceCategory.ORC
-      case "JSON"       => SourceCategory.JSON
-      case "CSV"        => SourceCategory.CSV
-      case "HIVE"       => SourceCategory.HIVE
-      case "NEO4J"      => SourceCategory.NEO4J
-      case "KAFKA"      => SourceCategory.KAFKA
-      case "MYSQL"      => SourceCategory.MYSQL
-      case "PULSAR"     => SourceCategory.PULSAR
-      case "HBASE"      => SourceCategory.HBASE
+      case "PARQUET" => SourceCategory.PARQUET
+      case "ORC"     => SourceCategory.ORC
+      case "JSON"    => SourceCategory.JSON
+      case "CSV"     => SourceCategory.CSV
+      case "HIVE"    => SourceCategory.HIVE
+      case "NEO4J"   => SourceCategory.NEO4J
+      case "KAFKA"   => SourceCategory.KAFKA
+      case "MYSQL"   => SourceCategory.MYSQL
+      case "PULSAR"  => SourceCategory.PULSAR
+      case "HBASE"   => SourceCategory.HBASE
+      case "TIGERGRAPH"=>SourceCategory.TIGER_GRAPH
       case "MAXCOMPUTE" => SourceCategory.MAXCOMPUTE
       case "CLICKHOUSE" => SourceCategory.CLICKHOUSE
       case _            => throw new IllegalArgumentException(s"${category} not support")
@@ -611,19 +623,25 @@ object Configs {
                                config.getString("table"),
                                config.getString("columnFamily"),
                                fields.toSet.toList)
+      case SourceCategory.TIGER_GRAPH=>
+        TigerGraphSourceConfigEntry(
+          SourceCategory.TIGER_GRAPH,
+          config.getString("url"),
+          config.getString("username"),
+          config.getString("password"),
+          config.getString("sentence")
+        )
       case SourceCategory.MAXCOMPUTE => {
         val partitionSpec = if (config.hasPath("partitionSpec")) {
           config.getString("partitionSpec")
         } else {
           null
         }
-
         val sentence = if (config.hasPath("sentence")) {
           config.getString("sentence")
         } else {
           null
         }
-
         MaxComputeConfigEntry(
           SourceCategory.MAXCOMPUTE,
           config.getString("odpsUrl"),

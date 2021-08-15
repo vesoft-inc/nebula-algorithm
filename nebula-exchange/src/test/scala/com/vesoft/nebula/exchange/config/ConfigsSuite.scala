@@ -7,22 +7,15 @@
 package scala.com.vesoft.nebula.exchange.config
 
 import java.io.File
-
-import com.vesoft.nebula.exchange.config.{
-  Configs,
-  FileBaseSourceConfigEntry,
-  FileDataSourceConfigEntry,
-  HBaseSourceConfigEntry,
-  HiveSourceConfigEntry,
-  MySQLSourceConfigEntry,
-  Neo4JSourceConfigEntry,
-  SinkCategory,
-  SourceCategory
-}
+import com.vesoft.nebula.exchange.config.{Configs, DataBaseConfigEntry, FileBaseSourceConfigEntry, FileDataSourceConfigEntry, HBaseSourceConfigEntry, HiveSourceConfigEntry, MySQLSourceConfigEntry, Neo4JSourceConfigEntry, SinkCategory, SourceCategory, TigerGraphSourceConfigEntry}
 import com.vesoft.nebula.exchange.{Argument, KeyPolicy}
+import org.apache.log4j.Logger
 import org.junit.Test
+import org.scalatest.Assertions.assertThrows
 
 class ConfigsSuite {
+  private[this] val LOG = Logger.getLogger(this.getClass)
+
   @Test
   def configsSuite(): Unit = {
     val args    = List("-c", "src/test/resources/application.conf", "-h", "-d")
@@ -151,6 +144,16 @@ class ConfigsSuite {
           assert(mysql.database.equals("database"))
           assert(mysql.table.equals("table"))
         }
+        case SourceCategory.TIGER_GRAPH=>{
+          val tigergraph=tagConfig.dataSourceConfigEntry.asInstanceOf[TigerGraphSourceConfigEntry]
+          assert(label.equals("tag9"))
+          assert(tigergraph.url.equals("jdbc:tg:http://127.0.0.1:14240"))
+          assert(tigergraph.username.equals("tigergraph"))
+          assert(tigergraph.password.equals("tigergraph"))
+          assert(tigergraph.sentence.equals("interpreted() INTERPRET QUERY () FOR GRAPH graph {V = {vertex_type.*};ans=SELECT s FROM V:s;PRINT ans;}"))
+          assert(batch == 1000)
+          assert(partition == 10)
+        }
         case _ => {}
       }
     }
@@ -233,8 +236,68 @@ class ConfigsSuite {
           assert(batch == 1000)
           assert(partition == 10)
         }
+        case SourceCategory.TIGER_GRAPH=>{
+          val tigergraph=edgeConfig.dataSourceConfigEntry.asInstanceOf[TigerGraphSourceConfigEntry]
+          assert(label.equals("edge8"))
+          assert(tigergraph.url.equals("jdbc:tg:http://127.0.0.1:14240"))
+          assert(tigergraph.username.equals("tigergraph"))
+          assert(tigergraph.password.equals("tigergraph"))
+          assert(tigergraph.sentence.equals("interpreted() INTERPRET QUERY () FOR GRAPH graph {SetAccum<Edge> @@EdgeSet;vs={vertex_type.*};ans=SELECT t FROM vs-(edge_type:e)->vertex_type:t ACCUM @@EdgeSet+=e;PRINT @@EdgeSet;}"))
+          assert(batch == 1000)
+          assert(partition == 10)
+        }
         case _ => {}
       }
+    }
+  }
+
+  /**
+    * correct config
+    */
+  @Test
+  def dataBaseConfigSuite(): Unit = {
+    val graphAddress = List("127.0.0.1:9669", "127.0.0.1:9670")
+    val metaAddress  = List("127.0.0.1:9559", "127.0.0.1:9560")
+    val space        = "test"
+    DataBaseConfigEntry(graphAddress, space, metaAddress)
+  }
+
+  /**
+    * empty space
+    */
+  @Test
+  def dataBaseConfigEmptySpaceSuite: Unit = {
+    val graphAddress = List("127.0.0.1:9669", "127.0.0.1:9670")
+    val metaAddress  = List("127.0.0.1:9559", "127.0.0.1:9560")
+    assertThrows[IllegalArgumentException] {
+      DataBaseConfigEntry(graphAddress, "", metaAddress)
+    }
+  }
+
+  /**
+    * wrong graph address
+    */
+  @Test
+  def dataBaseConfigWrongGraphSuite: Unit = {
+    val wrongGraphAddress = List("127.0.0.1:9669,127.0.0.1:9670")
+    val space             = "test"
+    val metaAddress       = List("127.0.0.1:9559", "127.0.0.1:9560")
+
+    assertThrows[IllegalArgumentException] {
+      DataBaseConfigEntry(wrongGraphAddress, space, metaAddress)
+    }
+  }
+
+  /**
+    * wrong meta Address
+    */
+  @Test
+  def dataBaseConfigWrongMetaSuite: Unit = {
+    val graphAddress     = List("127.0.0.1:9669", "127.0.0.1:9670")
+    val space            = "test"
+    val wrongMetaAddress = List("127.0.0.1:9559，127.0.0.1:9560")
+    assertThrows[IllegalArgumentException] {
+      DataBaseConfigEntry(graphAddress, space, wrongMetaAddress)
     }
   }
 }

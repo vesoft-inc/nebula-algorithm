@@ -164,6 +164,24 @@ object SingleSourceShortestPathConfig{
   }
 }
 
+/**
+ * Hanp
+ */
+case class HanpConfig(hopAttenuation:Double,maxIter:Int,preference:Double)
+
+object HanpConfig{
+  var hopAttenuation: Double    = _
+  var maxIter: Int  = _
+  var preference: Double = 1.0
+  def getHanpConfig(configs: Configs):HanpConfig={
+    val hanpConfig=configs.algorithmConfig.map
+    hopAttenuation=hanpConfig("algorithm.hanp.hopAttenuation").toDouble
+    maxIter=hanpConfig("algorithm.hanp.maxIter").toInt
+    preference=hanpConfig("algorithm.hanp.preference").toDouble
+    HanpConfig(hopAttenuation,maxIter,preference)
+  }
+}
+
 case class AlgoConfig(configs: Configs)
 
 object AlgoConfig {
