@@ -159,7 +159,7 @@ package object connector {
       vertexDataset
         .map(row => {
           val vertexId = row.get(0)
-          val vid: Long = if (row.schema.fields(0).dataType == LongType) {
+          val vid: Long = if (NebulaUtils.isNumic(row.schema.fields(0).toString())) {
             vertexId.toString.toLong
           } else {
             MurmurHash2.hash64(vertexId.toString.getBytes(),
