@@ -155,18 +155,10 @@ package object connector {
       implicit val encoder: Encoder[NebulaGraphxVertex] =
         Encoders.bean[NebulaGraphxVertex](classOf[NebulaGraphxVertex])
 
-      val fields = vertexDataset.schema.fields
       vertexDataset
         .map(row => {
-          val vertexId = row.get(0)
-          val vid: Long = if (row.schema.fields(0).dataType == LongType) {
-            vertexId.toString.toLong
-          } else {
-            MurmurHash2.hash64(vertexId.toString.getBytes(),
-                               vertexId.toString.getBytes().length,
-                               0xc70f6907)
-          }
-
+          val vertexId               = row.get(0)
+          val vid: Long              = vertexId.toString.toLong
           val props: ListBuffer[Any] = ListBuffer()
           for (i <- row.schema.fields.indices) {
             if (i != 0) {
@@ -187,7 +179,6 @@ package object connector {
       implicit val encoder: Encoder[NebulaGraphxEdge] =
         Encoders.bean[NebulaGraphxEdge](classOf[NebulaGraphxEdge])
 
-      val fields = edgeDataset.schema.fields
       edgeDataset
         .map(row => {
           val props: ListBuffer[Any] = ListBuffer()
@@ -196,19 +187,10 @@ package object connector {
               props.append(row.get(i))
             }
           }
-          val srcId = row.get(0).toString.getBytes()
-          val dstId = row.get(1).toString.getBytes()
-          val edgeSrc = if (row.schema.fields(0).dataType == LongType) {
-            srcId.toString.toLong
-          } else {
-            MurmurHash2.hash64(srcId, srcId.length, 0xc70f6907)
-          }
-          val edgeDst = if (row.schema.fields(0).dataType == LongType) {
-            dstId.toString.toLong
-          } else {
-            MurmurHash2.hash64(dstId, dstId.length, 0xc70f6907)
-          }
-
+          val srcId    = row.get(0)
+          val dstId    = row.get(1)
+          val edgeSrc  = srcId.toString.toLong
+          val edgeDst  = dstId.toString.toLong
           val edgeProp = (row.get(2).toString.toLong, props.toList)
           org.apache.spark.graphx
             .Edge(edgeSrc, edgeDst, edgeProp)
