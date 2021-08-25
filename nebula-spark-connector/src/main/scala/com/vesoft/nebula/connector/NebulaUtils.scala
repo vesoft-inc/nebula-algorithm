@@ -85,7 +85,11 @@ object NebulaUtils {
   }
 
   def isNumic(str: String): Boolean = {
-    for (char <- str.toCharArray) {
+    val newStr: String = if (str.startsWith("-")) {
+      str.substring(1)
+    } else { str }
+
+    for (char <- newStr.toCharArray) {
       if (!Character.isDigit(char)) return false
     }
     true
