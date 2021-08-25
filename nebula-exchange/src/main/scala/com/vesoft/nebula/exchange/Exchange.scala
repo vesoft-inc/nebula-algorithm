@@ -135,6 +135,7 @@ object Exchange {
 
         val data = createDataSource(spark, tagConfig.dataSourceConfigEntry)
         if (data.isDefined && !c.dry) {
+          data.get.cache()
           val count     = data.get.count()
           val startTime = System.currentTimeMillis()
           val batchSuccess =
@@ -179,6 +180,7 @@ object Exchange {
         LOG.info(s"nebula keys: ${nebulaKeys.mkString(", ")}")
         val data = createDataSource(spark, edgeConfig.dataSourceConfigEntry)
         if (data.isDefined && !c.dry) {
+          data.get.cache()
           val count        = data.get.count()
           val startTime    = System.currentTimeMillis()
           val batchSuccess = spark.sparkContext.longAccumulator(s"batchSuccess.${edgeConfig.name}")
@@ -216,9 +218,10 @@ object Exchange {
       val batchSuccess = spark.sparkContext.longAccumulator(s"batchSuccess.reimport")
       val batchFailure = spark.sparkContext.longAccumulator(s"batchFailure.reimport")
       val data         = spark.read.text(configs.errorConfig.errorPath)
-      val count        = data.count()
-      val startTime    = System.currentTimeMillis()
-      val processor    = new ReloadProcessor(data, configs, batchSuccess, batchFailure)
+      data.cache()
+      val count     = data.count()
+      val startTime = System.currentTimeMillis()
+      val processor = new ReloadProcessor(data, configs, batchSuccess, batchFailure)
       processor.process()
       val costTime = ((System.currentTimeMillis() - startTime) / 1000.0).formatted("%.2f")
       LOG.info(s"reimport ngql count: ${count}, cost time: ${costTime}")
