@@ -21,8 +21,10 @@ class NebulaVertexWriter(nebulaOptions: NebulaOptions, vertexIndex: Int, schema:
 
   private val LOG = LoggerFactory.getLogger(this.getClass)
 
-  val propNames   = NebulaExecutor.assignVertexPropNames(schema, vertexIndex, nebulaOptions.vidAsProp)
-  val fieldTypMap = metaProvider.getTagSchema(nebulaOptions.spaceName, nebulaOptions.label)
+  val propNames = NebulaExecutor.assignVertexPropNames(schema, vertexIndex, nebulaOptions.vidAsProp)
+  val fieldTypMap: Map[String, Integer] =
+    if (nebulaOptions.writeMode == WriteMode.DELETE) Map[String, Integer]()
+    else metaProvider.getTagSchema(nebulaOptions.spaceName, nebulaOptions.label)
 
   val policy = {
     if (nebulaOptions.vidPolicy.isEmpty) Option.empty
@@ -40,11 +42,14 @@ class NebulaVertexWriter(nebulaOptions: NebulaOptions, vertexIndex: Int, schema:
   override def write(row: InternalRow): Unit = {
     val vertex =
       NebulaExecutor.extraID(schema, row, vertexIndex, policy, isVidStringType)
-    val values = NebulaExecutor.assignVertexPropValues(schema,
-                                                       row,
-                                                       vertexIndex,
-                                                       nebulaOptions.vidAsProp,
-                                                       fieldTypMap)
+    val values =
+      if (nebulaOptions.writeMode == WriteMode.DELETE) List()
+      else
+        NebulaExecutor.assignVertexPropValues(schema,
+                                              row,
+                                              vertexIndex,
+                                              nebulaOptions.vidAsProp,
+                                              fieldTypMap)
     val nebulaVertex = NebulaVertex(vertex, values)
     vertices.append(nebulaVertex)
     if (vertices.size >= nebulaOptions.batch) {
@@ -56,7 +61,7 @@ class NebulaVertexWriter(nebulaOptions: NebulaOptions, vertexIndex: Int, schema:
     val nebulaVertices = NebulaVertices(propNames, vertices.toList, policy)
     val exec = if (nebulaOptions.writeMode == WriteMode.INSERT) {
       NebulaExecutor.toExecuteSentence(nebulaOptions.label, nebulaVertices)
-    } else {
+    } else if (nebulaOptions.writeMode == WriteMode.UPDATE) {
       nebulaVertices.values
         .map { vertex =>
           NebulaExecutor.toUpdateExecuteStatement(nebulaOptions.label,
@@ -64,6 +69,8 @@ class NebulaVertexWriter(nebulaOptions: NebulaOptions, vertexIndex: Int, schema:
                                                   vertex)
         }
         .mkString(";")
+    } else {
+      NebulaExecutor.toDeleteExecuteStatement(nebulaVertices)
     }
     vertices.clear()
     submit(exec)
