@@ -15,7 +15,7 @@
 
     <properties>
         <spark.version>2.4.4</spark.version>
-        <nebula.version>2.0-SNAPSHOT</nebula.version>
+        <nebula.version>2.5-SNAPSHOT</nebula.version>
         <config.version>1.4.0</config.version>
         <scopt.version>3.7.1</scopt.version>
         <scalatest.version>3.2.0</scalatest.version>
