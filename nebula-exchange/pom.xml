@@ -5,7 +5,7 @@
     <parent>
         <artifactId>nebula-spark</artifactId>
         <groupId>com.vesoft</groupId>
-        <version>2.0-SNAPSHOT</version>
+        <version>2.5-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -141,7 +141,8 @@
                                     <exclude>javax.inject:javax.inject</exclude>
                                     <exclude>org.spark-project.hive:hive-exec</exclude>
                                     <exclude>stax:stax-api</exclude>
-                                    <exclude>org.glassfish.hk2.external:aopalliance-repackaged</exclude>
+                                    <exclude>org.glassfish.hk2.external:aopalliance-repackaged
+                                    </exclude>
                                 </excludes>
                             </artifactSet>
                             <filters>
@@ -209,7 +210,8 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.2.0</version>
                 <configuration>
-                    <excludePackageNames>com.facebook.thrift:com.facebook.thrift.*</excludePackageNames>
+                    <excludePackageNames>com.facebook.thrift:com.facebook.thrift.*
+                    </excludePackageNames>
                 </configuration>
                 <executions>
                     <execution>
@@ -720,11 +722,6 @@
         <repository>
             <id>SparkPackagesRepo</id>
             <url>https://repos.spark-packages.org</url>
-        </repository>
-        <repository>
-            <id>bintray-streamnative-maven</id>
-            <name>bintray</name>
-            <url>https://dl.bintray.com/streamnative/maven</url>
         </repository>
         <repository>
             <id>snapshots</id>

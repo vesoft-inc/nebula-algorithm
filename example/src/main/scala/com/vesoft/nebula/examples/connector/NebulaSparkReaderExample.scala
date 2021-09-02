@@ -4,7 +4,7 @@
  * attached with Common Clause Condition 1.0, found in the LICENSES directory.
  */
 
-package main.scala.com.vesoft.nebula.examples.connector
+package com.vesoft.nebula.examples.connector
 
 import com.facebook.thrift.protocol.TCompactProtocol
 import com.vesoft.nebula.connector.connector.NebulaDataFrameReader

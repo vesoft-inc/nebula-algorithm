@@ -111,6 +111,8 @@ abstract class ServerBaseWriter extends Writer {
   def writeVertices(vertices: Vertices): String
 
   def writeEdges(edges: Edges): String
+
+  def writeNgql(ngql: String): String
 }
 
 /**
@@ -135,12 +137,12 @@ class NebulaGraphClientWriter(dataBaseConfigEntry: DataBaseConfigEntry,
 
   def prepare(): Unit = {
     val switchResult = graphProvider.switchSpace(session, dataBaseConfigEntry.space)
-    if (!switchResult) {
+    if (!switchResult.isSucceeded) {
       this.close()
-      throw new RuntimeException("Switch Failed")
+      throw new RuntimeException("Switch Failed for " + switchResult.getErrorMessage)
     }
 
-    LOG.info(s"Connection to ${dataBaseConfigEntry.metaAddresses}")
+    LOG.info(s"Connection to ${dataBaseConfigEntry.graphAddress}")
   }
 
   override def writeVertices(vertices: Vertices): String = {
@@ -171,6 +173,20 @@ class NebulaGraphClientWriter(dataBaseConfigEntry: DataBaseConfigEntry,
     }
     LOG.info(sentence)
     sentence
+  }
+
+  override def writeNgql(ngql: String): String = {
+    if (rateLimiter.tryAcquire(rateConfig.timeout, TimeUnit.MILLISECONDS)) {
+      val result = graphProvider.submit(session, ngql)
+      if (result.isSucceeded) {
+        return null
+      }
+      LOG.error(s"reimport ngql failed for ${result.getErrorMessage}")
+    } else {
+      LOG.error(s"reimport ngql failed because write speed is too fast")
+    }
+    LOG.info(ngql)
+    ngql
   }
 
   override def close(): Unit = {
@@ -240,6 +256,8 @@ class NebulaStorageClientWriter(addresses: List[(String, Int)], space: String)
   override def writeVertices(vertices: Vertices): String = ???
 
   override def writeEdges(edges: Edges): String = ???
+
+  override def writeNgql(ngql: String): String = ???
 
   override def close(): Unit = {}
 }
