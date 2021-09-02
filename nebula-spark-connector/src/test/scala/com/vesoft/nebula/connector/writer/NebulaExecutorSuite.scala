@@ -146,6 +146,32 @@ class NebulaExecutorSuite extends AnyFunSuite with BeforeAndAfterAll {
     assert(expectStatement.equals(vertexStatement))
   }
 
+  test("test toExecuteSentence for vertex with hash policy") {
+    val vertices: ListBuffer[NebulaVertex] = new ListBuffer[NebulaVertex]
+    val tagName                            = "person"
+    val propNames = List("col_string",
+                         "col_fixed_string",
+                         "col_bool",
+                         "col_int",
+                         "col_int64",
+                         "col_double",
+                         "col_date")
+
+    val props1 = List("\"Tom\"", "\"Tom\"", true, 10, 100L, 1.0, "2021-11-12")
+    val props2 = List("\"Bob\"", "\"Bob\"", false, 20, 200L, 2.0, "2021-05-01")
+    vertices.append(NebulaVertex("vid1", props1))
+    vertices.append(NebulaVertex("vid2", props2))
+
+    val nebulaVertices  = NebulaVertices(propNames, vertices.toList, Some(KeyPolicy.HASH))
+    val vertexStatement = NebulaExecutor.toExecuteSentence(tagName, nebulaVertices)
+
+    val expectStatement = "INSERT vertex `person`(`col_string`,`col_fixed_string`,`col_bool`," +
+      "`col_int`,`col_int64`,`col_double`,`col_date`) VALUES hash(\"vid1\"): (" + props1.mkString(
+      ", ") +
+      "), hash(\"vid2\"): (" + props2.mkString(", ") + ")"
+    assert(expectStatement.equals(vertexStatement))
+  }
+
   test("test toExecuteSentence for edge") {
     val edges: ListBuffer[NebulaEdge] = new ListBuffer[NebulaEdge]
     val edgeName                      = "friend"
