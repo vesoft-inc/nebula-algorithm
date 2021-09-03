@@ -21,6 +21,6 @@ object NebulaTemplate {
   private[connector] val UPDATE_VALUE_TEMPLATE  = "`%s`=%s"
 
   private[connector] val DELETE_VERTEX_TEMPLATE = "DELETE VERTEX %s"
-  private[connector] val DELETE_EDGE_TEMPLATE   = "DELETE EDGE %s"
+  private[connector] val DELETE_EDGE_TEMPLATE   = "DELETE EDGE %s %s"
   private[connector] val EDGE_ENDPOINT_TEMPLATE = "%s->%s@%d"
 }

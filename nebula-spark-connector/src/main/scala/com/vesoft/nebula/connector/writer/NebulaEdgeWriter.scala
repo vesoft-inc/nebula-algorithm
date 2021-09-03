@@ -89,7 +89,7 @@ class NebulaEdgeWriter(nebulaOptions: NebulaOptions,
         }
         .mkString(";")
     } else {
-      NebulaExecutor.toDeleteExecuteStatement(nebulaEdges)
+      NebulaExecutor.toDeleteExecuteStatement(nebulaOptions.label, nebulaEdges)
     }
     edges.clear()
     submit(exec)

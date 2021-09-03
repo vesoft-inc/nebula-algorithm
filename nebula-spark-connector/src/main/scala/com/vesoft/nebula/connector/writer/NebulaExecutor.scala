@@ -346,8 +346,9 @@ object NebulaExecutor {
   /**
     * construct delete statement for edge
     */
-  def toDeleteExecuteStatement(edges: NebulaEdges): String = {
+  def toDeleteExecuteStatement(edgeName: String, edges: NebulaEdges): String = {
     DELETE_EDGE_TEMPLATE.format(
+      edgeName,
       edges.values
         .map { value =>
           EDGE_ENDPOINT_TEMPLATE.format(
