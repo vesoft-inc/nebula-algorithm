@@ -41,6 +41,7 @@ object NebulaSparkWriterExample {
     updateEdge(spark)
 
     deleteVertex(spark)
+    deleteEdge(spark)
 
     spark.close()
   }
@@ -192,11 +193,11 @@ object NebulaSparkWriterExample {
     df.write.nebula(config, nebulaWriteVertexConfig).writeVertices()
   }
 
-  def deletEdge(spark: SparkSession): Unit = {
+  def deleteEdge(spark: SparkSession): Unit = {
     LOG.info("start to delete nebula edges")
     val df = spark.read
       .json("example/src/main/resources/edge")
-      .select("src", "dst", "degree", "descr")
+      .select("src", "dst", "degree")
     df.show()
     df.persist(StorageLevel.MEMORY_AND_DISK_SER)
 
@@ -209,10 +210,11 @@ object NebulaSparkWriterExample {
     val nebulaWriteEdgeConfig: WriteNebulaEdgeConfig = WriteNebulaEdgeConfig
       .builder()
       .withSpace("test")
+      .withEdge("friend")
       .withSrcIdField("src")
       .withDstIdField("dst")
       .withRankField("degree")
-      .withBatch(1000)
+      .withBatch(10)
       .withWriteMode(WriteMode.DELETE)
       .build()
     df.write.nebula(config, nebulaWriteEdgeConfig).writeEdges()
