@@ -8,7 +8,6 @@ package com.vesoft.nebula.connector.writer
 
 import com.vesoft.nebula.connector.KeyPolicy
 import com.vesoft.nebula.connector.connector.{NebulaEdge, NebulaEdges, NebulaVertex, NebulaVertices}
-import org.apache.spark.api.java.Optional
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions.GenericInternalRow
 import org.apache.spark.sql.types.{
@@ -197,7 +196,7 @@ class NebulaExecutorSuite extends AnyFunSuite with BeforeAndAfterAll {
   }
 
   test("test toUpdateExecuteSentence for vertex") {
-    val props = List("\"name\"", "\"name\"", true, 10, 100L, 1.0, "2021-11-12")
+    val vertices: ListBuffer[NebulaVertex] = new ListBuffer[NebulaVertex]
     val propNames = List("col_string",
                          "col_fixed_string",
                          "col_bool",
@@ -206,18 +205,53 @@ class NebulaExecutorSuite extends AnyFunSuite with BeforeAndAfterAll {
                          "col_double",
                          "col_date")
 
-    val vertexId     = "\"vid1\""
-    val nebulaVertex = NebulaVertex(vertexId, props)
+    val props1 = List("\"name\"", "\"name\"", true, 10, 100L, 1.0, "2021-11-12")
+    val props2 = List("\"name2\"", "\"name2\"", false, 11, 101L, 2.0, "2021-11-13")
+
+    vertices.append(NebulaVertex("\"vid1\"", props1))
+    vertices.append(NebulaVertex("\"vid2\"", props2))
+    val nebulaVertices = NebulaVertices(propNames, vertices.toList, None)
+
     val updateVertexStatement =
-      NebulaExecutor.toUpdateExecuteStatement("person", propNames, nebulaVertex)
+      NebulaExecutor.toUpdateExecuteStatement("person", nebulaVertices)
+
     val expectVertexUpdate =
       "UPDATE VERTEX ON `person` \"vid1\" SET `col_string`=\"name\",`col_fixed_string`=\"name\"," +
-        "`col_bool`=true,`col_int`=10,`col_int64`=100,`col_double`=1.0,`col_date`=2021-11-12"
+        "`col_bool`=true,`col_int`=10,`col_int64`=100,`col_double`=1.0,`col_date`=2021-11-12;" +
+        "UPDATE VERTEX ON `person` \"vid2\" SET `col_string`=\"name2\",`col_fixed_string`=\"name2\"," +
+        "`col_bool`=false,`col_int`=11,`col_int64`=101,`col_double`=2.0,`col_date`=2021-11-13"
+    assert(expectVertexUpdate.equals(updateVertexStatement))
+  }
+
+  test("test toUpdateExecuteSentence for vertex with hash policy") {
+    val vertices: ListBuffer[NebulaVertex] = new ListBuffer[NebulaVertex]
+    val propNames = List("col_string",
+                         "col_fixed_string",
+                         "col_bool",
+                         "col_int",
+                         "col_int64",
+                         "col_double",
+                         "col_date")
+
+    val props1 = List("\"name\"", "\"name\"", true, 10, 100L, 1.0, "2021-11-12")
+    val props2 = List("\"name2\"", "\"name2\"", false, 11, 101L, 2.0, "2021-11-13")
+
+    vertices.append(NebulaVertex("vid1", props1))
+    vertices.append(NebulaVertex("vid2", props2))
+    val nebulaVertices = NebulaVertices(propNames, vertices.toList, Some(KeyPolicy.HASH))
+
+    val updateVertexStatement =
+      NebulaExecutor.toUpdateExecuteStatement("person", nebulaVertices)
+    val expectVertexUpdate =
+      "UPDATE VERTEX ON `person` hash(\"vid1\") SET `col_string`=\"name\",`col_fixed_string`=\"name\"," +
+        "`col_bool`=true,`col_int`=10,`col_int64`=100,`col_double`=1.0,`col_date`=2021-11-12;" +
+        "UPDATE VERTEX ON `person` hash(\"vid2\") SET `col_string`=\"name2\",`col_fixed_string`=\"name2\"," +
+        "`col_bool`=false,`col_int`=11,`col_int64`=101,`col_double`=2.0,`col_date`=2021-11-13"
     assert(expectVertexUpdate.equals(updateVertexStatement))
   }
 
   test("test toUpdateExecuteSentence for edge") {
-    val props = List("\"name\"", "\"name\"", true, 10, 100L, 1.0, "2021-11-12")
+    val edges: ListBuffer[NebulaEdge] = new ListBuffer[NebulaEdge]
     val propNames = List("col_string",
                          "col_fixed_string",
                          "col_bool",
@@ -225,17 +259,115 @@ class NebulaExecutorSuite extends AnyFunSuite with BeforeAndAfterAll {
                          "col_int64",
                          "col_double",
                          "col_date")
+    val props1 = List("\"Tom\"", "\"Tom\"", true, 10, 100L, 1.0, "2021-11-12")
+    val props2 = List("\"Bob\"", "\"Bob\"", false, 20, 200L, 2.0, "2021-05-01")
+    edges.append(NebulaEdge("\"vid1\"", "\"vid2\"", Some(1L), props1))
+    edges.append(NebulaEdge("\"vid2\"", "\"vid1\"", Some(2L), props2))
 
-    val source     = "\"source\""
-    val target     = "\"target\""
-    val rank       = Some(0L)
-    val nebulaEdge = NebulaEdge(source, target, rank, props)
-    val updateEdgeStatement =
-      NebulaExecutor.toUpdateExecuteStatement("friend", propNames, nebulaEdge)
+    val nebulaEdges         = NebulaEdges(propNames, edges.toList, None, None)
+    val updateEdgeStatement = NebulaExecutor.toUpdateExecuteStatement("friend", nebulaEdges)
     val expectEdgeUpdate =
-      "UPDATE EDGE ON `friend` \"source\"->\"target\"@0 SET `col_string`=\"name\"," +
-        "`col_fixed_string`=\"name\",`col_bool`=true,`col_int`=10,`col_int64`=100," +
-        "`col_double`=1.0,`col_date`=2021-11-12"
+      "UPDATE EDGE ON `friend` \"vid1\"->\"vid2\"@1 SET `col_string`=\"Tom\"," +
+        "`col_fixed_string`=\"Tom\",`col_bool`=true,`col_int`=10,`col_int64`=100," +
+        "`col_double`=1.0,`col_date`=2021-11-12;" +
+        "UPDATE EDGE ON `friend` \"vid2\"->\"vid1\"@2 SET `col_string`=\"Bob\"," +
+        "`col_fixed_string`=\"Bob\",`col_bool`=false,`col_int`=20,`col_int64`=200," +
+        "`col_double`=2.0,`col_date`=2021-05-01"
     assert(expectEdgeUpdate.equals(updateEdgeStatement))
+  }
+
+  test("test toUpdateExecuteSentence for edge with hash policy") {
+    val edges: ListBuffer[NebulaEdge] = new ListBuffer[NebulaEdge]
+    val propNames = List("col_string",
+                         "col_fixed_string",
+                         "col_bool",
+                         "col_int",
+                         "col_int64",
+                         "col_double",
+                         "col_date")
+    val props1 = List("\"Tom\"", "\"Tom\"", true, 10, 100L, 1.0, "2021-11-12")
+    val props2 = List("\"Bob\"", "\"Bob\"", false, 20, 200L, 2.0, "2021-05-01")
+    edges.append(NebulaEdge("vid1", "vid2", Some(1L), props1))
+    edges.append(NebulaEdge("vid2", "vid1", Some(2L), props2))
+
+    val nebulaEdges =
+      NebulaEdges(propNames, edges.toList, Some(KeyPolicy.HASH), Some(KeyPolicy.HASH))
+    val updateEdgeStatement = NebulaExecutor.toUpdateExecuteStatement("friend", nebulaEdges)
+    val expectEdgeUpdate =
+      "UPDATE EDGE ON `friend` hash(\"vid1\")->hash(\"vid2\")@1 SET `col_string`=\"Tom\"," +
+        "`col_fixed_string`=\"Tom\",`col_bool`=true,`col_int`=10,`col_int64`=100," +
+        "`col_double`=1.0,`col_date`=2021-11-12;" +
+        "UPDATE EDGE ON `friend` hash(\"vid2\")->hash(\"vid1\")@2 SET `col_string`=\"Bob\"," +
+        "`col_fixed_string`=\"Bob\",`col_bool`=false,`col_int`=20,`col_int64`=200," +
+        "`col_double`=2.0,`col_date`=2021-05-01"
+    assert(expectEdgeUpdate.equals(updateEdgeStatement))
+  }
+
+  test("test toDeleteExecuteStatement for vertex") {
+    val vertices: ListBuffer[NebulaVertex] = new ListBuffer[NebulaVertex]
+    vertices.append(NebulaVertex("\"vid1\"", List()))
+    vertices.append(NebulaVertex("\"vid2\"", List()))
+
+    val nebulaVertices              = NebulaVertices(List(), vertices.toList, None)
+    val vertexStatement             = NebulaExecutor.toDeleteExecuteStatement(nebulaVertices)
+    val expectVertexDeleteStatement = "DELETE VERTEX \"vid1\",\"vid2\""
+    assert(expectVertexDeleteStatement.equals(vertexStatement))
+  }
+
+  test("test toDeleteExecuteStatement for vertex with HASH policy") {
+    val vertices: ListBuffer[NebulaVertex] = new ListBuffer[NebulaVertex]
+    vertices.append(NebulaVertex("vid1", List()))
+    vertices.append(NebulaVertex("vid2", List()))
+
+    val nebulaVertices              = NebulaVertices(List(), vertices.toList, Some(KeyPolicy.HASH))
+    val vertexStatement             = NebulaExecutor.toDeleteExecuteStatement(nebulaVertices)
+    val expectVertexDeleteStatement = "DELETE VERTEX hash(\"vid1\"),hash(\"vid2\")"
+    assert(expectVertexDeleteStatement.equals(vertexStatement))
+  }
+
+  test("test toDeleteExecuteStatement for edge") {
+    val edges: ListBuffer[NebulaEdge] = new ListBuffer[NebulaEdge]
+    edges.append(NebulaEdge("\"vid1\"", "\"vid2\"", Some(1L), List()))
+    edges.append(NebulaEdge("\"vid2\"", "\"vid1\"", Some(2L), List()))
+
+    val nebulaEdges               = NebulaEdges(List(), edges.toList, None, None)
+    val edgeStatement             = NebulaExecutor.toDeleteExecuteStatement("friend", nebulaEdges)
+    val expectEdgeDeleteStatement = "DELETE EDGE friend \"vid1\"->\"vid2\"@1,\"vid2\"->\"vid1\"@2"
+    assert(expectEdgeDeleteStatement.equals(edgeStatement))
+  }
+
+  test("test toDeleteExecuteStatement for edge without rank") {
+    val edges: ListBuffer[NebulaEdge] = new ListBuffer[NebulaEdge]
+    edges.append(NebulaEdge("\"vid1\"", "\"vid2\"", Option.empty, List()))
+    edges.append(NebulaEdge("\"vid2\"", "\"vid1\"", Option.empty, List()))
+
+    val nebulaEdges               = NebulaEdges(List(), edges.toList, None, None)
+    val edgeStatement             = NebulaExecutor.toDeleteExecuteStatement("friend", nebulaEdges)
+    val expectEdgeDeleteStatement = "DELETE EDGE friend \"vid1\"->\"vid2\"@0,\"vid2\"->\"vid1\"@0"
+    assert(expectEdgeDeleteStatement.equals(edgeStatement))
+  }
+
+  test("test toDeleteExecuteStatement for edge with src HASH policy") {
+    val edges: ListBuffer[NebulaEdge] = new ListBuffer[NebulaEdge]
+    edges.append(NebulaEdge("vid1", "\"vid2\"", Some(1L), List()))
+    edges.append(NebulaEdge("vid2", "\"vid1\"", Some(2L), List()))
+
+    val nebulaEdges   = NebulaEdges(List(), edges.toList, Some(KeyPolicy.HASH), None)
+    val edgeStatement = NebulaExecutor.toDeleteExecuteStatement("friend", nebulaEdges)
+    val expectEdgeDeleteStatement =
+      "DELETE EDGE friend hash(\"vid1\")->\"vid2\"@1,hash(\"vid2\")->\"vid1\"@2"
+    assert(expectEdgeDeleteStatement.equals(edgeStatement))
+  }
+
+  test("test toDeleteExecuteStatement for edge with all HASH policy") {
+    val edges: ListBuffer[NebulaEdge] = new ListBuffer[NebulaEdge]
+    edges.append(NebulaEdge("vid1", "vid2", Some(1L), List()))
+    edges.append(NebulaEdge("vid2", "vid1", Some(2L), List()))
+
+    val nebulaEdges   = NebulaEdges(List(), edges.toList, Some(KeyPolicy.HASH), Some(KeyPolicy.HASH))
+    val edgeStatement = NebulaExecutor.toDeleteExecuteStatement("friend", nebulaEdges)
+    val expectEdgeDeleteStatement =
+      "DELETE EDGE friend hash(\"vid1\")->hash(\"vid2\")@1,hash(\"vid2\")->hash(\"vid1\")@2"
+    assert(expectEdgeDeleteStatement.equals(edgeStatement))
   }
 }

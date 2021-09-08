@@ -40,6 +40,9 @@ object NebulaSparkWriterExample {
     updateVertex(spark)
     updateEdge(spark)
 
+    deleteVertex(spark)
+    deleteEdge(spark)
+
     spark.close()
   }
 
@@ -160,6 +163,59 @@ object NebulaSparkWriterExample {
       .withRankAsProperty(false)
       .withBatch(1000)
       .withWriteMode(WriteMode.UPDATE)
+      .build()
+    df.write.nebula(config, nebulaWriteEdgeConfig).writeEdges()
+  }
+
+  def deleteVertex(spark: SparkSession): Unit = {
+    LOG.info("start to delete nebula vertices")
+    val df = spark.read
+      .json("example/src/main/resources/vertex")
+      .select("id")
+    df.show()
+    df.persist(StorageLevel.MEMORY_AND_DISK_SER)
+
+    val config =
+      NebulaConnectionConfig
+        .builder()
+        .withMetaAddress("127.0.01:9559")
+        .withGraphAddress("127.0.0.1:9669")
+        .build()
+    val nebulaWriteVertexConfig: WriteNebulaVertexConfig = WriteNebulaVertexConfig
+      .builder()
+      .withSpace("test")
+      .withVidField("id")
+      .withBatch(1)
+      .withUser("root")
+      .withPasswd("nebula")
+      .withWriteMode(WriteMode.DELETE)
+      .build()
+    df.write.nebula(config, nebulaWriteVertexConfig).writeVertices()
+  }
+
+  def deleteEdge(spark: SparkSession): Unit = {
+    LOG.info("start to delete nebula edges")
+    val df = spark.read
+      .json("example/src/main/resources/edge")
+      .select("src", "dst", "degree")
+    df.show()
+    df.persist(StorageLevel.MEMORY_AND_DISK_SER)
+
+    val config =
+      NebulaConnectionConfig
+        .builder()
+        .withMetaAddress("127.0.0.1:9559")
+        .withGraphAddress("127.0.0.1:9669")
+        .build()
+    val nebulaWriteEdgeConfig: WriteNebulaEdgeConfig = WriteNebulaEdgeConfig
+      .builder()
+      .withSpace("test")
+      .withEdge("friend")
+      .withSrcIdField("src")
+      .withDstIdField("dst")
+      .withRankField("degree")
+      .withBatch(10)
+      .withWriteMode(WriteMode.DELETE)
       .build()
     df.write.nebula(config, nebulaWriteEdgeConfig).writeEdges()
   }

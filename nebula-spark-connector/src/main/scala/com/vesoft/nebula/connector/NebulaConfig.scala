@@ -7,7 +7,6 @@
 package com.vesoft.nebula.connector
 
 import org.slf4j.{Logger, LoggerFactory}
-
 import scala.collection.mutable.ListBuffer
 
 class NebulaConnectionConfig(metaAddress: String,
@@ -217,7 +216,7 @@ object WriteNebulaVertexConfig {
 
     private def check(): Unit = {
       assert(space != null && !space.isEmpty, s"config space is empty.")
-      assert(tagName != null && !tagName.isEmpty, s"config tagName is empty.")
+
       assert(vidField != null && !vidField.isEmpty, "config vidField is empty.")
       assert(batch > 0, s"config batch must be positive, your batch is $batch.")
       assert(
@@ -234,8 +233,14 @@ object WriteNebulaVertexConfig {
         case e: Throwable =>
           assert(false, s"optional write mode: insert or update, your write mode is $writeMode")
       }
+      if (!writeMode.equalsIgnoreCase(WriteMode.DELETE.toString)) {
+        assert(tagName != null && !tagName.isEmpty, s"config tagName is empty.")
+      } else {
+        if (tagName == null) tagName = "tag" // set a default for delete mode, happy to pass the option check.
+      }
       LOG.info(
-        s"NebulaWriteVertexConfig={space=$space,tagName=$tagName,vidField=$vidField,vidPolicy=$vidPolicy,batch=$batch,writeMode=$writeMode}")
+        s"NebulaWriteVertexConfig={space=$space,tagName=$tagName,vidField=$vidField," +
+          s"vidPolicy=$vidPolicy,batch=$batch,writeMode=$writeMode}")
     }
   }
 
@@ -428,7 +433,7 @@ object WriteNebulaEdgeConfig {
 
     private def check(): Unit = {
       assert(space != null && !space.isEmpty, s"config space is empty.")
-      assert(edgeName != null && !edgeName.isEmpty, s"config edgeName is empty.")
+
       assert(srcIdField != null && !srcIdField.isEmpty, "config srcIdField is empty.")
       assert(dstIdField != null && !dstIdField.isEmpty, "config dstIdField is empty.")
       assert(
@@ -452,8 +457,11 @@ object WriteNebulaEdgeConfig {
         case e: Throwable =>
           assert(false, s"optional write mode: insert or update, your write mode is $writeMode")
       }
+      assert(edgeName != null && !edgeName.isEmpty, s"config edgeName is empty.")
       LOG.info(
-        s"NebulaWriteEdgeConfig={space=$space,edgeName=$edgeName,srcField=$srcIdField,srcPolicy=$srcPolicy，dstField=$dstIdField,dstPolicy=$dstPolicy,rankField=$rankField,writeMode=$writeMode}")
+        s"NebulaWriteEdgeConfig={space=$space,edgeName=$edgeName,srcField=$srcIdField," +
+          s"srcPolicy=$srcPolicy，dstField=$dstIdField,dstPolicy=$dstPolicy,rankField=$rankField," +
+          s"writeMode=$writeMode}")
     }
   }
 

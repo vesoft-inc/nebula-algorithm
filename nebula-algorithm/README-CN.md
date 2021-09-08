@@ -13,6 +13,7 @@ nebula-algorithm 是一款基于 [GraphX](https://spark.apache.org/graphx/) 的 
  |StronglyConnectedComponent| 强联通分量  |社区发现|
  |       ShortestPath       |  最短路径   |路径规划、网络规划|
  |       TriangleCount      | 三角形计数  |网络结构分析|
+ |     GraphTriangleCount   |全图三角形计数|网络紧密性分析|
  |   BetweennessCentrality  | 介数中心性  |关键节点挖掘，节点影响力计算|
  |        DegreeStatic      |   度统计   |图结构分析|
  
