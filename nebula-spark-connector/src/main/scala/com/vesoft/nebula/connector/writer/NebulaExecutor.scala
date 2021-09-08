@@ -8,6 +8,9 @@ package com.vesoft.nebula.connector.writer
 
 import com.vesoft.nebula.connector.NebulaTemplate.{
   BATCH_INSERT_TEMPLATE,
+  DELETE_EDGE_TEMPLATE,
+  DELETE_VERTEX_TEMPLATE,
+  EDGE_ENDPOINT_TEMPLATE,
   EDGE_VALUE_TEMPLATE,
   EDGE_VALUE_WITHOUT_RANKING_TEMPLATE,
   ENDPOINT_TEMPLATE,
@@ -298,17 +301,79 @@ object NebulaExecutor {
                                propertyNames: PropertyNames,
                                edge: NebulaEdge): String = {
     var index = 0
+    val rank  = if (edge.rank.isEmpty) { 0 } else { edge.rank.get }
     UPDATE_EDGE_TEMPLATE.format(
       DataTypeEnum.EDGE.toString.toUpperCase,
       edgeName,
       edge.source,
       edge.target,
-      edge.rank.get,
+      rank,
       edge.values
         .map { value =>
           val updateValue = UPDATE_VALUE_TEMPLATE.format(propertyNames.get(index), value)
           index += 1
           updateValue
+        }
+        .mkString(",")
+    )
+  }
+
+  /**
+    * construct delete statement for vertex
+    */
+  def toDeleteExecuteStatement(vertices: NebulaVertices): String = {
+    DELETE_VERTEX_TEMPLATE.format(
+      vertices.values
+        .map { value =>
+          vertices.policy match {
+            case Some(KeyPolicy.HASH) =>
+              ENDPOINT_TEMPLATE.format(KeyPolicy.HASH.toString, value.vertexIDSlice)
+
+            case Some(KeyPolicy.UUID) =>
+              ENDPOINT_TEMPLATE.format(KeyPolicy.UUID.toString, value.vertexIDSlice)
+
+            case None =>
+              value.vertexIDSlice
+            case _ =>
+              throw new IllegalArgumentException(
+                s"vertex policy ${vertices.policy.get} is not supported")
+          }
+        }
+        .mkString(",")
+    )
+  }
+
+  /**
+    * construct delete statement for edge
+    */
+  def toDeleteExecuteStatement(edgeName: String, edges: NebulaEdges): String = {
+    DELETE_EDGE_TEMPLATE.format(
+      edgeName,
+      edges.values
+        .map { value =>
+          EDGE_ENDPOINT_TEMPLATE.format(
+            edges.getSourcePolicy match {
+              case Some(KeyPolicy.HASH) =>
+                ENDPOINT_TEMPLATE.format(KeyPolicy.HASH.toString, value.source)
+              case Some(KeyPolicy.UUID) =>
+                ENDPOINT_TEMPLATE.format(KeyPolicy.UUID.toString, value.source)
+              case None => value.source
+              case _ =>
+                throw new IllegalArgumentException(
+                  s"source vertex policy ${edges.getSourcePolicy.get} is not supported")
+            },
+            edges.getTargetPolicy match {
+              case Some(KeyPolicy.HASH) =>
+                ENDPOINT_TEMPLATE.format(KeyPolicy.HASH.toString, value.target)
+              case Some(KeyPolicy.UUID) =>
+                ENDPOINT_TEMPLATE.format(KeyPolicy.UUID.toString, value.target)
+              case None => value.target
+              case _ =>
+                throw new IllegalArgumentException(
+                  s"target vertex policy ${edges.getTargetPolicy.get} is not supported")
+            },
+            if (value.rank.isEmpty) 0 else value.rank.get
+          )
         }
         .mkString(",")
     )
