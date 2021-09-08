@@ -80,16 +80,14 @@ class NebulaEdgeWriter(nebulaOptions: NebulaOptions,
 
   def execute(): Unit = {
     val nebulaEdges = NebulaEdges(propNames, edges.toList, srcPolicy, dstPolicy)
-    val exec = if (nebulaOptions.writeMode == WriteMode.INSERT) {
-      NebulaExecutor.toExecuteSentence(nebulaOptions.label, nebulaEdges)
-    } else if (nebulaOptions.writeMode == WriteMode.UPDATE) {
-      nebulaEdges.values
-        .map { edge =>
-          NebulaExecutor.toUpdateExecuteStatement(nebulaOptions.label, nebulaEdges.propNames, edge)
-        }
-        .mkString(";")
-    } else {
-      NebulaExecutor.toDeleteExecuteStatement(nebulaOptions.label, nebulaEdges)
+    val exec = nebulaOptions.writeMode match {
+      case WriteMode.INSERT => NebulaExecutor.toExecuteSentence(nebulaOptions.label, nebulaEdges)
+      case WriteMode.UPDATE =>
+        NebulaExecutor.toUpdateExecuteStatement(nebulaOptions.label, nebulaEdges)
+      case WriteMode.DELETE =>
+        NebulaExecutor.toDeleteExecuteStatement(nebulaOptions.label, nebulaEdges)
+      case _ =>
+        throw new IllegalArgumentException(s"write mode ${nebulaOptions.writeMode} not supported.")
     }
     edges.clear()
     submit(exec)
