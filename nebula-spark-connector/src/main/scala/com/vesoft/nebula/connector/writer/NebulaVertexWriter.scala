@@ -59,18 +59,13 @@ class NebulaVertexWriter(nebulaOptions: NebulaOptions, vertexIndex: Int, schema:
 
   def execute(): Unit = {
     val nebulaVertices = NebulaVertices(propNames, vertices.toList, policy)
-    val exec = if (nebulaOptions.writeMode == WriteMode.INSERT) {
-      NebulaExecutor.toExecuteSentence(nebulaOptions.label, nebulaVertices)
-    } else if (nebulaOptions.writeMode == WriteMode.UPDATE) {
-      nebulaVertices.values
-        .map { vertex =>
-          NebulaExecutor.toUpdateExecuteStatement(nebulaOptions.label,
-                                                  nebulaVertices.propNames,
-                                                  vertex)
-        }
-        .mkString(";")
-    } else {
-      NebulaExecutor.toDeleteExecuteStatement(nebulaVertices)
+    val exec = nebulaOptions.writeMode match {
+      case WriteMode.INSERT => NebulaExecutor.toExecuteSentence(nebulaOptions.label, nebulaVertices)
+      case WriteMode.UPDATE =>
+        NebulaExecutor.toUpdateExecuteStatement(nebulaOptions.label, nebulaVertices)
+      case WriteMode.DELETE => NebulaExecutor.toDeleteExecuteStatement(nebulaVertices)
+      case _ =>
+        throw new IllegalArgumentException(s"write mode ${nebulaOptions.writeMode} not supported.")
     }
     vertices.clear()
     submit(exec)
