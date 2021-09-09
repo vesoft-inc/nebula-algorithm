@@ -332,7 +332,7 @@ class NebulaExecutorSuite extends AnyFunSuite with BeforeAndAfterAll {
 
     val nebulaEdges               = NebulaEdges(List(), edges.toList, None, None)
     val edgeStatement             = NebulaExecutor.toDeleteExecuteStatement("friend", nebulaEdges)
-    val expectEdgeDeleteStatement = "DELETE EDGE friend \"vid1\"->\"vid2\"@1,\"vid2\"->\"vid1\"@2"
+    val expectEdgeDeleteStatement = "DELETE EDGE `friend` \"vid1\"->\"vid2\"@1,\"vid2\"->\"vid1\"@2"
     assert(expectEdgeDeleteStatement.equals(edgeStatement))
   }
 
@@ -343,7 +343,7 @@ class NebulaExecutorSuite extends AnyFunSuite with BeforeAndAfterAll {
 
     val nebulaEdges               = NebulaEdges(List(), edges.toList, None, None)
     val edgeStatement             = NebulaExecutor.toDeleteExecuteStatement("friend", nebulaEdges)
-    val expectEdgeDeleteStatement = "DELETE EDGE friend \"vid1\"->\"vid2\"@0,\"vid2\"->\"vid1\"@0"
+    val expectEdgeDeleteStatement = "DELETE EDGE `friend` \"vid1\"->\"vid2\"@0,\"vid2\"->\"vid1\"@0"
     assert(expectEdgeDeleteStatement.equals(edgeStatement))
   }
 
@@ -355,7 +355,7 @@ class NebulaExecutorSuite extends AnyFunSuite with BeforeAndAfterAll {
     val nebulaEdges   = NebulaEdges(List(), edges.toList, Some(KeyPolicy.HASH), None)
     val edgeStatement = NebulaExecutor.toDeleteExecuteStatement("friend", nebulaEdges)
     val expectEdgeDeleteStatement =
-      "DELETE EDGE friend hash(\"vid1\")->\"vid2\"@1,hash(\"vid2\")->\"vid1\"@2"
+      "DELETE EDGE `friend` hash(\"vid1\")->\"vid2\"@1,hash(\"vid2\")->\"vid1\"@2"
     assert(expectEdgeDeleteStatement.equals(edgeStatement))
   }
 
@@ -367,7 +367,7 @@ class NebulaExecutorSuite extends AnyFunSuite with BeforeAndAfterAll {
     val nebulaEdges   = NebulaEdges(List(), edges.toList, Some(KeyPolicy.HASH), Some(KeyPolicy.HASH))
     val edgeStatement = NebulaExecutor.toDeleteExecuteStatement("friend", nebulaEdges)
     val expectEdgeDeleteStatement =
-      "DELETE EDGE friend hash(\"vid1\")->hash(\"vid2\")@1,hash(\"vid2\")->hash(\"vid1\")@2"
+      "DELETE EDGE `friend` hash(\"vid1\")->hash(\"vid2\")@1,hash(\"vid2\")->hash(\"vid1\")@2"
     assert(expectEdgeDeleteStatement.equals(edgeStatement))
   }
 }
