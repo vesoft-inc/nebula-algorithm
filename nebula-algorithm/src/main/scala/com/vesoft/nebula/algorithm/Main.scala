@@ -7,8 +7,8 @@
 package com.vesoft.nebula.algorithm
 
 import com.vesoft.nebula.algorithm.config.Configs.Argument
-import com.vesoft.nebula.algorithm.config.{AlgoConfig, BetweennessConfig, CcConfig, Configs, HanpConfig, KCoreConfig, LPAConfig, LouvainConfig, PRConfig, ShortestPathConfig, SingleSourceShortestPathConfig, SparkConfig}
-import com.vesoft.nebula.algorithm.lib.{BetweennessCentralityAlgo, ClosenessAlgo, ConnectedComponentsAlgo, DegreeStaticAlgo, HanpAlgo, KCoreAlgo, LabelPropagationAlgo, LouvainAlgo, PageRankAlgo, ShortestPathAlgo, SingleSourceShortestPathAlgo, StronglyConnectedComponentsAlgo, TriangleCountAlgo}
+import com.vesoft.nebula.algorithm.config.{AlgoConfig, BetweennessConfig, CcConfig, Configs, HanpConfig, KCoreConfig, LPAConfig, LouvainConfig, Node2vecConfig, PRConfig, ShortestPathConfig, SingleSourceShortestPathConfig, SparkConfig}
+import com.vesoft.nebula.algorithm.lib.{BetweennessCentralityAlgo, ClosenessAlgo, ConnectedComponentsAlgo, DegreeStaticAlgo, HanpAlgo, KCoreAlgo, LabelPropagationAlgo, LouvainAlgo, Node2vecAlgo, PageRankAlgo, ShortestPathAlgo, SingleSourceShortestPathAlgo, StronglyConnectedComponentsAlgo, TriangleCountAlgo}
 import com.vesoft.nebula.algorithm.reader.{CsvReader, JsonReader, NebulaReader}
 import com.vesoft.nebula.algorithm.writer.{CsvWriter, NebulaWriter, TextWriter}
 import org.apache.commons.math3.ode.UnknownParameterException
@@ -148,6 +148,10 @@ object Main {
         case "hanp"=>{
           val hanpConfig=HanpConfig.getHanpConfig(configs)
           HanpAlgo(spark, dataSet, hanpConfig, hasWeight)
+        }
+        case "node2vec"=>{
+          val node2vecConfig=Node2vecConfig.getNode2vecConfig(configs)
+          Node2vecAlgo(spark,dataSet,node2vecConfig,hasWeight)
         }
         case _ => throw new UnknownParameterException("unknown executeAlgo name.")
       }

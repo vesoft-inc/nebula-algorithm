@@ -182,6 +182,55 @@ object HanpConfig{
   }
 }
 
+/**
+ * Node2vec
+ */
+case class Node2vecConfig(iter: Int,
+                          lr: Double,
+                          dataNumPartition:Int,
+                          modelNumPartition: Int,
+                          dim: Int,
+                          window: Int,
+                          walkLength: Int,
+                          numWalks: Int,
+                          p: Double,
+                          q: Double,
+                          directed: Boolean,
+                          degree: Int,
+                          embSeparate:String)
+object Node2vecConfig{
+  var iter: Int = _
+  var lr: Double = _
+  var dataNumPartition: Int = _
+  var modelNumPartition: Int = _
+  var dim: Int = _
+  var window: Int = _
+  var walkLength: Int = _
+  var numWalks: Int = _
+  var p: Double = _
+  var q: Double = _
+  var directed: Boolean = _
+  var degree: Int = _
+  var embSeparate:String=_
+  def getNode2vecConfig(configs: Configs):Node2vecConfig={
+    val node2vecConfig=configs.algorithmConfig.map
+    iter=node2vecConfig("algorithm.node2vec.iter").toInt
+    lr=node2vecConfig("algorithm.node2vec.lr").toDouble
+    dataNumPartition=node2vecConfig("algorithm.node2vec.dataNumPartition").toInt
+    modelNumPartition=node2vecConfig("algorithm.node2vec.modelNumPartition").toInt
+    dim=node2vecConfig("algorithm.node2vec.dim").toInt
+    window=node2vecConfig("algorithm.node2vec.window").toInt
+    walkLength=node2vecConfig("algorithm.node2vec.walkLength").toInt
+    numWalks=node2vecConfig("algorithm.node2vec.numWalks").toInt
+    p=node2vecConfig("algorithm.node2vec.p").toDouble
+    q=node2vecConfig("algorithm.node2vec.q").toDouble
+    directed=node2vecConfig("algorithm.node2vec.directed").toBoolean
+    degree=node2vecConfig("algorithm.node2vec.degree").toInt
+    embSeparate=node2vecConfig("algorithm.node2vec.embSeparate").toString
+    Node2vecConfig(iter,lr, dataNumPartition,modelNumPartition, dim, window, walkLength, numWalks, p, q, directed, degree,embSeparate)
+  }
+}
+
 case class AlgoConfig(configs: Configs)
 
 object AlgoConfig {
