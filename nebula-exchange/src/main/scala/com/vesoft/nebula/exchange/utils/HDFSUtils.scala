@@ -22,6 +22,7 @@ object HDFSUtils {
       conf.set("fs.default.name", namenode)
       conf.set("fs.defaultFS", namenode)
     }
+	conf.set("fs.hdfs.impl.disable.cache", "true")
     FileSystem.get(conf)
   }
 
