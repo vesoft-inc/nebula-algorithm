@@ -11,7 +11,7 @@ import com.vesoft.nebula.client.graph.NebulaPoolConfig
 import com.vesoft.nebula.client.graph.data.HostAddress
 import com.vesoft.nebula.client.graph.net.NebulaPool
 import com.vesoft.nebula.client.storage.StorageClient
-import com.vesoft.nebula.exchange.config.TagConfigEntry
+import com.vesoft.nebula.exchange.config.{NebulaSinkConfigEntry, SinkCategory, TagConfigEntry}
 import com.vesoft.nebula.exchange.utils.NebulaUtils
 import com.vesoft.nebula.exchange.{KeyPolicy, MetaProvider, VidType}
 import com.vesoft.nebula.meta.PropertyType
@@ -70,10 +70,11 @@ class NebulaUtilsSuite {
                             "col10",
                             "col11",
                             "col12")
-    val label = "person"
+    val label               = "person"
+    val dataSinkConfigEntry = NebulaSinkConfigEntry(SinkCategory.SST, List("127.0.0.1:9669"))
     val sourceConfig = TagConfigEntry(label,
                                       null,
-                                      null,
+                                      dataSinkConfigEntry,
                                       sourceFields,
                                       nebulaFields,
                                       "id",
