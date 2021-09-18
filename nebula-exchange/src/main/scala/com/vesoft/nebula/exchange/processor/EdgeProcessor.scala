@@ -112,7 +112,14 @@ class EdgeProcessor(data: DataFrame,
       val spaceVidLen = metaProvider.getSpaceVidLen(space)
       val edgeItem    = metaProvider.getEdgeItem(space, edgeName)
 
-      data
+      val distintData = if (edgeConfig.rankingField.isDefined) {
+        data.dropDuplicates(edgeConfig.sourceField,
+                            edgeConfig.targetField,
+                            edgeConfig.rankingField.get)
+      } else {
+        data.dropDuplicates(edgeConfig.sourceField, edgeConfig.targetField)
+      }
+      distintData
         .mapPartitions { iter =>
           iter.map { row =>
             val srcIndex: Int = row.schema.fieldIndex(edgeConfig.sourceField)
