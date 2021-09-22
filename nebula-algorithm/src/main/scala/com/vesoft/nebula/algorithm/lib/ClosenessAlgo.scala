@@ -9,10 +9,9 @@ package com.vesoft.nebula.algorithm.lib
 import com.vesoft.nebula.algorithm.config.AlgoConstants
 import com.vesoft.nebula.algorithm.utils.NebulaUtil
 import org.apache.log4j.Logger
-import org.apache.spark.graphx
 import org.apache.spark.graphx.{EdgeTriplet, Graph, Pregel, VertexId}
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.types.{DoubleType, LongType, StringType, StructField, StructType}
+import org.apache.spark.sql.types.{DoubleType, LongType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 
 object ClosenessAlgo {

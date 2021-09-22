@@ -28,7 +28,8 @@ class Node2vecAlgoSuite {
       1.0,
       false,
       10,
-      ","
+      ",",
+      "src/test/resources/model"
     )
     val result            = Node2vecAlgo.apply(spark, data, node2vecConfig, true)
     assert(result.count() == 4)

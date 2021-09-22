@@ -9,13 +9,10 @@ package com.vesoft.nebula.algorithm.lib
 
 import com.vesoft.nebula.algorithm.config.{AlgoConstants, HanpConfig}
 import com.vesoft.nebula.algorithm.utils.NebulaUtil
-import org.apache.commons.math3.optim.MaxIter
 import org.apache.spark.graphx.{EdgeTriplet, Graph, VertexId}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.types.{LongType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
-
-import java.util.prefs.Preferences
 
 object HanpAlgo {
   val ALGORITHM: String = "Hanp"

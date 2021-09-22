@@ -9,12 +9,11 @@ package com.vesoft.nebula.algorithm.lib
 
 import com.vesoft.nebula.algorithm.config.{AlgoConstants, Node2vecConfig}
 import com.vesoft.nebula.algorithm.utils.NebulaUtil
-import org.apache.parquet.format.IntType
 import org.apache.spark.SparkContext
 import org.apache.spark.graphx.{Edge, EdgeTriplet, Graph, VertexId}
 import org.apache.spark.mllib.feature.Word2Vec
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.types.{LongType, StringType, StructField, StructType}
+import org.apache.spark.sql.types.{StringType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 
 import java.io.Serializable
@@ -203,11 +202,12 @@ object Node2vecAlgo {
     }.filter(_!=null)
     val word2vec = new Word2Vec()
     word2vec.setLearningRate(node2vecConfig.lr)
-            .setNumIterations(node2vecConfig.iter)
+            .setNumIterations(node2vecConfig.maxIter)
             .setNumPartitions(node2vecConfig.modelNumPartition)
             .setVectorSize(node2vecConfig.dim)
             .setWindowSize(node2vecConfig.window)
     val model=word2vec.fit(randomPaths)
+    model.save(context,node2vecConfig.modelPath)// use Word2VecModel.load(context, path) to load model
     this.vectors=model.getVectors
     this
   }

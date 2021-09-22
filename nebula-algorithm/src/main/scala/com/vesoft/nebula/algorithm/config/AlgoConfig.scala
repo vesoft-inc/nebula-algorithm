@@ -185,7 +185,7 @@ object HanpConfig{
 /**
  * Node2vec
  */
-case class Node2vecConfig(iter: Int,
+case class Node2vecConfig(maxIter: Int,
                           lr: Double,
                           dataNumPartition:Int,
                           modelNumPartition: Int,
@@ -197,9 +197,10 @@ case class Node2vecConfig(iter: Int,
                           q: Double,
                           directed: Boolean,
                           degree: Int,
-                          embSeparate:String)
+                          embSeparate:String,
+                          modelPath:String)
 object Node2vecConfig{
-  var iter: Int = _
+  var maxIter: Int = _
   var lr: Double = _
   var dataNumPartition: Int = _
   var modelNumPartition: Int = _
@@ -212,9 +213,10 @@ object Node2vecConfig{
   var directed: Boolean = _
   var degree: Int = _
   var embSeparate:String=_
+  var modelPath:String=_
   def getNode2vecConfig(configs: Configs):Node2vecConfig={
     val node2vecConfig=configs.algorithmConfig.map
-    iter=node2vecConfig("algorithm.node2vec.iter").toInt
+    maxIter=node2vecConfig("algorithm.node2vec.maxIter").toInt
     lr=node2vecConfig("algorithm.node2vec.lr").toDouble
     dataNumPartition=node2vecConfig("algorithm.node2vec.dataNumPartition").toInt
     modelNumPartition=node2vecConfig("algorithm.node2vec.modelNumPartition").toInt
@@ -226,8 +228,9 @@ object Node2vecConfig{
     q=node2vecConfig("algorithm.node2vec.q").toDouble
     directed=node2vecConfig("algorithm.node2vec.directed").toBoolean
     degree=node2vecConfig("algorithm.node2vec.degree").toInt
-    embSeparate=node2vecConfig("algorithm.node2vec.embSeparate").toString
-    Node2vecConfig(iter,lr, dataNumPartition,modelNumPartition, dim, window, walkLength, numWalks, p, q, directed, degree,embSeparate)
+    embSeparate=node2vecConfig("algorithm.node2vec.embSeparate")
+    modelPath=node2vecConfig("algorithm.node2vec.modelPath")
+    Node2vecConfig(maxIter,lr, dataNumPartition,modelNumPartition, dim, window, walkLength, numWalks, p, q, directed, degree,embSeparate,modelPath)
   }
 }
 
