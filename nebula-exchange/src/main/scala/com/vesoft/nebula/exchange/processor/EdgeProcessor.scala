@@ -156,6 +156,8 @@ class EdgeProcessor(data: DataFrame,
 
             val ranking: Long = if (edgeConfig.rankingField.isDefined) {
               val rankIndex = row.schema.fieldIndex(edgeConfig.rankingField.get)
+              assert(rankIndex >= 0 && !row.isNullAt(rankIndex),
+                s"rank must exist and cannot be null, your row data is $row")
               row.get(rankIndex).toString.toLong
             } else {
               0
