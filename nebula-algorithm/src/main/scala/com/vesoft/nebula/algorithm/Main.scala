@@ -9,6 +9,7 @@ package com.vesoft.nebula.algorithm
 import com.vesoft.nebula.algorithm.config.Configs.Argument
 import com.vesoft.nebula.algorithm.config.{
   AlgoConfig,
+  AlgoConstants,
   BetweennessConfig,
   CcConfig,
   Configs,
@@ -23,6 +24,7 @@ import com.vesoft.nebula.algorithm.lib.{
   BetweennessCentralityAlgo,
   ConnectedComponentsAlgo,
   DegreeStaticAlgo,
+  GraphTriangleCountAlgo,
   KCoreAlgo,
   LabelPropagationAlgo,
   LouvainAlgo,
@@ -35,6 +37,7 @@ import com.vesoft.nebula.algorithm.reader.{CsvReader, JsonReader, NebulaReader}
 import com.vesoft.nebula.algorithm.writer.{CsvWriter, NebulaWriter, TextWriter}
 import org.apache.commons.math3.ode.UnknownParameterException
 import org.apache.log4j.Logger
+import org.apache.spark.sql.types.{LongType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 
 /**
@@ -159,6 +162,9 @@ object Main {
         }
         case "trianglecount" => {
           TriangleCountAlgo(spark, dataSet)
+        }
+        case "graphtrianglecount" => {
+          GraphTriangleCountAlgo(spark, dataSet)
         }
         case _ => throw new UnknownParameterException("unknown executeAlgo name.")
       }

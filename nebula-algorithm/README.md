@@ -17,6 +17,7 @@ nebula-algorithm is a Spark Application based on [GraphX](https://spark.apache.o
 |StronglyConnectedComponent| community detection|
 |       ShortestPath       | path plan, network plan|
 |       TriangleCount      | network structure analysis|
+|    GraphTriangleCount    | network structure and tightness analysis|
 |   BetweennessCentrality  | important node digging, node influence calculation|
 |        DegreeStatic      | graph structure analysis|
 

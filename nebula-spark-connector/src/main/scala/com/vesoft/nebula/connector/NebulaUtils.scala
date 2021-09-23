@@ -6,6 +6,7 @@
 
 package com.vesoft.nebula.connector
 
+import com.vesoft.nebula.client.graph.data.{DateTimeWrapper, DateWrapper, TimeWrapper}
 import com.vesoft.nebula.meta.{ColumnDef, ColumnTypeDef, PropertyType}
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.catalyst.InternalRow
@@ -41,7 +42,7 @@ object NebulaUtils {
         LongType
       case PropertyType.BOOL                        => BooleanType
       case PropertyType.FLOAT | PropertyType.DOUBLE => DoubleType
-      case PropertyType.TIMESTAMP                   => TimestampType
+      case PropertyType.TIMESTAMP                   => LongType
       case PropertyType.FIXED_STRING | PropertyType.STRING | PropertyType.DATE | PropertyType.TIME |
           PropertyType.DATETIME =>
         StringType
@@ -80,7 +81,14 @@ object NebulaUtils {
           row.setInt(pos, prop.asInstanceOf[Int])
       case _ =>
         (prop: Any, row: InternalRow, pos: Int) =>
-          row.update(pos, UTF8String.fromString(String.valueOf(prop)))
+          if (prop.isInstanceOf[DateTimeWrapper]) {
+            row.update(pos,
+                       UTF8String.fromString(prop.asInstanceOf[DateTimeWrapper].getUTCDateTimeStr))
+          } else if (prop.isInstanceOf[TimeWrapper]) {
+            row.update(pos, UTF8String.fromString(prop.asInstanceOf[TimeWrapper].getUTCTimeStr))
+          } else {
+            row.update(pos, UTF8String.fromString(String.valueOf(prop)))
+          }
     }
   }
 

@@ -27,30 +27,18 @@ object HDFSUtils {
 
   def list(path: String): List[String] = {
     val system = getFileSystem()
-    try {
-      system.listStatus(new Path(path)).map(_.getPath.getName).toList
-    } finally {
-      system.close()
-    }
+    system.listStatus(new Path(path)).map(_.getPath.getName).toList
   }
 
   def exists(path: String): Boolean = {
     val system = getFileSystem()
-    try {
-      system.exists(new Path(path))
-    } finally {
-      system.close()
-    }
+    system.exists(new Path(path))
   }
 
   def getContent(path: String): String = {
     val system      = getFileSystem()
     val inputStream = system.open(new Path(path))
-    try {
-      Source.fromInputStream(inputStream).mkString
-    } finally {
-      system.close()
-    }
+    Source.fromInputStream(inputStream).mkString
   }
 
   def saveContent(path: String,
@@ -78,10 +66,6 @@ object HDFSUtils {
                  e)
     }
     val system = getFileSystem(namenode)
-    try {
-      system.copyFromLocalFile(new Path(localPath), new Path(remotePath))
-    } finally {
-      system.close()
-    }
+    system.copyFromLocalFile(new Path(localPath), new Path(remotePath))
   }
 }

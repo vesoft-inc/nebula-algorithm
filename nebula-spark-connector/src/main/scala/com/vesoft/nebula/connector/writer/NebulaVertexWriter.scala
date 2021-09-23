@@ -21,8 +21,10 @@ class NebulaVertexWriter(nebulaOptions: NebulaOptions, vertexIndex: Int, schema:
 
   private val LOG = LoggerFactory.getLogger(this.getClass)
 
-  val propNames   = NebulaExecutor.assignVertexPropNames(schema, vertexIndex, nebulaOptions.vidAsProp)
-  val fieldTypMap = metaProvider.getTagSchema(nebulaOptions.spaceName, nebulaOptions.label)
+  val propNames = NebulaExecutor.assignVertexPropNames(schema, vertexIndex, nebulaOptions.vidAsProp)
+  val fieldTypMap: Map[String, Integer] =
+    if (nebulaOptions.writeMode == WriteMode.DELETE) Map[String, Integer]()
+    else metaProvider.getTagSchema(nebulaOptions.spaceName, nebulaOptions.label)
 
   val policy = {
     if (nebulaOptions.vidPolicy.isEmpty) Option.empty
@@ -40,11 +42,14 @@ class NebulaVertexWriter(nebulaOptions: NebulaOptions, vertexIndex: Int, schema:
   override def write(row: InternalRow): Unit = {
     val vertex =
       NebulaExecutor.extraID(schema, row, vertexIndex, policy, isVidStringType)
-    val values = NebulaExecutor.assignVertexPropValues(schema,
-                                                       row,
-                                                       vertexIndex,
-                                                       nebulaOptions.vidAsProp,
-                                                       fieldTypMap)
+    val values =
+      if (nebulaOptions.writeMode == WriteMode.DELETE) List()
+      else
+        NebulaExecutor.assignVertexPropValues(schema,
+                                              row,
+                                              vertexIndex,
+                                              nebulaOptions.vidAsProp,
+                                              fieldTypMap)
     val nebulaVertex = NebulaVertex(vertex, values)
     vertices.append(nebulaVertex)
     if (vertices.size >= nebulaOptions.batch) {
@@ -54,16 +59,13 @@ class NebulaVertexWriter(nebulaOptions: NebulaOptions, vertexIndex: Int, schema:
 
   def execute(): Unit = {
     val nebulaVertices = NebulaVertices(propNames, vertices.toList, policy)
-    val exec = if (nebulaOptions.writeMode == WriteMode.INSERT) {
-      NebulaExecutor.toExecuteSentence(nebulaOptions.label, nebulaVertices)
-    } else {
-      nebulaVertices.values
-        .map { vertex =>
-          NebulaExecutor.toUpdateExecuteStatement(nebulaOptions.label,
-                                                  nebulaVertices.propNames,
-                                                  vertex)
-        }
-        .mkString(";")
+    val exec = nebulaOptions.writeMode match {
+      case WriteMode.INSERT => NebulaExecutor.toExecuteSentence(nebulaOptions.label, nebulaVertices)
+      case WriteMode.UPDATE =>
+        NebulaExecutor.toUpdateExecuteStatement(nebulaOptions.label, nebulaVertices)
+      case WriteMode.DELETE => NebulaExecutor.toDeleteExecuteStatement(nebulaVertices)
+      case _ =>
+        throw new IllegalArgumentException(s"write mode ${nebulaOptions.writeMode} not supported.")
     }
     vertices.clear()
     submit(exec)
