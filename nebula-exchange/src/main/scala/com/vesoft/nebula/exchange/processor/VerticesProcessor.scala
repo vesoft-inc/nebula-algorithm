@@ -121,6 +121,7 @@ class VerticesProcessor(data: DataFrame,
       val tagItem     = metaProvider.getTagItem(space, tagName)
 
       data
+        .dropDuplicates(tagConfig.vertexField)
         .mapPartitions { iter =>
           iter.map { row =>
             val index: Int = row.schema.fieldIndex(tagConfig.vertexField)
