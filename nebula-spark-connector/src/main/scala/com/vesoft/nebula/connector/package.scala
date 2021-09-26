@@ -187,11 +187,10 @@ package object connector {
               props.append(row.get(i))
             }
           }
-          val srcId   = row.get(0)
-          val dstId   = row.get(1)
-          val edgeSrc = srcId.toString.toLong
-          val edgeDst = dstId.toString.toLong
-
+          val srcId    = row.get(0)
+          val dstId    = row.get(1)
+          val edgeSrc  = srcId.toString.toLong
+          val edgeDst  = dstId.toString.toLong
           val edgeProp = (row.get(2).toString.toLong, props.toList)
           org.apache.spark.graphx
             .Edge(edgeSrc, edgeDst, edgeProp)

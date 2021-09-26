@@ -33,7 +33,9 @@ class NebulaEdgeWriter(nebulaOptions: NebulaOptions,
                                                      nebulaOptions.srcAsProp,
                                                      nebulaOptions.dstAsProp,
                                                      nebulaOptions.rankAsProp)
-  val fieldTypMap = metaProvider.getEdgeSchema(nebulaOptions.spaceName, nebulaOptions.label)
+  val fieldTypMap: Map[String, Integer] =
+    if (nebulaOptions.writeMode == WriteMode.DELETE) Map[String, Integer]()
+    else metaProvider.getEdgeSchema(nebulaOptions.spaceName, nebulaOptions.label)
 
   val srcPolicy =
     if (nebulaOptions.srcPolicy.isEmpty) Option.empty
@@ -58,15 +60,17 @@ class NebulaEdgeWriter(nebulaOptions: NebulaOptions,
       if (rankIndex.isEmpty) Option.empty
       else Option(NebulaExecutor.extraRank(schema, row, rankIndex.get))
     val values =
-      NebulaExecutor.assignEdgeValues(schema,
-                                      row,
-                                      srcIndex,
-                                      dstIndex,
-                                      rankIdx,
-                                      nebulaOptions.srcAsProp,
-                                      nebulaOptions.dstAsProp,
-                                      nebulaOptions.rankAsProp,
-                                      fieldTypMap)
+      if (nebulaOptions.writeMode == WriteMode.DELETE) List()
+      else
+        NebulaExecutor.assignEdgeValues(schema,
+                                        row,
+                                        srcIndex,
+                                        dstIndex,
+                                        rankIdx,
+                                        nebulaOptions.srcAsProp,
+                                        nebulaOptions.dstAsProp,
+                                        nebulaOptions.rankAsProp,
+                                        fieldTypMap)
     val nebulaEdge = NebulaEdge(srcId, dstId, rank, values)
     edges.append(nebulaEdge)
     if (edges.size >= nebulaOptions.batch) {
@@ -76,14 +80,14 @@ class NebulaEdgeWriter(nebulaOptions: NebulaOptions,
 
   def execute(): Unit = {
     val nebulaEdges = NebulaEdges(propNames, edges.toList, srcPolicy, dstPolicy)
-    val exec = if (nebulaOptions.writeMode == WriteMode.INSERT) {
-      NebulaExecutor.toExecuteSentence(nebulaOptions.label, nebulaEdges)
-    } else {
-      nebulaEdges.values
-        .map { edge =>
-          NebulaExecutor.toUpdateExecuteStatement(nebulaOptions.label, nebulaEdges.propNames, edge)
-        }
-        .mkString(";")
+    val exec = nebulaOptions.writeMode match {
+      case WriteMode.INSERT => NebulaExecutor.toExecuteSentence(nebulaOptions.label, nebulaEdges)
+      case WriteMode.UPDATE =>
+        NebulaExecutor.toUpdateExecuteStatement(nebulaOptions.label, nebulaEdges)
+      case WriteMode.DELETE =>
+        NebulaExecutor.toDeleteExecuteStatement(nebulaOptions.label, nebulaEdges)
+      case _ =>
+        throw new IllegalArgumentException(s"write mode ${nebulaOptions.writeMode} not supported.")
     }
     edges.clear()
     submit(exec)

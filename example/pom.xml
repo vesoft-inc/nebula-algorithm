@@ -100,31 +100,7 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.2.0</version>
-                <configuration>
-                    <excludePackageNames>com.facebook.thrift:com.facebook.thrift.*</excludePackageNames>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                        <configuration>
-                            <encoding>UTF-8</encoding>
-                            <charset>UTF-8</charset>
-                            <additionalOptions>
-                                <additionalparam>-source 8</additionalparam>
-                                <additionalOption>-Xdoclint:none</additionalOption>
-                            </additionalOptions>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+
         </plugins>
     </build>
 
