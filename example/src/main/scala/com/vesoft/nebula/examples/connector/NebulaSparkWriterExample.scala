@@ -178,7 +178,7 @@ object NebulaSparkWriterExample {
     val config =
       NebulaConnectionConfig
         .builder()
-        .withMetaAddress("127.0.01:9559")
+        .withMetaAddress("127.0.0.1:9559")
         .withGraphAddress("127.0.0.1:9669")
         .build()
     val nebulaWriteVertexConfig: WriteNebulaVertexConfig = WriteNebulaVertexConfig
