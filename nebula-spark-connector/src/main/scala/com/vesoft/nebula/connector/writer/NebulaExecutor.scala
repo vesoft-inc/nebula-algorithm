@@ -141,8 +141,11 @@ object NebulaExecutor {
                                fieldTypeMap: Map[String, Integer]): Any = {
     if (record.isNullAt(index)) return null
 
-    val types     = schema.fields.map(field => field.dataType)
-    val propValue = record.get(index, types(index))
+    val types                  = schema.fields.map(field => field.dataType)
+    val propValue              = record.get(index, types(index))
+    val propValueTypeClassName = propValue.getClass.getName
+    val simpleName = propValueTypeClassName.substring(propValueTypeClassName.lastIndexOf(".") + 1,
+                                                      propValueTypeClassName.length)
 
     val fieldName = schema.fields(index).name
     PropertyType.findByValue(fieldTypeMap(fieldName)) match {
@@ -153,12 +156,16 @@ object NebulaExecutor {
       case PropertyType.TIME     => "time(\"" + propValue + "\")"
       case PropertyType.TIMESTAMP => {
         if (NebulaUtils.isNumic(propValue.toString)) {
-          propValue
+          if (simpleName.equalsIgnoreCase("UTF8String")) propValue.toString
+          else propValue
         } else {
           "timestamp(\"" + propValue + "\")"
         }
       }
-      case _ => propValue
+      case _ => {
+        if (simpleName.equalsIgnoreCase("UTF8String")) propValue.toString
+        else propValue
+      }
     }
   }
 
