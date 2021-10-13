@@ -30,17 +30,5 @@
 #        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
 #        restore-keys: ${{ runner.os }}-maven-
 #
-#    - name: Install nebula-graph
-#      run: |
-#        mkdir tmp
-#        pushd tmp
-#        git clone https://github.com/vesoft-inc/nebula-docker-compose.git
-#        pushd nebula-docker-compose/
-#        cp ../../nebula-exchange/src/test/resources/docker-compose.yaml .
-#        docker-compose up -d
-#        sleep 10
-#        popd
-#        popd
-#
 #    - name: Build with Maven
 #      run: mvn -B package
