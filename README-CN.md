@@ -22,14 +22,14 @@ nebula-algorithm 是一款基于 [GraphX](https://spark.apache.org/graphx/) 的 
 ## 如何获取
  1. 编译打包 Nebula Algorithm
     ```
-    $ git clone https://github.com/vesoft-inc/nebula-spark-utils.git
+    $ git clone https://github.com/vesoft-inc/nebula-algorithm.git
     $ cd nebula-algorithm
     $ mvn clean package -Dgpg.skip -Dmaven.javadoc.skip=true -Dmaven.test.skip=true
     ```
-    编译完成后，在 `nebula-algorithm/target` 目录下会生成 `nebula-algorithm-2.0.0.jar` 。
+    编译完成后，在 `nebula-algorithm/target` 目录下会生成 `nebula-algorithm-2.5.0.jar` 。
 
  2. 在 Maven 远程仓库下载
-   https://repo1.maven.org/maven2/com/vesoft/nebula-algorithm/2.0.0/
+   https://repo1.maven.org/maven2/com/vesoft/nebula-algorithm/2.5.0/
 
 # 使用 Nebula Algorithm
 
@@ -39,22 +39,22 @@ nebula-algorithm 是一款基于 [GraphX](https://spark.apache.org/graphx/) 的 
 
    * 设置配置文件
    
-    关于配置项的具体说明参考[示例配置](https://github.com/vesoft-inc/nebula-spark-utils/blob/master/nebula-algorithm/src/main/resources/application.conf)
+    关于配置项的具体说明参考[示例配置](https://github.com/vesoft-inc/nebula-algorithm/blob/master/nebula-algorithm/src/main/resources/application.conf)
 
    * 提交算法任务
 
     ```
-    ${SPARK_HOME}/bin/spark-submit --master <mode> --class com.vesoft.nebula.algorithm.Main nebula-algorithm-2.0.0.jar -p application.conf
+    ${SPARK_HOME}/bin/spark-submit --master <mode> --class com.vesoft.nebula.algorithm.Main nebula-algorithm-2.5.0.jar -p application.conf
     ```
 * 使用方法2：调用 nebula-algorithm 算法接口
 
-   在`nebula-algorithm`的`lib`库中提供了10中常用图计算算法，可通过编程调用的形式调用算法。
+   在`nebula-algorithm`的`lib`库中提供了11中常用图计算算法，可通过编程调用的形式调用算法。
    * 在pom.xml中添加依赖
    ```
     <dependency>
          <groupId>com.vesoft</groupId>
          <artifactId>nebula-algorithm</artifactId>
-         <version>2.0.0</version>
+         <version>2.5.0</version>
     </dependency>
    ```
    * 定义算法参数调用算法（以`PageRank`为例）
@@ -63,7 +63,7 @@ nebula-algorithm 是一款基于 [GraphX](https://spark.apache.org/graphx/) 的 
    val louvainResult = PageRankAlgo.apply(spark, data, prConfig, false)
    ```
  
-    其他算法的调用方法见[测试示例](https://github.com/vesoft-inc/nebula-spark-utils/tree/master/nebula-algorithm/src/test/scala/com/vesoft/nebula/algorithm/lib) 。
+    其他算法的调用方法见[测试示例](https://github.com/vesoft-inc/nebula-algorithm/tree/master/nebula-algorithm/src/test/scala/com/vesoft/nebula/algorithm/lib) 。
     
     > 注：执行算法的DataFrame默认第一列是源点，第二列是目标点，第三列是边权重。
 
