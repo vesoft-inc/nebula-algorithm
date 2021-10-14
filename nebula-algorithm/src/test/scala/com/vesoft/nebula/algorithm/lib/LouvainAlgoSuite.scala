@@ -18,5 +18,13 @@ class LouvainAlgoSuite {
     val louvainConfig = new LouvainConfig(5, 2, 1.0)
     val louvainResult = LouvainAlgo.apply(spark, data, louvainConfig, false)
     assert(louvainResult.count() == 4)
+
+    val dataWithoutWith = spark.read
+      .option("header", false)
+      .option("delimiter", " ")
+      .csv("src/test/resources/edge_noWeight.csv")
+      .select("_c0", "_c1")
+    val louvainResult1 = LouvainAlgo.apply(spark, dataWithoutWith, louvainConfig, false)
+    assert(louvainResult1.count() == 13)
   }
 }

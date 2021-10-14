@@ -365,9 +365,8 @@ object CommUtil {
   // return the collections of communities
   def getCommunities(G: Graph[VertexData, Double]): RDD[Row] = {
     val communities = G.vertices
-      .map(x => {
-        Row(x._1, x._2.cId)
-      })
+      .flatMapValues(_.innerVertices)
+      .map(value => { Row(value._2, value._1) })
     communities
   }
 }
