@@ -362,8 +362,7 @@ object AlgoConstants {
   val INDEGREE_RESULT_COL: String      = "inDegree"
   val OUTDEGREE_RESULT_COL: String     = "outDegree"
   val TRIANGLECOUNT_RESULT_COL: String = "tranglecount"
-  val SINGLESOURCESHORTESTPATH_RESULT_COL:String = "singlesourceshortestpath"
-  val CLOSENESS_RESULT_COL:String ="closeness"
-  val HANP_RESULT_COL:String="hanp"
-  val NODE2VEC_RESULT_COL:String="node2vec"
+  val CLOSENESS_RESULT_COL: String     = "closeness"
+  val HANP_RESULT_COL: String          = "hanp"
+  val NODE2VEC_RESULT_COL: String      = "node2vec"
 }

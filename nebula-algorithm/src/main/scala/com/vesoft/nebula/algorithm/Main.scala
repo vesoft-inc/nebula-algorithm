@@ -19,7 +19,6 @@ import com.vesoft.nebula.algorithm.config.{
   Node2vecConfig,
   PRConfig,
   ShortestPathConfig,
-  SingleSourceShortestPathConfig,
   SparkConfig
 }
 import com.vesoft.nebula.algorithm.lib.{
@@ -35,7 +34,6 @@ import com.vesoft.nebula.algorithm.lib.{
   Node2vecAlgo,
   PageRankAlgo,
   ShortestPathAlgo,
-  SingleSourceShortestPathAlgo,
   StronglyConnectedComponentsAlgo,
   TriangleCountAlgo
 }
@@ -170,11 +168,6 @@ object Main {
         }
         case "graphtrianglecount" => {
           GraphTriangleCountAlgo(spark, dataSet)
-        }
-        case "singlesourceshortestpath" => {
-          val singleSourceShortestPathConfig =
-            SingleSourceShortestPathConfig.getSingleSourceShortestPathConfig(configs)
-          SingleSourceShortestPathAlgo(spark, dataSet, singleSourceShortestPathConfig, hasWeight)
         }
         case "closeness" => {
           ClosenessAlgo(spark, dataSet, hasWeight)

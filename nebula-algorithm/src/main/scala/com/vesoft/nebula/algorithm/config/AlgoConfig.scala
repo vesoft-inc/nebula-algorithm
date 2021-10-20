@@ -151,43 +151,29 @@ object BetweennessConfig {
 }
 
 /**
- * SingleSourceShortestPath
- */
-case class SingleSourceShortestPathConfig(sourceId: VertexId)
+  * Hanp
+  */
+case class HanpConfig(hopAttenuation: Double, maxIter: Int, preference: Double)
 
-object SingleSourceShortestPathConfig{
-  var sourceId: Long = _
-  def getSingleSourceShortestPathConfig(configs: Configs):SingleSourceShortestPathConfig={
-    val sspConfig=configs.algorithmConfig.map
-    sourceId=sspConfig("algorithm.singlesourceshortestpath.sourceid").toLong
-    SingleSourceShortestPathConfig(sourceId)
+object HanpConfig {
+  var hopAttenuation: Double = _
+  var maxIter: Int           = _
+  var preference: Double     = 1.0
+  def getHanpConfig(configs: Configs): HanpConfig = {
+    val hanpConfig = configs.algorithmConfig.map
+    hopAttenuation = hanpConfig("algorithm.hanp.hopAttenuation").toDouble
+    maxIter = hanpConfig("algorithm.hanp.maxIter").toInt
+    preference = hanpConfig("algorithm.hanp.preference").toDouble
+    HanpConfig(hopAttenuation, maxIter, preference)
   }
 }
 
 /**
- * Hanp
- */
-case class HanpConfig(hopAttenuation:Double,maxIter:Int,preference:Double)
-
-object HanpConfig{
-  var hopAttenuation: Double    = _
-  var maxIter: Int  = _
-  var preference: Double = 1.0
-  def getHanpConfig(configs: Configs):HanpConfig={
-    val hanpConfig=configs.algorithmConfig.map
-    hopAttenuation=hanpConfig("algorithm.hanp.hopAttenuation").toDouble
-    maxIter=hanpConfig("algorithm.hanp.maxIter").toInt
-    preference=hanpConfig("algorithm.hanp.preference").toDouble
-    HanpConfig(hopAttenuation,maxIter,preference)
-  }
-}
-
-/**
- * Node2vec
- */
+  * Node2vec
+  */
 case class Node2vecConfig(maxIter: Int,
                           lr: Double,
-                          dataNumPartition:Int,
+                          dataNumPartition: Int,
                           modelNumPartition: Int,
                           dim: Int,
                           window: Int,
@@ -197,40 +183,53 @@ case class Node2vecConfig(maxIter: Int,
                           q: Double,
                           directed: Boolean,
                           degree: Int,
-                          embSeparate:String,
-                          modelPath:String)
-object Node2vecConfig{
-  var maxIter: Int = _
-  var lr: Double = _
-  var dataNumPartition: Int = _
+                          embSeparate: String,
+                          modelPath: String)
+object Node2vecConfig {
+  var maxIter: Int           = _
+  var lr: Double             = _
+  var dataNumPartition: Int  = _
   var modelNumPartition: Int = _
-  var dim: Int = _
-  var window: Int = _
-  var walkLength: Int = _
-  var numWalks: Int = _
-  var p: Double = _
-  var q: Double = _
-  var directed: Boolean = _
-  var degree: Int = _
-  var embSeparate:String=_
-  var modelPath:String=_
-  def getNode2vecConfig(configs: Configs):Node2vecConfig={
-    val node2vecConfig=configs.algorithmConfig.map
-    maxIter=node2vecConfig("algorithm.node2vec.maxIter").toInt
-    lr=node2vecConfig("algorithm.node2vec.lr").toDouble
-    dataNumPartition=node2vecConfig("algorithm.node2vec.dataNumPartition").toInt
-    modelNumPartition=node2vecConfig("algorithm.node2vec.modelNumPartition").toInt
-    dim=node2vecConfig("algorithm.node2vec.dim").toInt
-    window=node2vecConfig("algorithm.node2vec.window").toInt
-    walkLength=node2vecConfig("algorithm.node2vec.walkLength").toInt
-    numWalks=node2vecConfig("algorithm.node2vec.numWalks").toInt
-    p=node2vecConfig("algorithm.node2vec.p").toDouble
-    q=node2vecConfig("algorithm.node2vec.q").toDouble
-    directed=node2vecConfig("algorithm.node2vec.directed").toBoolean
-    degree=node2vecConfig("algorithm.node2vec.degree").toInt
-    embSeparate=node2vecConfig("algorithm.node2vec.embSeparate")
-    modelPath=node2vecConfig("algorithm.node2vec.modelPath")
-    Node2vecConfig(maxIter,lr, dataNumPartition,modelNumPartition, dim, window, walkLength, numWalks, p, q, directed, degree,embSeparate,modelPath)
+  var dim: Int               = _
+  var window: Int            = _
+  var walkLength: Int        = _
+  var numWalks: Int          = _
+  var p: Double              = _
+  var q: Double              = _
+  var directed: Boolean      = _
+  var degree: Int            = _
+  var embSeparate: String    = _
+  var modelPath: String      = _
+  def getNode2vecConfig(configs: Configs): Node2vecConfig = {
+    val node2vecConfig = configs.algorithmConfig.map
+    maxIter = node2vecConfig("algorithm.node2vec.maxIter").toInt
+    lr = node2vecConfig("algorithm.node2vec.lr").toDouble
+    dataNumPartition = node2vecConfig("algorithm.node2vec.dataNumPartition").toInt
+    modelNumPartition = node2vecConfig("algorithm.node2vec.modelNumPartition").toInt
+    dim = node2vecConfig("algorithm.node2vec.dim").toInt
+    window = node2vecConfig("algorithm.node2vec.window").toInt
+    walkLength = node2vecConfig("algorithm.node2vec.walkLength").toInt
+    numWalks = node2vecConfig("algorithm.node2vec.numWalks").toInt
+    p = node2vecConfig("algorithm.node2vec.p").toDouble
+    q = node2vecConfig("algorithm.node2vec.q").toDouble
+    directed = node2vecConfig("algorithm.node2vec.directed").toBoolean
+    degree = node2vecConfig("algorithm.node2vec.degree").toInt
+    embSeparate = node2vecConfig("algorithm.node2vec.embSeparate")
+    modelPath = node2vecConfig("algorithm.node2vec.modelPath")
+    Node2vecConfig(maxIter,
+                   lr,
+                   dataNumPartition,
+                   modelNumPartition,
+                   dim,
+                   window,
+                   walkLength,
+                   numWalks,
+                   p,
+                   q,
+                   directed,
+                   degree,
+                   embSeparate,
+                   modelPath)
   }
 }
 
