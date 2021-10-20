@@ -22,6 +22,8 @@ object TriangleCountAlgo {
 
   /**
     * run the TriangleCount algorithm for nebula graph
+    *
+    * compute each vertex's triangle count
     */
   def apply(spark: SparkSession, dataset: Dataset[Row]): DataFrame = {
 
