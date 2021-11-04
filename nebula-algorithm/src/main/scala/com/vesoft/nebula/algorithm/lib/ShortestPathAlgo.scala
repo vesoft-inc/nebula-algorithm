@@ -6,15 +6,9 @@
 
 package com.vesoft.nebula.algorithm.lib
 
-import com.vesoft.nebula.algorithm.utils.NebulaUtil
 import com.vesoft.nebula.algorithm.config.{
   AlgoConstants,
-  CcConfig,
-  Configs,
-  NebulaConfig,
-  PRConfig,
-  ShortestPathConfig,
-  SparkConfig
+  ShortestPathConfig
 }
 import org.apache.log4j.Logger
 import org.apache.spark.graphx.{Graph, VertexId, VertexRDD}

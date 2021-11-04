@@ -41,6 +41,11 @@
             <version>${spark.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-mllib_2.11</artifactId>
+            <version>${spark.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.vesoft</groupId>
             <artifactId>nebula-spark-connector</artifactId>
             <version>${nebula.version}</version>

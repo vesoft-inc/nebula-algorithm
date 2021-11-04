@@ -9,25 +9,29 @@ package com.vesoft.nebula.algorithm
 import com.vesoft.nebula.algorithm.config.Configs.Argument
 import com.vesoft.nebula.algorithm.config.{
   AlgoConfig,
-  AlgoConstants,
   BetweennessConfig,
   CcConfig,
   Configs,
+  HanpConfig,
   KCoreConfig,
   LPAConfig,
   LouvainConfig,
+  Node2vecConfig,
   PRConfig,
   ShortestPathConfig,
   SparkConfig
 }
 import com.vesoft.nebula.algorithm.lib.{
   BetweennessCentralityAlgo,
+  ClosenessAlgo,
   ConnectedComponentsAlgo,
   DegreeStaticAlgo,
   GraphTriangleCountAlgo,
+  HanpAlgo,
   KCoreAlgo,
   LabelPropagationAlgo,
   LouvainAlgo,
+  Node2vecAlgo,
   PageRankAlgo,
   ShortestPathAlgo,
   StronglyConnectedComponentsAlgo,
@@ -37,7 +41,6 @@ import com.vesoft.nebula.algorithm.reader.{CsvReader, JsonReader, NebulaReader}
 import com.vesoft.nebula.algorithm.writer.{CsvWriter, NebulaWriter, TextWriter}
 import org.apache.commons.math3.ode.UnknownParameterException
 import org.apache.log4j.Logger
-import org.apache.spark.sql.types.{LongType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 
 /**
@@ -165,6 +168,17 @@ object Main {
         }
         case "graphtrianglecount" => {
           GraphTriangleCountAlgo(spark, dataSet)
+        }
+        case "closeness" => {
+          ClosenessAlgo(spark, dataSet, hasWeight)
+        }
+        case "hanp" => {
+          val hanpConfig = HanpConfig.getHanpConfig(configs)
+          HanpAlgo(spark, dataSet, hanpConfig, hasWeight)
+        }
+        case "node2vec" => {
+          val node2vecConfig = Node2vecConfig.getNode2vecConfig(configs)
+          Node2vecAlgo(spark, dataSet, node2vecConfig, hasWeight)
         }
         case _ => throw new UnknownParameterException("unknown executeAlgo name.")
       }
