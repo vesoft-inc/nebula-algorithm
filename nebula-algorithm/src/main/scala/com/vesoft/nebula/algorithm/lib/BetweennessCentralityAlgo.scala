@@ -30,7 +30,7 @@ object BetweennessCentralityAlgo {
             betweennessConfig: BetweennessConfig,
             hasWeight: Boolean): DataFrame = {
 
-    val graph: Graph[None.type, Double] = NebulaUtil.loadInitGraph(dataset, false)
+    val graph: Graph[None.type, Double] = NebulaUtil.loadInitGraph(dataset, hasWeight)
     val betweennessGraph                = execute(graph, betweennessConfig.maxIter, hasWeight)
 
     val schema = StructType(
