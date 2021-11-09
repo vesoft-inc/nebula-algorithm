@@ -13,11 +13,11 @@ import org.junit.Test
 
 class HanpSuite {
   @Test
-  def hanpSuite()={
-    val spark             = SparkSession.builder().master("local").getOrCreate()
-    val data              = spark.read.option("header", true).csv("src/test/resources/edge.csv")
-    val hanpConfig = new HanpConfig(0.1,10,1.0)
-    val result            = HanpAlgo.apply(spark, data, hanpConfig, false)
+  def hanpSuite() = {
+    val spark      = SparkSession.builder().master("local").getOrCreate()
+    val data       = spark.read.option("header", true).csv("src/test/resources/edge.csv")
+    val hanpConfig = new HanpConfig(0.1, 10, 1.0)
+    val result     = HanpAlgo.apply(spark, data, hanpConfig, false)
     assert(result.count() == 4)
   }
 }
