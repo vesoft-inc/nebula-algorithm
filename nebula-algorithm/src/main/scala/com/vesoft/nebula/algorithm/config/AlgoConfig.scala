@@ -150,6 +150,24 @@ object BetweennessConfig {
 }
 
 /**
+  * ClusterCoefficient
+  * algoType has two options: local or global
+  */
+case class CoefficientConfig(algoType: String)
+
+object CoefficientConfig {
+  var algoType: String = _
+
+  def getCoefficientConfig(configs: Configs): CoefficientConfig = {
+    val coefficientConfig = configs.algorithmConfig.map
+    algoType = coefficientConfig("algorithm.clustercoefficient.type")
+    assert(algoType.equalsIgnoreCase("local") || algoType.equalsIgnoreCase("global"),
+           "ClusterCoefficient only support local or global type.")
+    CoefficientConfig(algoType)
+  }
+}
+
+/**
   * Hanp
   */
 case class HanpConfig(hopAttenuation: Double, maxIter: Int, preference: Double)
