@@ -93,8 +93,8 @@ object ClusteringCoefficientAlgo {
     // compute the number of open triangle and closed triangle (According to C(n,2)=n*(n-1)/2)
     val triangleNum = graph.degrees.map(vertex => (vertex._2 * (vertex._2 - 1)) / 2.0).reduce(_ + _)
     if (triangleNum == 0)
-      0
+      0.0
     else
-      closedTriangleNum / triangleNum
+      (closedTriangleNum / triangleNum * 1.0).formatted("%.6f").toDouble
   }
 }
