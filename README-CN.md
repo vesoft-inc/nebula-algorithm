@@ -59,8 +59,13 @@ nebula-algorithm 是一款基于 [GraphX](https://spark.apache.org/graphx/) 的 
    ```
    * 定义算法参数调用算法（以`PageRank`为例）
    ```
+   import com.vesoft.nebula.algorithm.config.{Configs, PRConfig, SparkConfig}
+   import org.apache.spark.sql.{DataFrame, SparkSession}
+
+   val spark = SparkSession.builder().master("local").getOrCreate()
+   val data  = spark.read.option("header", true).csv("src/test/resources/edge.csv")
    val prConfig = new PRConfig(5, 1.0)
-   val louvainResult = PageRankAlgo.apply(spark, data, prConfig, false)
+   val prResult = PageRankAlgo.apply(spark, data, prConfig, false)
    ```
  
     其他算法的调用方法见[测试示例](https://github.com/vesoft-inc/nebula-algorithm/tree/master/nebula-algorithm/src/test/scala/com/vesoft/nebula/algorithm/lib) 。

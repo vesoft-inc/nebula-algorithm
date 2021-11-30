@@ -12,10 +12,10 @@ import org.junit.Test
 class PageRankAlgoSuite {
   @Test
   def pageRankSuite(): Unit = {
-    val spark         = SparkSession.builder().master("local").getOrCreate()
-    val data          = spark.read.option("header", true).csv("src/test/resources/edge.csv")
-    val prConfig      = new PRConfig(5, 1.0)
-    val louvainResult = PageRankAlgo.apply(spark, data, prConfig, false)
-    assert(louvainResult.count() == 4)
+    val spark    = SparkSession.builder().master("local").getOrCreate()
+    val data     = spark.read.option("header", true).csv("src/test/resources/edge.csv")
+    val prConfig = new PRConfig(5, 1.0)
+    val prResult = PageRankAlgo.apply(spark, data, prConfig, false)
+    assert(prResult.count() == 4)
   }
 }
