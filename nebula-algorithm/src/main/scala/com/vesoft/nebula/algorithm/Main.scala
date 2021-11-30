@@ -10,6 +10,7 @@ import com.vesoft.nebula.algorithm.config.{
   AlgoConfig,
   BetweennessConfig,
   CcConfig,
+  CoefficientConfig,
   Configs,
   HanpConfig,
   KCoreConfig,
@@ -22,6 +23,7 @@ import com.vesoft.nebula.algorithm.config.{
 }
 import com.vesoft.nebula.algorithm.lib.{
   BetweennessCentralityAlgo,
+  ClusteringCoefficientAlgo,
   ClosenessAlgo,
   ConnectedComponentsAlgo,
   DegreeStaticAlgo,
@@ -167,6 +169,10 @@ object Main {
         }
         case "graphtrianglecount" => {
           GraphTriangleCountAlgo(spark, dataSet)
+        }
+        case "clusteringcoefficient" => {
+          val coefficientConfig = CoefficientConfig.getCoefficientConfig(configs)
+          ClusteringCoefficientAlgo(spark, dataSet, coefficientConfig)
         }
         case "closeness" => {
           ClosenessAlgo(spark, dataSet, hasWeight)
