@@ -44,6 +44,18 @@ object ReadData {
   }
 
   /**
+    * read edge data from csv
+    * the data has string type id
+    */
+  def readStringCsvData(spark: SparkSession): DataFrame = {
+    val df = spark.read
+      .option("header", true)
+      .option("delimiter", ",")
+      .csv("example/src/main/resources/string_data.csv")
+    df
+  }
+
+  /**
     * read edge data from Nebula
     */
   def readNebulaData(spark: SparkSession): DataFrame = {
