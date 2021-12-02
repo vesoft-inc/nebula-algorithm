@@ -13,11 +13,14 @@ object ReadData {
 
   /**
     * read edge data from local csv and apply clustering coefficient
-    *livejournal data: https://snap.stanford.edu/data/soc-LiveJournal1.txt.gz
+    * livejournal data: https://snap.stanford.edu/data/soc-LiveJournal1.txt.gz
+    *
+    * The livejournal data is put to hdfs, the path is
+    * hdfs://127.0.0.1:9000/user/root/livejournal/soc-LiveJournal1.txt
     */
   def readLiveJournalData(spark: SparkSession): DataFrame = {
     val df = spark.sparkContext.textFile(
-      "hdfs://192.168.8.171:9000/user/nicole/livejournal/soc-LiveJournal1.txt")
+      "hdfs://127.0.0.1:9000/user/root/livejournal/soc-LiveJournal1.txt")
 
     val dd = df
       .map(line => {

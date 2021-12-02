@@ -28,8 +28,6 @@ object ClusteringCoefficientExample {
     val nebulaDF      = ReadData.readNebulaData(spark)
     val liveJournalDF = ReadData.readLiveJournalData(spark)
 
-    val cf = spark.read.csv("hdfs://192.168.8.171:9000/tmp/cf")
-
     localClusteringCoefficient(spark, csvDF)
     globalCLusteringCoefficient(spark, csvDF)
   }
@@ -47,7 +45,7 @@ object ClusteringCoefficientExample {
       .orderBy(col("clustercoefficient"))
       .write
       .option("header", true)
-      .csv("hdfs://192.168.8.171:9000/tmp/ccresult")
+      .csv("hdfs://127.0.0.1:9000/tmp/ccresult")
   }
 
   /**
