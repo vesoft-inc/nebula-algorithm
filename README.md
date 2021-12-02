@@ -69,8 +69,13 @@ Limitation: Due to Nebula Algorithm will not encode string id, thus during the a
    ```
    * Instantiate algorithm's config, below is an example for `PageRank`.
    ```
+   import com.vesoft.nebula.algorithm.config.{Configs, PRConfig, SparkConfig}
+   import org.apache.spark.sql.{DataFrame, SparkSession}
+
+   val spark = SparkSession.builder().master("local").getOrCreate()
+   val data  = spark.read.option("header", true).csv("src/test/resources/edge.csv")
    val prConfig = new PRConfig(5, 1.0)
-   val louvainResult = PageRankAlgo.apply(spark, data, prConfig, false)
+   val prResult = PageRankAlgo.apply(spark, data, prConfig, false)
    ```
    
     For other algorithms, please refer to [test cases](https://github.com/vesoft-inc/nebula-algorithm/tree/master/nebula-algorithm/src/test/scala/com/vesoft/nebula/algorithm/lib).
