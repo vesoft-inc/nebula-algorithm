@@ -81,9 +81,9 @@ You could submit the entire spark application or invoke algorithms in `lib` libr
    val prResult = PageRankAlgo.apply(spark, data, prConfig, false)
    ```
    
-   If your vertex id is String type, [Pagerank Example](https://github.com/vesoft-inc/nebula-algorithm/blob/master/example/src/main/scala/com/vesoft/nebula/algorithm/PageRankExample.scala) gives the encoding and decoding process for String id.
+   If your vertex ids are Strings, see [Pagerank Example](https://github.com/vesoft-inc/nebula-algorithm/blob/master/example/src/main/scala/com/vesoft/nebula/algorithm/PageRankExample.scala) for how to encoding and decoding them.
     
-    For other algorithms, please refer to [examples](https://github.com/vesoft-inc/nebula-algorithm/tree/master/example/src/main/scala/com/vesoft/nebula/algorithm)
+    For examples of other algorithms, see [examples](https://github.com/vesoft-inc/nebula-algorithm/tree/master/example/src/main/scala/com/vesoft/nebula/algorithm)
    > Note: The first column of DataFrame in the application represents the source vertices, the second represents the target vertices and the third represents edges' weight.
 
 ## Version match
