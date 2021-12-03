@@ -15,7 +15,7 @@ import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 object KCoreAlgo {
   private val LOGGER = Logger.getLogger(this.getClass)
 
-  val ALGORITHM: String = "LabelPropagation"
+  val ALGORITHM: String = "KCore"
 
   /**
     * run the louvain algorithm for nebula graph
@@ -42,7 +42,7 @@ object KCoreAlgo {
     var lastVertexNum: Long    = graph.numVertices
     var currentVertexNum: Long = -1
     var isStable: Boolean      = false
-    var iterNum: Int           = 1
+    var iterNum: Int           = 0
 
     var degreeGraph = graph
       .outerJoinVertices(graph.degrees) { (vid, vd, degree) =>

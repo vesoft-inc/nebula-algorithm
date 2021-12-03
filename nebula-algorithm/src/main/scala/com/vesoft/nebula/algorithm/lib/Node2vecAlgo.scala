@@ -1,8 +1,7 @@
 /*
  * Copyright (c) 2021. vesoft inc. All rights reserved.
  *
- * This source code is licensed under Apache 2.0 License,
- * attached with Common Clause Condition 1.0, found in the LICENSES directory.
+ * This source code is licensed under Apache 2.0 License.
  */
 
 package com.vesoft.nebula.algorithm.lib
@@ -85,6 +84,7 @@ object Node2vecAlgo {
 
     (J, q)
   }
+
   def setupEdgeAlias(p: Double = 1.0, q: Double = 1.0)(
       srcId: Long,
       srcNeighbors: Array[(Long, Double)],
@@ -100,6 +100,7 @@ object Node2vecAlgo {
 
     setupAlias(neighbors_)
   }
+
   def drawAlias(J: Array[Int], q: Array[Double]): Int = {
     val K  = J.length
     val kk = math.floor(math.random * K).toInt
@@ -107,6 +108,7 @@ object Node2vecAlgo {
     if (math.random < q(kk)) kk
     else J(kk)
   }
+
   def load(graph: Graph[None.type, Double]): this.type = {
     val bcMaxDegree = context.broadcast(node2vecConfig.degree)
     val bcEdgeCreator = node2vecConfig.directed match {
@@ -145,6 +147,7 @@ object Node2vecAlgo {
       .cache
     this
   }
+
   def initTransitionProb(): this.type = {
     val bcP = context.broadcast(node2vecConfig.p)
     val bcQ = context.broadcast(node2vecConfig.q)
@@ -172,6 +175,7 @@ object Node2vecAlgo {
 
     this
   }
+
   def randomWalk(): this.type = {
     val edge2attr = graph.triplets
       .map { edgeTriplet =>
@@ -230,9 +234,9 @@ object Node2vecAlgo {
         randomWalkPaths = randomWalk
       }
     }
-
     this
   }
+
   def embedding(): this.type = {
     val randomPaths = randomWalkPaths
       .map {
