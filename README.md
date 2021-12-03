@@ -20,6 +20,7 @@ nebula-algorithm is a Spark Application based on [GraphX](https://spark.apache.o
 |    GraphTriangleCount    | network structure and tightness analysis|
 |   BetweennessCentrality  | important node digging, node influence calculation|
 |        DegreeStatic      | graph structure analysis|
+|   ClusteringCoefficient  | recommended, telecom fraud analysis|
 
 
 You could submit the entire spark application or invoke algorithms in `lib` library to apply graph algorithms for DataFrame.
@@ -41,8 +42,6 @@ You could submit the entire spark application or invoke algorithms in `lib` libr
 
 ## Use Nebula Algorithm
 
-Limitation: Due to Nebula Algorithm will not encode string id, thus during the algorithm execution, the source and target of edges must be in Type Int (The `vid_type` in Nebula Space could be String, while data must be in Type Int).
-
 * Option 1: Submit nebula-algorithm package
 
    * Configuration
@@ -55,6 +54,10 @@ Limitation: Due to Nebula Algorithm will not encode string id, thus during the a
     ${SPARK_HOME}/bin/spark-submit --master <mode> --class com.vesoft.nebula.algorithm.Main nebula-algorithm-2.0.0.jar -p application.conf
     ```
    
+   * Limitation
+    
+    Due to Nebula Algorithm jar does not encode string id, thus during the algorithm execution, the source and target of edges must be in Type Int (The `vid_type` in Nebula Space could be String, while data must be in Type Int).
+
 * Option2: Call nebula-algorithm interface
 
    Now there are 10 algorithms provided in `lib` from `nebula-algorithm`, which could be invoked in a programming fashion as below:
@@ -78,8 +81,9 @@ Limitation: Due to Nebula Algorithm will not encode string id, thus during the a
    val prResult = PageRankAlgo.apply(spark, data, prConfig, false)
    ```
    
-    For other algorithms, please refer to [test cases](https://github.com/vesoft-inc/nebula-algorithm/tree/master/nebula-algorithm/src/test/scala/com/vesoft/nebula/algorithm/lib).
-   
+   If your vertex ids are Strings, see [Pagerank Example](https://github.com/vesoft-inc/nebula-algorithm/blob/master/example/src/main/scala/com/vesoft/nebula/algorithm/PageRankExample.scala) for how to encoding and decoding them.
+    
+    For examples of other algorithms, see [examples](https://github.com/vesoft-inc/nebula-algorithm/tree/master/example/src/main/scala/com/vesoft/nebula/algorithm)
    > Note: The first column of DataFrame in the application represents the source vertices, the second represents the target vertices and the third represents edges' weight.
 
 ## Version match
@@ -88,7 +92,7 @@ Limitation: Due to Nebula Algorithm will not encode string id, thus during the a
 |:------------------------:|:--------------:|
 |       2.0.0              |  2.0.0, 2.0.1  |
 |       2.1.0              |  2.0.0, 2.0.1  |
-|       2.5.0              |     2.5.0      |
+|       2.5.0              |     >=2.5.0    |
 |       2.5-SNAPSHOT       |     nightly    |
 
 ## Contribute
