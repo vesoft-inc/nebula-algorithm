@@ -168,6 +168,22 @@ object CoefficientConfig {
 }
 
 /**
+  * bfs
+  */
+case class BfsConfig(maxIter: Int, root: Long)
+object BfsConfig {
+  var maxIter: Int = _
+  var root: Long   = _
+
+  def getBfsConfig(configs: Configs): BfsConfig = {
+    val bfsConfig = configs.algorithmConfig.map
+    maxIter = bfsConfig("algorithm.bfs.maxIter").toInt
+    root = bfsConfig("algorithm.bfs.root").toLong
+    BfsConfig(maxIter, root)
+  }
+}
+
+/**
   * Hanp
   */
 case class HanpConfig(hopAttenuation: Double, maxIter: Int, preference: Double)

@@ -365,4 +365,5 @@ object AlgoConstants {
   val CLOSENESS_RESULT_COL: String          = "closeness"
   val HANP_RESULT_COL: String               = "hanp"
   val NODE2VEC_RESULT_COL: String           = "node2vec"
+  val BFS_RESULT_COL: String                = "bfs"
 }
