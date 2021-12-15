@@ -92,7 +92,8 @@ You could submit the entire spark application or invoke algorithms in `lib` libr
 |:------------------------:|:--------------:|
 |       2.0.0              |  2.0.0, 2.0.1  |
 |       2.1.0              |  2.0.0, 2.0.1  |
-|       2.5.0              |     >=2.5.0    |
+|       2.5.0              |2.5.0,2.5.1,2.6.0,2.6.1|
+|       2.6.0              |2.5.0,2.5.1,2.6.0,2.6.1|    
 |       2.5-SNAPSHOT       |     nightly    |
 
 ## Contribute
