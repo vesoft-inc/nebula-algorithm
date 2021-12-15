@@ -1,15 +1,13 @@
 # This workflow will build a Java project with Maven
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
 
-name: pull_request
+name: snapshot
 
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches:
-      - master
-      - 'v[0-9]+.*'
+  schedule:
+    - cron: '0 6 * * *'
 
 jobs:
   build:
@@ -30,5 +28,10 @@ jobs:
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-maven-
 
-    - name: Build with Maven
-      run: mvn -B package
+    - name: Deploy SNAPSHOT to Sonatype
+      uses: samuelmeuli/action-maven-publish@v1
+      with:
+        gpg_private_key: ${{ secrets.JAVA_GPG_PRIVATE_KEY }}
+        gpg_passphrase: ${{ secrets.JAVA_GPG_PASSPHRASE }}
+        nexus_username: ${{ secrets.OSSRH_USERNAME }}
+        nexus_password: ${{ secrets.OSSRH_TOKEN }}
