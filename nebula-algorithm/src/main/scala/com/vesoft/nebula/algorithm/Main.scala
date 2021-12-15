@@ -9,6 +9,7 @@ import com.vesoft.nebula.algorithm.config.Configs.Argument
 import com.vesoft.nebula.algorithm.config.{
   AlgoConfig,
   BetweennessConfig,
+  BfsConfig,
   CcConfig,
   CoefficientConfig,
   Configs,
@@ -23,8 +24,9 @@ import com.vesoft.nebula.algorithm.config.{
 }
 import com.vesoft.nebula.algorithm.lib.{
   BetweennessCentralityAlgo,
-  ClusteringCoefficientAlgo,
+  BfsAlgo,
   ClosenessAlgo,
+  ClusteringCoefficientAlgo,
   ConnectedComponentsAlgo,
   DegreeStaticAlgo,
   GraphTriangleCountAlgo,
@@ -184,6 +186,10 @@ object Main {
         case "node2vec" => {
           val node2vecConfig = Node2vecConfig.getNode2vecConfig(configs)
           Node2vecAlgo(spark, dataSet, node2vecConfig, hasWeight)
+        }
+        case "bfs" => {
+          val bfsConfig = BfsConfig.getBfsConfig(configs)
+          BfsAlgo(spark, dataSet, bfsConfig)
         }
         case _ => throw new UnknownParameterException("unknown executeAlgo name.")
       }
