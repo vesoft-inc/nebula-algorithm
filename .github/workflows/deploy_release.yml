@@ -26,7 +26,7 @@ jobs:
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-maven-
 
-    - name: Deploy SNAPSHOT to Sonatype
+    - name: Deploy Release to Sonatype
       uses: samuelmeuli/action-maven-publish@v1
       with:
         gpg_private_key: ${{ secrets.JAVA_GPG_PRIVATE_KEY }}
