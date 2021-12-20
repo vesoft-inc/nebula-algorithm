@@ -21,6 +21,7 @@ nebula-algorithm is a Spark Application based on [GraphX](https://spark.apache.o
 |   BetweennessCentrality  | important node digging, node influence calculation|
 |        DegreeStatic      | graph structure analysis|
 |   ClusteringCoefficient  | recommended, telecom fraud analysis|
+|        BFS               | sequence traversal, Shortest path plan|
 
 
 You could submit the entire spark application or invoke algorithms in `lib` library to apply graph algorithms for DataFrame.
@@ -60,7 +61,7 @@ You could submit the entire spark application or invoke algorithms in `lib` libr
 
 * Option2: Call nebula-algorithm interface
 
-   Now there are 10 algorithms provided in `lib` from `nebula-algorithm`, which could be invoked in a programming fashion as below:
+   Now there are 10+ algorithms provided in `lib` from `nebula-algorithm`, which could be invoked in a programming fashion as below:
    
    * Add dependencies in `pom.xml`.
    ```
@@ -92,7 +93,8 @@ You could submit the entire spark application or invoke algorithms in `lib` libr
 |:------------------------:|:--------------:|
 |       2.0.0              |  2.0.0, 2.0.1  |
 |       2.1.0              |  2.0.0, 2.0.1  |
-|       2.5.0              |     >=2.5.0    |
+|       2.5.0              |  2.5.0, 2.5.1  |
+|       2.6.0              |  2.6.0, 2.6.1  |
 |       2.5-SNAPSHOT       |     nightly    |
 
 ## Contribute
