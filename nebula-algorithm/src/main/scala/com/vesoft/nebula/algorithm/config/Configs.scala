@@ -99,8 +99,15 @@ object NebulaConfigEntry {
     val pswd             = nebulaConfig.getString("write.pswd")
     val writeSpace       = nebulaConfig.getString("write.space")
     val writeTag         = nebulaConfig.getString("write.tag")
+    val writeType        = nebulaConfig.getString("write.type")
     val writeConfigEntry =
-      NebulaWriteConfigEntry(graphAddress, writeMetaAddress, user, pswd, writeSpace, writeTag)
+      NebulaWriteConfigEntry(graphAddress,
+                             writeMetaAddress,
+                             user,
+                             pswd,
+                             writeSpace,
+                             writeTag,
+                             writeType)
     NebulaConfigEntry(readConfigEntry, writeConfigEntry)
   }
 }
@@ -209,10 +216,11 @@ case class NebulaWriteConfigEntry(graphAddress: String = "",
                                   user: String = "",
                                   pswd: String = "",
                                   space: String = "",
-                                  tag: String = "") {
+                                  tag: String = "",
+                                  writeType: String = "insert") {
   override def toString: String = {
     s"NebulaWriteConfigEntry: " +
-      s"{graphAddress: $graphAddress, user: $user, password: $pswd, space: $space, tag: $tag}"
+      s"{graphAddress: $graphAddress, user: $user, password: $pswd, space: $space, tag: $tag, type: $writeType}"
   }
 }
 
