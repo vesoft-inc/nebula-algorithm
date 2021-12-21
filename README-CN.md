@@ -14,9 +14,10 @@ nebula-algorithm 是一款基于 [GraphX](https://spark.apache.org/graphx/) 的 
  |       ShortestPath       |  最短路径   |路径规划、网络规划|
  |       TriangleCount      | 三角形计数  |网络结构分析|
  |     GraphTriangleCount   |全图三角形计数|网络紧密性分析|
- |   BetweennessCentrality  | 介数中心性  |关键节点挖掘，节点影响力计算|
+ |   BetweennessCentrality  | 介数中心性  |关键节点挖掘、节点影响力计算|
  |        DegreeStatic      |   度统计   |图结构分析|
- |   ClusteringCoefficient  |  聚集系数  |推荐，电信诈骗分析|
+ |   ClusteringCoefficient  |  聚集系数  |推荐、电信诈骗分析|
+ |        BFS               |广度优先遍历 |层序遍历、最短路径规划|
  
 使用 `nebula-algorithm`，可以通过提交 `Spark` 任务的形式使用完整的算法工具对 `Nebula Graph` 数据库中的数据执行图计算，也可以通过编程形式调用`lib`库下的算法针对DataFrame执行图计算。
 
@@ -50,7 +51,7 @@ nebula-algorithm 是一款基于 [GraphX](https://spark.apache.org/graphx/) 的 
     Nebula Algorithm 算法包未自动对字符串 id 进行编码，因此采用第一种方式执行图算法时，边的源点和目标点必须是整数（Nebula Space 的 vid_type 可以是 String 类型，但数据必须是整数）。
 * 使用方法2：调用 nebula-algorithm 算法接口
 
-   在 `nebula-algorithm` 的 `lib` 库中提供了10中常用图计算算法，可通过编程调用的形式调用算法。
+   在 `nebula-algorithm` 的 `lib` 库中提供了10+种常用图计算算法，可通过编程调用的形式调用算法。
    * 在pom.xml中添加依赖
    ```
     <dependency>
@@ -82,7 +83,8 @@ nebula-algorithm 是一款基于 [GraphX](https://spark.apache.org/graphx/) 的 
 |:------------------------:|:--------------:|
 |       2.0.0              |  2.0.0, 2.0.1  |
 |       2.1.0              |  2.0.0, 2.0.1  |
-|       2.5.0              |     >=2.5.0    |
+|       2.5.0              |  2.5.0, 2.5.1  |
+|       2.6.0              |  2.6.0, 2.6.1  |
 |       2.5-SNAPSHOT       |     nightly    |
 
 ## 贡献
