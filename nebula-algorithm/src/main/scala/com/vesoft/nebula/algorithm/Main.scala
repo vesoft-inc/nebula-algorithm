@@ -14,6 +14,7 @@ import com.vesoft.nebula.algorithm.config.{
   CoefficientConfig,
   Configs,
   HanpConfig,
+  JaccardConfig,
   KCoreConfig,
   LPAConfig,
   LouvainConfig,
@@ -31,6 +32,7 @@ import com.vesoft.nebula.algorithm.lib.{
   DegreeStaticAlgo,
   GraphTriangleCountAlgo,
   HanpAlgo,
+  JaccardAlgo,
   KCoreAlgo,
   LabelPropagationAlgo,
   LouvainAlgo,
@@ -190,6 +192,10 @@ object Main {
         case "bfs" => {
           val bfsConfig = BfsConfig.getBfsConfig(configs)
           BfsAlgo(spark, dataSet, bfsConfig)
+        }
+        case "jaccard" => {
+          val jaccardConfig = JaccardConfig.getJaccardConfig(configs)
+          JaccardAlgo(spark, dataSet, jaccardConfig)
         }
         case _ => throw new UnknownParameterException("unknown executeAlgo name.")
       }
