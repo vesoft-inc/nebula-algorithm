@@ -25,7 +25,7 @@ object JaccardAlgo {
   val ALGORITHM: String = "Jaccard"
 
   /**
-    * run the louvain algorithm for nebula graph
+    * run the Jaccard algorithm for nebula graph
     */
   def apply(spark: SparkSession, dataset: Dataset[Row], jaccardConfig: JaccardConfig): DataFrame = {
 
