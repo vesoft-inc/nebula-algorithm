@@ -266,6 +266,20 @@ object Node2vecConfig {
   }
 }
 
+/**
+  * Jaccard
+  */
+case class JaccardConfig(tol: Double)
+
+object JaccardConfig {
+  var tol: Double = _
+  def getJaccardConfig(configs: Configs): JaccardConfig = {
+    val jaccardConfig = configs.algorithmConfig.map
+    tol = jaccardConfig("algorithm.jaccard.tol").toDouble
+    JaccardConfig(tol)
+  }
+}
+
 case class AlgoConfig(configs: Configs)
 
 object AlgoConfig {
