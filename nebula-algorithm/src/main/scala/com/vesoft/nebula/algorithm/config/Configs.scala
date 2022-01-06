@@ -197,6 +197,8 @@ case class NebulaReadConfigEntry(address: String = "",
                                  space: String = "",
                                  labels: List[String] = List(),
                                  weightCols: List[String] = List()) {
+  assert(weightCols.isEmpty || labels.size == weightCols.size,
+         "weightCols must be empty or has the same amount values with labels")
   override def toString: String = {
     s"NebulaReadConfigEntry: " +
       s"{address: $address, space: $space, labels: ${labels.mkString(",")}, " +
