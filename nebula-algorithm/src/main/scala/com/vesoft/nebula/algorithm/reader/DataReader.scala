@@ -48,11 +48,11 @@ class NebulaReader(spark: SparkSession, configs: Configs, partitionNum: String)
         .withReturnCols(returnCols.toList)
         .withPartitionNum(partition)
         .build()
-      if (dataset == null) {
-        dataset = spark.read.nebula(config, nebulaReadEdgeConfig).loadEdgesToDF()
-      } else {
-        dataset = dataset.union(spark.read.nebula(config, nebulaReadEdgeConfig).loadEdgesToDF())
+      var df = spark.read.nebula(config, nebulaReadEdgeConfig).loadEdgesToDF()
+      if (weights.nonEmpty) {
+        df = df.select("_srcId", "_dstId", weights(i))
       }
+      dataset = if (dataset == null) df else dataset.union(df)
     }
     dataset
   }
