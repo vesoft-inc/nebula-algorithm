@@ -160,9 +160,9 @@ object CoefficientConfig {
 
   def getCoefficientConfig(configs: Configs): CoefficientConfig = {
     val coefficientConfig = configs.algorithmConfig.map
-    algoType = coefficientConfig("algorithm.clustercoefficient.type")
+    algoType = coefficientConfig("algorithm.clusteringcoefficient.type")
     assert(algoType.equalsIgnoreCase("local") || algoType.equalsIgnoreCase("global"),
-           "ClusterCoefficient only support local or global type.")
+           "ClusteringCoefficient only support local or global type.")
     CoefficientConfig(algoType)
   }
 }
