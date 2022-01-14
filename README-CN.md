@@ -9,15 +9,19 @@ nebula-algorithm 是一款基于 [GraphX](https://spark.apache.org/graphx/) 的 
  |         Louvain          |  社区发现  | 社团挖掘、层次化聚类|
  |          KCore           |    K核    |社区发现、金融风控|
  |     LabelPropagation     |  标签传播  |资讯传播、广告推荐、社区发现|
+ |          Hanp            |  标签传播进阶版|社区发现、推荐|
  |    ConnectedComponent    |  联通分量  |社区发现、孤岛发现|
  |StronglyConnectedComponent| 强联通分量  |社区发现|
  |       ShortestPath       |  最短路径   |路径规划、网络规划|
  |       TriangleCount      | 三角形计数  |网络结构分析|
  |     GraphTriangleCount   |全图三角形计数|网络紧密性分析|
  |   BetweennessCentrality  | 介数中心性  |关键节点挖掘、节点影响力计算|
+ |        Closeness         | 接近中心性  |关键节点挖掘、节点影响力计算|
  |        DegreeStatic      |   度统计   |图结构分析|
  |   ClusteringCoefficient  |  聚集系数  |推荐、电信诈骗分析|
- |        BFS               |广度优先遍历 |层序遍历、最短路径规划|
+ |         Jaccard          |杰卡德相似度计算|相似度计算、推荐|
+ |          BFS             |广度优先遍历 |层序遍历、最短路径规划|
+ |         Node2Vec         |    -      |图分类|
  
 使用 `nebula-algorithm`，可以通过提交 `Spark` 任务的形式使用完整的算法工具对 `Nebula Graph` 数据库中的数据执行图计算，也可以通过编程形式调用`lib`库下的算法针对DataFrame执行图计算。
 
@@ -28,10 +32,10 @@ nebula-algorithm 是一款基于 [GraphX](https://spark.apache.org/graphx/) 的 
     $ cd nebula-algorithm
     $ mvn clean package -Dgpg.skip -Dmaven.javadoc.skip=true -Dmaven.test.skip=true
     ```
-    编译完成后，在 `nebula-algorithm/target` 目录下会生成 `nebula-algorithm-2.0.0.jar` 。
+    编译完成后，在 `nebula-algorithm/target` 目录下会生成 `nebula-algorithm-3.0-SNAPSHOT.jar` 。
 
  2. 在 Maven 远程仓库下载
-   https://repo1.maven.org/maven2/com/vesoft/nebula-algorithm/2.0.0/
+   https://repo1.maven.org/maven2/com/vesoft/nebula-algorithm/
 
 # 使用 Nebula Algorithm
    
@@ -44,7 +48,7 @@ nebula-algorithm 是一款基于 [GraphX](https://spark.apache.org/graphx/) 的 
    * 提交算法任务
 
     ```
-    ${SPARK_HOME}/bin/spark-submit --master <mode> --class com.vesoft.nebula.algorithm.Main nebula-algorithm-2.0.0.jar -p application.conf
+    ${SPARK_HOME}/bin/spark-submit --master <mode> --class com.vesoft.nebula.algorithm.Main nebula-algorithm-3.0-SNAPSHOT.jar -p application.conf
     ```
     * 使用限制
     
@@ -77,6 +81,28 @@ nebula-algorithm 是一款基于 [GraphX](https://spark.apache.org/graphx/) 的 
     
     > 注：执行算法的 DataFrame 默认第一列是源点，第二列是目标点，第三列是边权重。
 
+## Nebula 中属性配置
+    如果你想将算法结果写入到 Nebula，请确保 Nebula 的 tag 中有对应算法结果名称的属性。各项算法对应的属性名如下所示：
+
+    |        Algorithm         |     property name       |property type|
+    |:------------------------:|:-----------------------:|:-----------:|
+    |         pagerank         |         pagerank        |double/string|
+    |          louvain         |          louvain        | int/string  |
+    |          kcore           |           kcore         | int/string  |
+    |     labelpropagation     |           lpa           | int/string  |
+    |   connectedcomponent     |            cc           | int/string  |
+    |stronglyconnectedcomponent|            scc          | int/string  |
+    |         betweenness      |         betweenness     |double/string|
+    |        shortestpath      |        shortestpath     |   string    |
+    |        degreestatic      |degree,inDegree,outDegree| int/string  |
+    |        trianglecount     |       trianglecount     | int/string  |
+    |  clusteringcoefficient   |    clustercoefficient   |double/string|
+    |         closeness        |         closeness       |double/string|
+    |            hanp          |            hanp         | int/string  |
+    |            bfs           |            bfs          |    string   |
+    |         jaccard          |          jaccard        |    string   |
+    |        node2vec          |          node2vec       |    string   |
+    
 ## 版本匹配
 
 | Nebula Algorithm Version | Nebula Version |
@@ -85,7 +111,8 @@ nebula-algorithm 是一款基于 [GraphX](https://spark.apache.org/graphx/) 的 
 |       2.1.0              |  2.0.0, 2.0.1  |
 |       2.5.0              |  2.5.0, 2.5.1  |
 |       2.6.0              |  2.6.0, 2.6.1  |
-|       2.5-SNAPSHOT       |     nightly    |
+|       2.6.2              |  2.6.0, 2.6.1  |
+|     3.0-SNAPSHOT         |     nightly    |
 
 ## 贡献
 

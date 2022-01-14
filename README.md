@@ -13,15 +13,19 @@ nebula-algorithm is a Spark Application based on [GraphX](https://spark.apache.o
 |         Louvain          | community digging, hierarchical clustering|
 |          KCore           | community detection, financial risk control|
 |     LabelPropagation     | community detection, consultation propagation, advertising recommendation|
+|          Hanp            | community detection, consultation propagation|
 |    ConnectedComponent    | community detection, isolated island detection|
 |StronglyConnectedComponent| community detection|
 |       ShortestPath       | path plan, network plan|
 |       TriangleCount      | network structure analysis|
 |    GraphTriangleCount    | network structure and tightness analysis|
 |   BetweennessCentrality  | important node digging, node influence calculation|
+|   ClosenessCentrality    | important node digging, node influence calculation|
 |        DegreeStatic      | graph structure analysis|
 |   ClusteringCoefficient  | recommended, telecom fraud analysis|
+|       Jaccard            | similarity calculation, recommendation|
 |        BFS               | sequence traversal, Shortest path plan|
+|     Node2Vec             | graph machine learning, recommendation|
 
 
 You could submit the entire spark application or invoke algorithms in `lib` library to apply graph algorithms for DataFrame.
@@ -33,13 +37,13 @@ You could submit the entire spark application or invoke algorithms in `lib` libr
     $ cd nebula-algorithm
     $ mvn clean package -Dgpg.skip -Dmaven.javadoc.skip=true -Dmaven.test.skip=true
     ```
-    After the above buiding process, the target file  `nebula-algorithm-2.0.0.jar` will be placed under `nebula-algorithm/target`.
+    After the above buiding process, the target file  `nebula-algorithm-3.0-SNAPSHOT.jar` will be placed under `nebula-algorithm/target`.
 
  2. Download from Maven repo
       
       Alternatively, it could be downloaded from the following Maven repo:
       
-      https://repo1.maven.org/maven2/com/vesoft/nebula-algorithm/2.0.0/
+      https://repo1.maven.org/maven2/com/vesoft/nebula-algorithm/
 
 ## Use Nebula Algorithm
 
@@ -52,7 +56,7 @@ You could submit the entire spark application or invoke algorithms in `lib` libr
    * Submit Spark Application
 
     ```
-    ${SPARK_HOME}/bin/spark-submit --master <mode> --class com.vesoft.nebula.algorithm.Main nebula-algorithm-2.0.0.jar -p application.conf
+    ${SPARK_HOME}/bin/spark-submit --master <mode> --class com.vesoft.nebula.algorithm.Main nebula-algorithm-3.0—SNAPSHOT.jar -p application.conf
     ```
    
    * Limitation
@@ -87,6 +91,27 @@ You could submit the entire spark application or invoke algorithms in `lib` libr
     For examples of other algorithms, see [examples](https://github.com/vesoft-inc/nebula-algorithm/tree/master/example/src/main/scala/com/vesoft/nebula/algorithm)
    > Note: The first column of DataFrame in the application represents the source vertices, the second represents the target vertices and the third represents edges' weight.
 
+## Nebula config
+    If you want to write the algorithm result into Nebula, make sure there is corresponding property name in your tag.
+    |        Algorithm         |     property name       |property type|
+    |:------------------------:|:-----------------------:|:-----------:|
+    |         pagerank         |         pagerank        |double/string|
+    |          louvain         |          louvain        | int/string  |
+    |          kcore           |           kcore         | int/string  |
+    |     labelpropagation     |           lpa           | int/string  |
+    |   connectedcomponent     |            cc           | int/string  |
+    |stronglyconnectedcomponent|            scc          | int/string  |
+    |         betweenness      |         betweenness     |double/string|
+    |        shortestpath      |        shortestpath     |   string    |
+    |        degreestatic      |degree,inDegree,outDegree| int/string  |
+    |        trianglecount     |       trianglecount     | int/string  |
+    |  clusteringcoefficient   |    clustercoefficient   |double/string|
+    |         closeness        |         closeness       |double/string|
+    |            hanp          |            hanp         | int/string  |
+    |            bfs           |            bfs          |    string   |
+    |         jaccard          |          jaccard        |    string   |
+    |        node2vec          |          node2vec       |    string   |
+    
 ## Version match
 
 | Nebula Algorithm Version | Nebula Version |
@@ -95,7 +120,8 @@ You could submit the entire spark application or invoke algorithms in `lib` libr
 |       2.1.0              |  2.0.0, 2.0.1  |
 |       2.5.0              |  2.5.0, 2.5.1  |
 |       2.6.0              |  2.6.0, 2.6.1  |
-|       2.5-SNAPSHOT       |     nightly    |
+|       2.6.1              |  2.6.0, 2.6.1  |
+|       3.0-SNAPSHOT       |     nightly    |
 
 ## Contribute
 
