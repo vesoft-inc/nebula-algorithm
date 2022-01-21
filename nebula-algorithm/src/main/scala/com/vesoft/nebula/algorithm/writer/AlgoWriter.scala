@@ -50,13 +50,13 @@ class NebulaWriter(data: DataFrame, configs: Configs) extends AlgoWriter(data, c
 class CsvWriter(data: DataFrame, configs: Configs) extends AlgoWriter(data, configs) {
   override def write(): Unit = {
     val resultPath = configs.localConfigEntry.resultPath
-    data.repartition(1).write.option("header", true).csv(resultPath)
+    data.write.option("header", true).csv(resultPath)
   }
 }
 
 class TextWriter(data: DataFrame, configs: Configs) extends AlgoWriter(data, configs) {
   override def write(): Unit = {
     val resultPath = configs.localConfigEntry.resultPath
-    data.repartition(1).write.option("header", true).text(resultPath)
+    data.write.option("header", true).text(resultPath)
   }
 }

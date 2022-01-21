@@ -79,14 +79,25 @@ object Main {
     val sparkConfig  = SparkConfig.getSpark(configs)
     val partitionNum = sparkConfig.partitionNum
 
+    val startTime = System.currentTimeMillis()
     // reader
-    val dataSet = createDataSource(sparkConfig.spark, configs, partitionNum)
+    val dataSet  = createDataSource(sparkConfig.spark, configs, partitionNum)
+    val readTime = System.currentTimeMillis()
 
     // algorithm
     val algoResult = executeAlgorithm(sparkConfig.spark, algoName, configs, dataSet)
+    val algoTime   = System.currentTimeMillis()
+
     // writer
     saveAlgoResult(algoResult, configs)
+    val endTime = System.currentTimeMillis()
 
+    sparkConfig.spark.stop()
+    val readDuration  = ((readTime - startTime) / 1000.0).formatted("%.4f")
+    val algoDuration  = ((algoTime - readTime) / 1000.0).formatted("%.4f")
+    val writeDuration = ((endTime - algoTime) / 1000.0).formatted("%.4f")
+    LOGGER.info(
+      s"read data source cost: $readDuration s, algo cost: $algoDuration s, write algo result cost: $writeDuration s")
     sys.exit(0)
   }
 
