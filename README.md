@@ -37,7 +37,7 @@ You could submit the entire spark application or invoke algorithms in `lib` libr
     $ cd nebula-algorithm
     $ mvn clean package -Dgpg.skip -Dmaven.javadoc.skip=true -Dmaven.test.skip=true
     ```
-    After the above buiding process, the target file  `nebula-algorithm-3.0-SNAPSHOT.jar` will be placed under `nebula-algorithm/target`.
+    After the above buiding process, the target file  `nebula-algorithm-3.0.0.jar` will be placed under `nebula-algorithm/target`.
 
  2. Download from Maven repo
       
@@ -56,7 +56,7 @@ You could submit the entire spark application or invoke algorithms in `lib` libr
    * Submit Spark Application
 
     ```
-    ${SPARK_HOME}/bin/spark-submit --master <mode> --class com.vesoft.nebula.algorithm.Main nebula-algorithm-3.0—SNAPSHOT.jar -p application.conf
+    ${SPARK_HOME}/bin/spark-submit --master <mode> --class com.vesoft.nebula.algorithm.Main nebula-algorithm-3.0.0.jar -p application.conf
     ```
    
    * Limitation
@@ -121,6 +121,7 @@ You could submit the entire spark application or invoke algorithms in `lib` libr
 |       2.5.0              |  2.5.0, 2.5.1  |
 |       2.6.0              |  2.6.0, 2.6.1  |
 |       2.6.1              |  2.6.0, 2.6.1  |
+|       3.0.0              |     3.0.0      |
 |       3.0-SNAPSHOT       |     nightly    |
 
 ## Contribute

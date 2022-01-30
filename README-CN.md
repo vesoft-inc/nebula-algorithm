@@ -32,7 +32,7 @@ nebula-algorithm 是一款基于 [GraphX](https://spark.apache.org/graphx/) 的 
     $ cd nebula-algorithm
     $ mvn clean package -Dgpg.skip -Dmaven.javadoc.skip=true -Dmaven.test.skip=true
     ```
-    编译完成后，在 `nebula-algorithm/target` 目录下会生成 `nebula-algorithm-3.0-SNAPSHOT.jar` 。
+    编译完成后，在 `nebula-algorithm/target` 目录下会生成 `nebula-algorithm-3.0.0.jar` 。
 
  2. 在 Maven 远程仓库下载
    https://repo1.maven.org/maven2/com/vesoft/nebula-algorithm/
@@ -48,7 +48,7 @@ nebula-algorithm 是一款基于 [GraphX](https://spark.apache.org/graphx/) 的 
    * 提交算法任务
 
     ```
-    ${SPARK_HOME}/bin/spark-submit --master <mode> --class com.vesoft.nebula.algorithm.Main nebula-algorithm-3.0-SNAPSHOT.jar -p application.conf
+    ${SPARK_HOME}/bin/spark-submit --master <mode> --class com.vesoft.nebula.algorithm.Main nebula-algorithm-3.0.0.jar -p application.conf
     ```
     * 使用限制
     
@@ -112,6 +112,7 @@ nebula-algorithm 是一款基于 [GraphX](https://spark.apache.org/graphx/) 的 
 |       2.5.0              |  2.5.0, 2.5.1  |
 |       2.6.0              |  2.6.0, 2.6.1  |
 |       2.6.2              |  2.6.0, 2.6.1  |
+|       3.0.0              |     3.0.0      |     
 |     3.0-SNAPSHOT         |     nightly    |
 
 ## 贡献
