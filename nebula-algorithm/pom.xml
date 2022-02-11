@@ -6,7 +6,7 @@
     <parent>
         <artifactId>algorithm</artifactId>
         <groupId>com.vesoft</groupId>
-        <version>2.6.1</version>
+        <version>2.6.2</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -15,7 +15,7 @@
 
     <properties>
         <spark.version>2.4.4</spark.version>
-        <nebula.version>2.6.0</nebula.version>
+        <nebula.version>2.6.2</nebula.version>
         <config.version>1.4.0</config.version>
         <scopt.version>3.7.1</scopt.version>
         <scalatest.version>3.2.0</scalatest.version>
@@ -89,6 +89,17 @@
                             <phase>deploy</phase>
                         </execution>
                     </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.sonatype.plugins</groupId>
+                    <artifactId>nexus-staging-maven-plugin</artifactId>
+                    <version>1.6.8</version>
+                    <extensions>true</extensions>
+                    <configuration>
+                        <serverId>ossrh</serverId>
+                        <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                        <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.scala-tools</groupId>
