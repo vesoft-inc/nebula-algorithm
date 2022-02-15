@@ -121,6 +121,8 @@ You could submit the entire spark application or invoke algorithms in `lib` libr
 |       2.5.0              |  2.5.0, 2.5.1  |
 |       2.6.0              |  2.6.0, 2.6.1  |
 |       2.6.1              |  2.6.0, 2.6.1  |
+|       2.6.2              |  2.6.0, 2.6.1  |
+|       3.0.0              |     3.0.0      |
 |       3.0-SNAPSHOT       |     nightly    |
 
 ## Contribute
