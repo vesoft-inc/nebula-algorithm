@@ -61,7 +61,7 @@ nebula-algorithm 是一款基于 [GraphX](https://spark.apache.org/graphx/) 的 
     <dependency>
          <groupId>com.vesoft</groupId>
          <artifactId>nebula-algorithm</artifactId>
-         <version>2.0.0</version>
+         <version>3.0.0</version>
     </dependency>
    ```
    * 定义算法参数调用算法（以`PageRank`为例）
