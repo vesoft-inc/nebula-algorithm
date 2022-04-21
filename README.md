@@ -72,7 +72,7 @@ You could submit the entire spark application or invoke algorithms in `lib` libr
     <dependency>
          <groupId>com.vesoft</groupId>
          <artifactId>nebula-algorithm</artifactId>
-         <version>2.0.0</version>
+         <version>3.0.0</version>
     </dependency>
    ```
    * Instantiate algorithm's config, below is an example for `PageRank`.
