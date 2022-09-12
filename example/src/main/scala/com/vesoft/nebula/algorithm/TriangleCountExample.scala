@@ -24,6 +24,7 @@ object TriangleCountExample {
 
     // val csvDF     = ReadData.readCsvData(spark)
     // val nebulaDF  = ReadData.readNebulaData(spark)
+    // val nebulaDFbyNgql = ReadData.readNebulaDataByNgql(spark)
     val journalDF = ReadData.readLiveJournalData(spark)
 
     graphTriangleCount(spark, journalDF)
