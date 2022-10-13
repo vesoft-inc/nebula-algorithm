@@ -80,34 +80,47 @@ object NebulaConfigEntry {
     if (!config.hasPath("nebula")) {
       return NebulaConfigEntry(NebulaReadConfigEntry(), NebulaWriteConfigEntry())
     }
-    val nebulaConfig = config.getConfig("nebula")
+    var nebulaConfig: Config =  ConfigFactory.empty()
+    if(nebulaConfig.hasPath("nebula")){
+      nebulaConfig = config.getConfig("nebula")
+    }else if(nebulaConfig.hasPath("nebula-ngql")){
+      nebulaConfig = config.getConfig("nebula-ngql")
+    }
+
 
     val readMetaAddress = nebulaConfig.getString("read.metaAddress")
-    val readSpace       = nebulaConfig.getString("read.space")
-    val readLabels      = nebulaConfig.getStringList("read.labels").asScala.toList
+    val readSpace = nebulaConfig.getString("read.space")
+    val readLabels = nebulaConfig.getStringList("read.labels").asScala.toList
     val readWeightCols = if (nebulaConfig.hasPath("read.weightCols")) {
       nebulaConfig.getStringList("read.weightCols").asScala.toList
     } else {
       List()
     }
-    val readConfigEntry =
-      NebulaReadConfigEntry(readMetaAddress, readSpace, readLabels, readWeightCols)
+    var readConfigEntry: NebulaReadConfigEntry = NebulaReadConfigEntry()
+    if (nebulaConfig.hasPath("read.ngql")) {
+      val ngal = nebulaConfig.getString("read.ngql")
+      val graphAddress = nebulaConfig.getString("read.graphAddress")
+      readConfigEntry = NebulaReadConfigEntry(readMetaAddress, readSpace, readLabels, readWeightCols, ngal, graphAddress)
+    } else {
+      readConfigEntry = NebulaReadConfigEntry(readMetaAddress, readSpace, readLabels, readWeightCols)
+    }
 
-    val graphAddress     = nebulaConfig.getString("write.graphAddress")
+
+    val graphAddress = nebulaConfig.getString("write.graphAddress")
     val writeMetaAddress = nebulaConfig.getString("write.metaAddress")
-    val user             = nebulaConfig.getString("write.user")
-    val pswd             = nebulaConfig.getString("write.pswd")
-    val writeSpace       = nebulaConfig.getString("write.space")
-    val writeTag         = nebulaConfig.getString("write.tag")
-    val writeType        = nebulaConfig.getString("write.type")
+    val user = nebulaConfig.getString("write.user")
+    val pswd = nebulaConfig.getString("write.pswd")
+    val writeSpace = nebulaConfig.getString("write.space")
+    val writeTag = nebulaConfig.getString("write.tag")
+    val writeType = nebulaConfig.getString("write.type")
     val writeConfigEntry =
       NebulaWriteConfigEntry(graphAddress,
-                             writeMetaAddress,
-                             user,
-                             pswd,
-                             writeSpace,
-                             writeTag,
-                             writeType)
+        writeMetaAddress,
+        user,
+        pswd,
+        writeSpace,
+        writeTag,
+        writeType)
     NebulaConfigEntry(readConfigEntry, writeConfigEntry)
   }
 }
@@ -203,7 +216,9 @@ case class NebulaConfigEntry(readConfigEntry: NebulaReadConfigEntry,
 case class NebulaReadConfigEntry(address: String = "",
                                  space: String = "",
                                  labels: List[String] = List(),
-                                 weightCols: List[String] = List()) {
+                                 weightCols: List[String] = List(),
+                                 graphAddress: String = "",
+                                 ngql: String = "") {
   override def toString: String = {
     s"NebulaReadConfigEntry: " +
       s"{address: $address, space: $space, labels: ${labels.mkString(",")}, " +

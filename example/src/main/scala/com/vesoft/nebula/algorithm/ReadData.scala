@@ -12,12 +12,12 @@ import org.apache.spark.sql.types.{StringType, StructField, StructType}
 object ReadData {
 
   /**
-    * read edge data from local csv and apply clustering coefficient
-    * livejournal data: https://snap.stanford.edu/data/soc-LiveJournal1.txt.gz
-    *
-    * The livejournal data is put to hdfs, the path is
-    * hdfs://127.0.0.1:9000/user/root/livejournal/soc-LiveJournal1.txt
-    */
+   * read edge data from local csv and apply clustering coefficient
+   * livejournal data: https://snap.stanford.edu/data/soc-LiveJournal1.txt.gz
+   *
+   * The livejournal data is put to hdfs, the path is
+   * hdfs://127.0.0.1:9000/user/root/livejournal/soc-LiveJournal1.txt
+   */
   def readLiveJournalData(spark: SparkSession): DataFrame = {
     val df = spark.sparkContext.textFile(
       "hdfs://127.0.0.1:9000/user/root/livejournal/soc-LiveJournal1.txt")
@@ -30,14 +30,14 @@ object ReadData {
 
     val schema = StructType(
       List(StructField("src", StringType, nullable = false),
-           StructField("dst", StringType, nullable = true)))
+        StructField("dst", StringType, nullable = true)))
     val edgeDF = spark.sqlContext.createDataFrame(dd, schema)
     edgeDF
   }
 
   /**
-    * read edge data from csv
-    */
+   * read edge data from csv
+   */
   def readCsvData(spark: SparkSession): DataFrame = {
     val df = spark.read
       .option("header", true)
@@ -47,9 +47,9 @@ object ReadData {
   }
 
   /**
-    * read edge data from csv
-    * the data has string type id
-    */
+   * read edge data from csv
+   * the data has string type id
+   */
   def readStringCsvData(spark: SparkSession): DataFrame = {
     val df = spark.read
       .option("header", true)
@@ -59,8 +59,8 @@ object ReadData {
   }
 
   /**
-    * read edge data from Nebula
-    */
+   * read edge data from Nebula
+   */
   def readNebulaData(spark: SparkSession): DataFrame = {
     val config =
       NebulaConnectionConfig
@@ -80,4 +80,29 @@ object ReadData {
     val df: DataFrame = spark.read.nebula(config, nebulaReadEdgeConfig).loadEdgesToDF()
     df
   }
+
+  /**
+   * read edge data from Nebula by NGQL
+   */
+  def readNebulaDataByNgql(spark: SparkSession): DataFrame = {
+    val config =
+      NebulaConnectionConfig
+        .builder()
+        .withMetaAddress("127.0.0.1:9559")
+        .withGraphAddress("127.0.0.1:9669")
+        .withTimeout(6000)
+        .withConenctionRetry(2)
+        .build()
+    val nebulaReadEdgeConfig: ReadNebulaConfig = ReadNebulaConfig
+      .builder()
+      .withSpace("test")
+      .withLabel("knows")
+      .withNoColumn(true)
+      .withLimit(2000)
+      .withNgql(" GET SUBGRAPH with prop 1 STEPS FROM \"2\" YIELD  EDGES AS relationships ;")
+      .build()
+    val df: DataFrame = spark.read.nebula(config, nebulaReadEdgeConfig).loadEdgesToDfByNgql()
+    df
+  }
+
 }

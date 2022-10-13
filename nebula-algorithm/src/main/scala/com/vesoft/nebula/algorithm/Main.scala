@@ -49,14 +49,14 @@ import org.apache.log4j.Logger
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 
 /**
-  * This object is the entry of all graph algorithms.
-  *
-  * How to use this tool to run algorithm:
-  *    1. Configure application.conf file.
-  *    2. Make sure your environment has installed spark and started spark service.
-  *    3. Submit nebula algorithm application using this command:
-  *        spark-submit --class com.vesoft.nebula.tools.algorithm.Main /your-jar-path/nebula-algorithm-1.1.0.jar -p /your-application.conf-path/application.conf
-  */
+ * This object is the entry of all graph algorithms.
+ *
+ * How to use this tool to run algorithm:
+ *    1. Configure application.conf file.
+ *    2. Make sure your environment has installed spark and started spark service.
+ *    3. Submit nebula algorithm application using this command:
+ *        spark-submit --class com.vesoft.nebula.tools.algorithm.Main /your-jar-path/nebula-algorithm-1.1.0.jar -p /your-application.conf-path/application.conf
+ */
 object Main {
 
   private val LOGGER = Logger.getLogger(this.getClass)
@@ -102,12 +102,12 @@ object Main {
   }
 
   /**
-    * create data from datasource
-    *
-    * @param spark
-    * @param configs
-    * @return DataFrame
-    */
+   * create data from datasource
+   *
+   * @param spark
+   * @param configs
+   * @return DataFrame
+   */
   private[this] def createDataSource(spark: SparkSession,
                                      configs: Configs,
                                      partitionNum: String): DataFrame = {
@@ -116,6 +116,10 @@ object Main {
       case "nebula" => {
         val reader = new NebulaReader(spark, configs, partitionNum)
         reader.read()
+      }
+      case "nebula-ngql" => {
+        val reader = new NebulaReader(spark, configs, partitionNum)
+        reader.readByNqgl()
       }
       case "csv" => {
         val reader = new CsvReader(spark, configs, partitionNum)
@@ -130,13 +134,13 @@ object Main {
   }
 
   /**
-    * execute algorithms
-    * @param spark
-    * @param algoName
-    * @param configs
-    * @param dataSet
-    * @return DataFrame
-    */
+   * execute algorithms
+   * @param spark
+   * @param algoName
+   * @param configs
+   * @param dataSet
+   * @return DataFrame
+   */
   private[this] def executeAlgorithm(spark: SparkSession,
                                      algoName: String,
                                      configs: Configs,

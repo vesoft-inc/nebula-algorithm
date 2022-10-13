@@ -17,14 +17,13 @@ abstract class DataReader(spark: SparkSession, configs: Configs) {
 }
 
 class NebulaReader(spark: SparkSession, configs: Configs, partitionNum: String)
-    extends DataReader(spark, configs) {
+  extends DataReader(spark, configs) {
   override def read(): DataFrame = {
     val metaAddress = configs.nebulaConfig.readConfigEntry.address
-    val space       = configs.nebulaConfig.readConfigEntry.space
-    val labels      = configs.nebulaConfig.readConfigEntry.labels
-    val weights     = configs.nebulaConfig.readConfigEntry.weightCols
-    val partition   = partitionNum.toInt
-
+    val space = configs.nebulaConfig.readConfigEntry.space
+    val labels = configs.nebulaConfig.readConfigEntry.labels
+    val weights = configs.nebulaConfig.readConfigEntry.weightCols
+    val partition = partitionNum.toInt
     val config =
       NebulaConnectionConfig
         .builder()
@@ -65,13 +64,63 @@ class NebulaReader(spark: SparkSession, configs: Configs, partitionNum: String)
     }
     dataset
   }
+
+  def readByNqgl(): DataFrame = {
+    val metaAddress = configs.nebulaConfig.readConfigEntry.address
+    val graphAddress = configs.nebulaConfig.readConfigEntry.graphAddress
+    val space = configs.nebulaConfig.readConfigEntry.space
+    val labels = configs.nebulaConfig.readConfigEntry.labels
+    val weights = configs.nebulaConfig.readConfigEntry.weightCols
+    val ngql = configs.nebulaConfig.readConfigEntry.ngql
+
+    val config =
+      NebulaConnectionConfig
+        .builder()
+        .withMetaAddress(metaAddress)
+        .withGraphAddress(graphAddress)
+        .withConenctionRetry(2)
+        .build()
+
+    val noColumn = weights.isEmpty
+
+    var dataset: DataFrame = null
+    for (i <- labels.indices) {
+      val returnCols: ListBuffer[String] = new ListBuffer[String]
+      if (configs.dataSourceSinkEntry.hasWeight && weights.nonEmpty) {
+        returnCols.append(weights(i))
+      }
+      val nebulaReadEdgeConfig: ReadNebulaConfig = ReadNebulaConfig
+        .builder()
+        .withSpace(space)
+        .withLabel(labels(i))
+        .withNoColumn(noColumn)
+        .withReturnCols(returnCols.toList)
+        .withNgql(ngql)
+        .build()
+      if (dataset == null) {
+        dataset = spark.read.nebula(config, nebulaReadEdgeConfig).loadEdgesToDfByNgql()
+        if (weights.nonEmpty) {
+          dataset = dataset.select("_srcId", "_dstId", weights(i))
+        }
+      } else {
+        var df = spark.read
+          .nebula(config, nebulaReadEdgeConfig)
+          .loadEdgesToDF()
+        if (weights.nonEmpty) {
+          df = df.select("_srcId", "_dstId", weights(i))
+        }
+        dataset = dataset.union(df)
+      }
+    }
+    dataset
+  }
 }
 
 class CsvReader(spark: SparkSession, configs: Configs, partitionNum: String)
-    extends DataReader(spark, configs) {
+  extends DataReader(spark, configs) {
   override def read(): DataFrame = {
     val delimiter = configs.localConfigEntry.delimiter
-    val header    = configs.localConfigEntry.header
+    val header = configs.localConfigEntry.header
     val localPath = configs.localConfigEntry.filePath
 
     val partition = partitionNum.toInt
@@ -82,8 +131,8 @@ class CsvReader(spark: SparkSession, configs: Configs, partitionNum: String)
         .option("delimiter", delimiter)
         .csv(localPath)
     val weight = configs.localConfigEntry.weight
-    val src    = configs.localConfigEntry.srcId
-    val dst    = configs.localConfigEntry.dstId
+    val src = configs.localConfigEntry.srcId
+    val dst = configs.localConfigEntry.dstId
     if (configs.dataSourceSinkEntry.hasWeight && weight != null && !weight.trim.isEmpty) {
       data.select(src, dst, weight)
     } else {
@@ -97,15 +146,15 @@ class CsvReader(spark: SparkSession, configs: Configs, partitionNum: String)
 }
 
 class JsonReader(spark: SparkSession, configs: Configs, partitionNum: String)
-    extends DataReader(spark, configs) {
+  extends DataReader(spark, configs) {
   override def read(): DataFrame = {
     val localPath = configs.localConfigEntry.filePath
-    val data      = spark.read.json(localPath)
+    val data = spark.read.json(localPath)
     val partition = partitionNum.toInt
 
     val weight = configs.localConfigEntry.weight
-    val src    = configs.localConfigEntry.srcId
-    val dst    = configs.localConfigEntry.dstId
+    val src = configs.localConfigEntry.srcId
+    val dst = configs.localConfigEntry.dstId
     if (configs.dataSourceSinkEntry.hasWeight && weight != null && !weight.trim.isEmpty) {
       data.select(src, dst, weight)
     } else {
