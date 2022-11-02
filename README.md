@@ -91,7 +91,7 @@ You could submit the entire spark application or invoke algorithms in `lib` libr
     For examples of other algorithms, see [examples](https://github.com/vesoft-inc/nebula-algorithm/tree/master/example/src/main/scala/com/vesoft/nebula/algorithm)
    > Note: The first column of DataFrame in the application represents the source vertices, the second represents the target vertices and the third represents edges' weight.
 
-## Nebula config
+## Sink to NebulaGraph
 
 If you want to write the algorithm execution result into NebulaGraph(`sink: nebula`), make sure there is corresponding property name in your tag defination.
 
@@ -114,7 +114,7 @@ If you want to write the algorithm execution result into NebulaGraph(`sink: nebu
 |         jaccard          |          jaccard        |    string   |
 |        node2vec          |          node2vec       |    string   |
     
-## Version match
+## Version Compatibility Matrix
 
 | Nebula Algorithm Version | Nebula Version |
 |:------------------------:|:--------------:|
