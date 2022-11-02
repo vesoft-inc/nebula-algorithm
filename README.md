@@ -92,25 +92,27 @@ You could submit the entire spark application or invoke algorithms in `lib` libr
    > Note: The first column of DataFrame in the application represents the source vertices, the second represents the target vertices and the third represents edges' weight.
 
 ## Nebula config
-    If you want to write the algorithm result into Nebula, make sure there is corresponding property name in your tag.
-    |        Algorithm         |     property name       |property type|
-    |:------------------------:|:-----------------------:|:-----------:|
-    |         pagerank         |         pagerank        |double/string|
-    |          louvain         |          louvain        | int/string  |
-    |          kcore           |           kcore         | int/string  |
-    |     labelpropagation     |           lpa           | int/string  |
-    |   connectedcomponent     |            cc           | int/string  |
-    |stronglyconnectedcomponent|            scc          | int/string  |
-    |         betweenness      |         betweenness     |double/string|
-    |        shortestpath      |        shortestpath     |   string    |
-    |        degreestatic      |degree,inDegree,outDegree| int/string  |
-    |        trianglecount     |       trianglecount     | int/string  |
-    |  clusteringcoefficient   |    clustercoefficient   |double/string|
-    |         closeness        |         closeness       |double/string|
-    |            hanp          |            hanp         | int/string  |
-    |            bfs           |            bfs          |    string   |
-    |         jaccard          |          jaccard        |    string   |
-    |        node2vec          |          node2vec       |    string   |
+
+If you want to write the algorithm execution result into NebulaGraph(`sink: nebula`), make sure there is corresponding property name in your tag defination.
+
+|        Algorithm         |     property name       |property type|
+|:------------------------:|:-----------------------:|:-----------:|
+|         pagerank         |         pagerank        |double/string|
+|          louvain         |          louvain        | int/string  |
+|          kcore           |           kcore         | int/string  |
+|     labelpropagation     |           lpa           | int/string  |
+|   connectedcomponent     |            cc           | int/string  |
+|stronglyconnectedcomponent|            scc          | int/string  |
+|         betweenness      |         betweenness     |double/string|
+|        shortestpath      |        shortestpath     |   string    |
+|        degreestatic      |degree,inDegree,outDegree| int/string  |
+|        trianglecount     |       trianglecount     | int/string  |
+|  clusteringcoefficient   |    clustercoefficient   |double/string|
+|         closeness        |         closeness       |double/string|
+|            hanp          |            hanp         | int/string  |
+|            bfs           |            bfs          |    string   |
+|         jaccard          |          jaccard        |    string   |
+|        node2vec          |          node2vec       |    string   |
     
 ## Version match
 
@@ -122,7 +124,7 @@ You could submit the entire spark application or invoke algorithms in `lib` libr
 |       2.6.0              |  2.6.0, 2.6.1  |
 |       2.6.1              |  2.6.0, 2.6.1  |
 |       2.6.2              |  2.6.0, 2.6.1  |
-|       3.0.0              |  3.0.x, 3.1.x  |
+|       3.0.0              |  3.0.x, 3.1.x, 3.2.x, 3.3.x |
 |       3.0-SNAPSHOT       |     nightly    |
 
 ## Contribute
