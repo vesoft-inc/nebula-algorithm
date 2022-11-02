@@ -81,29 +81,30 @@ nebula-algorithm 是一款基于 [GraphX](https://spark.apache.org/graphx/) 的 
     
     > 注：执行算法的 DataFrame 默认第一列是源点，第二列是目标点，第三列是边权重。
 
-## Nebula 中属性配置
-    如果你想将算法结果写入到 Nebula，请确保 Nebula 的 tag 中有对应算法结果名称的属性。各项算法对应的属性名如下所示：
+## 运算结果写回 NebulaGraph
 
-    |        Algorithm         |     property name       |property type|
-    |:------------------------:|:-----------------------:|:-----------:|
-    |         pagerank         |         pagerank        |double/string|
-    |          louvain         |          louvain        | int/string  |
-    |          kcore           |           kcore         | int/string  |
-    |     labelpropagation     |           lpa           | int/string  |
-    |   connectedcomponent     |            cc           | int/string  |
-    |stronglyconnectedcomponent|            scc          | int/string  |
-    |         betweenness      |         betweenness     |double/string|
-    |        shortestpath      |        shortestpath     |   string    |
-    |        degreestatic      |degree,inDegree,outDegree| int/string  |
-    |        trianglecount     |       trianglecount     | int/string  |
-    |  clusteringcoefficient   |    clustercoefficient   |double/string|
-    |         closeness        |         closeness       |double/string|
-    |            hanp          |            hanp         | int/string  |
-    |            bfs           |            bfs          |    string   |
-    |         jaccard          |          jaccard        |    string   |
-    |        node2vec          |          node2vec       |    string   |
-    
-## 版本匹配
+如果你想将算法结果写入到 NebulaGraph，请确保 NebulaGraph 的 tag 中有对应算法结果名称的属性。各项算法对应的属性名如下所示：
+
+|        Algorithm         |     property name       |property type|
+|:------------------------:|:-----------------------:|:-----------:|
+|         pagerank         |         pagerank        |double/string|
+|          louvain         |          louvain        | int/string  |
+|          kcore           |           kcore         | int/string  |
+|     labelpropagation     |           lpa           | int/string  |
+|   connectedcomponent     |            cc           | int/string  |
+|stronglyconnectedcomponent|            scc          | int/string  |
+|         betweenness      |         betweenness     |double/string|
+|        shortestpath      |        shortestpath     |   string    |
+|        degreestatic      |degree,inDegree,outDegree| int/string  |
+|        trianglecount     |       trianglecount     | int/string  |
+|  clusteringcoefficient   |    clustercoefficient   |double/string|
+|         closeness        |         closeness       |double/string|
+|            hanp          |            hanp         | int/string  |
+|            bfs           |            bfs          |    string   |
+|         jaccard          |          jaccard        |    string   |
+|        node2vec          |          node2vec       |    string   |
+
+## 版本兼容矩阵
 
 | Nebula Algorithm Version | Nebula Version |
 |:------------------------:|:--------------:|
@@ -113,7 +114,7 @@ nebula-algorithm 是一款基于 [GraphX](https://spark.apache.org/graphx/) 的 
 |       2.6.0              |  2.6.0, 2.6.1  |
 |       2.6.1              |  2.6.0, 2.6.1  |
 |       2.6.2              |  2.6.0, 2.6.1  |
-|       3.0.0              |     3.0.0      |
+|       3.0.0              |3.0.x, 3.1.x, 3,2.x, 3.3.x|
 |     3.0-SNAPSHOT         |     nightly    |
 
 ## 贡献
