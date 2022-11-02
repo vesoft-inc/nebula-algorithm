@@ -1,62 +1,73 @@
-# 欢迎使用 Nebula Algorithm
+# Welcome to Nebula Algorithm
 
-nebula-algorithm 是一款基于 [GraphX](https://spark.apache.org/graphx/) 的 Spark 应用程序，提供了以下图计算算法：
+<p align="center">
+  <br>English | <a href="README-CN.md">中文</a>
+</p>
+
+nebula-algorithm is a Spark Application based on [GraphX](https://spark.apache.org/graphx/) with the following Algorithm provided for now:
 
 
- |           算法名          |中文说明|应用场景|
- |:------------------------:|:-----------:|:----:|
- |         PageRank         |  页面排序  | 网页排序、重点节点挖掘|
- |         Louvain          |  社区发现  | 社团挖掘、层次化聚类|
- |          KCore           |    K核    |社区发现、金融风控|
- |     LabelPropagation     |  标签传播  |资讯传播、广告推荐、社区发现|
- |          Hanp            |  标签传播进阶版|社区发现、推荐|
- |    ConnectedComponent    |  联通分量  |社区发现、孤岛发现|
- |StronglyConnectedComponent| 强联通分量  |社区发现|
- |       ShortestPath       |  最短路径   |路径规划、网络规划|
- |       TriangleCount      | 三角形计数  |网络结构分析|
- |     GraphTriangleCount   |全图三角形计数|网络紧密性分析|
- |   BetweennessCentrality  | 介数中心性  |关键节点挖掘、节点影响力计算|
- |        Closeness         | 接近中心性  |关键节点挖掘、节点影响力计算|
- |        DegreeStatic      |   度统计   |图结构分析|
- |   ClusteringCoefficient  |  聚集系数  |推荐、电信诈骗分析|
- |         Jaccard          |杰卡德相似度计算|相似度计算、推荐|
- |          BFS             |广度优先遍历 |层序遍历、最短路径规划|
- |         Node2Vec         |    -      |图分类|
- 
-使用 `nebula-algorithm`，可以通过提交 `Spark` 任务的形式使用完整的算法工具对 `Nebula Graph` 数据库中的数据执行图计算，也可以通过编程形式调用`lib`库下的算法针对DataFrame执行图计算。
+|          Name          |Use Case|
+|:------------------------:|:---------------:|
+|         PageRank         | page ranking, important node digging|
+|         Louvain          | community digging, hierarchical clustering|
+|          KCore           | community detection, financial risk control|
+|     LabelPropagation     | community detection, consultation propagation, advertising recommendation|
+|          Hanp            | community detection, consultation propagation|
+|    ConnectedComponent    | community detection, isolated island detection|
+|StronglyConnectedComponent| community detection|
+|       ShortestPath       | path plan, network plan|
+|       TriangleCount      | network structure analysis|
+|    GraphTriangleCount    | network structure and tightness analysis|
+|   BetweennessCentrality  | important node digging, node influence calculation|
+|   ClosenessCentrality    | important node digging, node influence calculation|
+|        DegreeStatic      | graph structure analysis|
+|   ClusteringCoefficient  | recommended, telecom fraud analysis|
+|       Jaccard            | similarity calculation, recommendation|
+|        BFS               | sequence traversal, Shortest path plan|
+|     Node2Vec             | graph machine learning, recommendation|
 
-## 如何获取
- 1. 编译打包 Nebula Algorithm
+
+You could submit the entire spark application or invoke algorithms in `lib` library to apply graph algorithms for DataFrame.
+
+## Get Nebula Algorithm
+ 1. Build Nebula Algorithm
     ```
     $ git clone https://github.com/vesoft-inc/nebula-algorithm.git
     $ cd nebula-algorithm
     $ mvn clean package -Dgpg.skip -Dmaven.javadoc.skip=true -Dmaven.test.skip=true
     ```
-    编译完成后，在 `nebula-algorithm/target` 目录下会生成 `nebula-algorithm-3.0-SNAPSHOT.jar` 。
+    After the above buiding process, the target file  `nebula-algorithm-3.0-SNAPSHOT.jar` will be placed under `nebula-algorithm/target`.
 
- 2. 在 Maven 远程仓库下载
-   https://repo1.maven.org/maven2/com/vesoft/nebula-algorithm/
+ 2. Download from Maven repo
+      
+      Alternatively, it could be downloaded from the following Maven repo:
+      
+      https://repo1.maven.org/maven2/com/vesoft/nebula-algorithm/
 
-# 使用 Nebula Algorithm
+## Use Nebula Algorithm
+
+* Option 1: Submit nebula-algorithm package
+
+   * Configuration
    
-* 使用方法1：直接提交 nebula-algorithm 算法包
+   Refer to the [configuration example](https://github.com/vesoft-inc/nebula-algorithm/blob/master/nebula-algorithm/src/main/resources/application.conf).
 
-   * 设置配置文件
-   
-    关于配置项的具体说明参考[示例配置](https://github.com/vesoft-inc/nebula-algorithm/blob/master/nebula-algorithm/src/main/resources/application.conf)
-
-   * 提交算法任务
+   * Submit Spark Application
 
     ```
-    ${SPARK_HOME}/bin/spark-submit --master <mode> --class com.vesoft.nebula.algorithm.Main nebula-algorithm-3.0-SNAPSHOT.jar -p application.conf
+    ${SPARK_HOME}/bin/spark-submit --master <mode> --class com.vesoft.nebula.algorithm.Main nebula-algorithm-3.0—SNAPSHOT.jar -p application.conf
     ```
-    * 使用限制
+   
+   * Limitation
     
-    Nebula Algorithm 算法包未自动对字符串 id 进行编码，因此采用第一种方式执行图算法时，边的源点和目标点必须是整数（Nebula Space 的 vid_type 可以是 String 类型，但数据必须是整数）。
-* 使用方法2：调用 nebula-algorithm 算法接口
+    Due to Nebula Algorithm jar does not encode string id, thus during the algorithm execution, the source and target of edges must be in Type Int (The `vid_type` in Nebula Space could be String, while data must be in Type Int).
 
-   在 `nebula-algorithm` 的 `lib` 库中提供了10+种常用图计算算法，可通过编程调用的形式调用算法。
-   * 在pom.xml中添加依赖
+* Option2: Call nebula-algorithm interface
+
+   Now there are 10+ algorithms provided in `lib` from `nebula-algorithm`, which could be invoked in a programming fashion as below:
+   
+   * Add dependencies in `pom.xml`.
    ```
     <dependency>
          <groupId>com.vesoft</groupId>
@@ -64,7 +75,7 @@ nebula-algorithm 是一款基于 [GraphX](https://spark.apache.org/graphx/) 的 
          <version>3.0.0</version>
     </dependency>
    ```
-   * 定义算法参数调用算法（以`PageRank`为例）
+   * Instantiate algorithm's config, below is an example for `PageRank`.
    ```
    import com.vesoft.nebula.algorithm.config.{Configs, PRConfig, SparkConfig}
    import org.apache.spark.sql.{DataFrame, SparkSession}
@@ -74,16 +85,15 @@ nebula-algorithm 是一款基于 [GraphX](https://spark.apache.org/graphx/) 的 
    val prConfig = new PRConfig(5, 1.0)
    val prResult = PageRankAlgo.apply(spark, data, prConfig, false)
    ```
-   * 如果你的节点 id 是 String 类型，可以参考 PageRank 的 [Example](https://github.com/vesoft-inc/nebula-algorithm/blob/master/example/src/main/scala/com/vesoft/nebula/algorithm/PageRankExample.scala) 。 
-   该 Example 进行了 id 转换，将 String 类型 id 编码为 Long 类型的 id ， 并在算法结果中将 Long 类型 id 解码为原始的 String 类型 id 。
    
-    其他算法的调用方法见[测试示例](https://github.com/vesoft-inc/nebula-algorithm/tree/master/nebula-algorithm/src/test/scala/com/vesoft/nebula/algorithm/lib) 。
+   If your vertex ids are Strings, see [Pagerank Example](https://github.com/vesoft-inc/nebula-algorithm/blob/master/example/src/main/scala/com/vesoft/nebula/algorithm/PageRankExample.scala) for how to encoding and decoding them.
     
-    > 注：执行算法的 DataFrame 默认第一列是源点，第二列是目标点，第三列是边权重。
+    For examples of other algorithms, see [examples](https://github.com/vesoft-inc/nebula-algorithm/tree/master/example/src/main/scala/com/vesoft/nebula/algorithm)
+   > Note: The first column of DataFrame in the application represents the source vertices, the second represents the target vertices and the third represents edges' weight.
 
-## 运算结果写回 NebulaGraph
+## Sink to NebulaGraph
 
-如果你想将算法结果写入到 NebulaGraph，请确保 NebulaGraph 的 tag 中有对应算法结果名称的属性。各项算法对应的属性名如下所示：
+If you want to write the algorithm execution result into NebulaGraph(`sink: nebula`), make sure there is corresponding property name in your tag defination.
 
 |        Algorithm         |     property name       |property type|
 |:------------------------:|:-----------------------:|:-----------:|
@@ -103,8 +113,8 @@ nebula-algorithm 是一款基于 [GraphX](https://spark.apache.org/graphx/) 的 
 |            bfs           |            bfs          |    string   |
 |         jaccard          |          jaccard        |    string   |
 |        node2vec          |          node2vec       |    string   |
-
-## 版本兼容矩阵
+    
+## Version Compatibility Matrix
 
 | Nebula Algorithm Version | Nebula Version |
 |:------------------------:|:--------------:|
@@ -114,13 +124,13 @@ nebula-algorithm 是一款基于 [GraphX](https://spark.apache.org/graphx/) 的 
 |       2.6.0              |  2.6.0, 2.6.1  |
 |       2.6.1              |  2.6.0, 2.6.1  |
 |       2.6.2              |  2.6.0, 2.6.1  |
-|       3.0.0              |3.0.x, 3.1.x, 3,2.x, 3.3.x|
-|     3.0-SNAPSHOT         |     nightly    |
+|       3.0.0              |  3.0.x, 3.1.x, 3.2.x, 3.3.x |
+|       3.0-SNAPSHOT       |     nightly    |
 
-## 贡献
+## Contribute
 
-Nebula Algorithm 是一个完全开源的项目，欢迎开源爱好者通过以下方式参与：
+Nebula Algorithm is open source, you are more than welcomed to contribute in the following ways:
 
-- 前往 [Nebula Graph 论坛](https://discuss.nebula-graph.com.cn/ "点击前往“Nebula Graph 论坛") 上参与 Issue 讨论，如答疑、提供想法或者报告无法解决的问题
-- 撰写或改进文档
-- 提交优化代码
+- Discuss in the community via [the forum](https://discuss.nebula-graph.io/) or raise issues here.
+- Compose or improve our documents.
+- Pull Request to help improve the code itself here.
