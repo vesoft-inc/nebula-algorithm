@@ -40,7 +40,7 @@ class NebulaWriter(data: DataFrame, configs: Configs) extends AlgoWriter(data, c
       .withTag(tag)
       .withVidField(AlgoConstants.ALGO_ID_COL)
       .withVidAsProp(false)
-      .withBatch(1000)
+      .withBatch(500)
       .withWriteMode(writeMode)
       .build()
     data.write.nebula(config, nebulaWriteVertexConfig).writeVertices()
