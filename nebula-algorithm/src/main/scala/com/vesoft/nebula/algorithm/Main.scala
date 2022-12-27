@@ -13,6 +13,7 @@ import com.vesoft.nebula.algorithm.config.{
   CcConfig,
   CoefficientConfig,
   Configs,
+  DfsConfig,
   HanpConfig,
   JaccardConfig,
   KCoreConfig,
@@ -30,6 +31,7 @@ import com.vesoft.nebula.algorithm.lib.{
   ClusteringCoefficientAlgo,
   ConnectedComponentsAlgo,
   DegreeStaticAlgo,
+  DfsAlgo,
   GraphTriangleCountAlgo,
   HanpAlgo,
   JaccardAlgo,
@@ -203,6 +205,10 @@ object Main {
         case "bfs" => {
           val bfsConfig = BfsConfig.getBfsConfig(configs)
           BfsAlgo(spark, dataSet, bfsConfig)
+        }
+        case "dfs" => {
+          val dfsConfig = DfsConfig.getDfsConfig(configs)
+          DfsAlgo(spark, dataSet, dfsConfig)
         }
         case "jaccard" => {
           val jaccardConfig = JaccardConfig.getJaccardConfig(configs)

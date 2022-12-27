@@ -184,6 +184,22 @@ object BfsConfig {
 }
 
 /**
+  * dfs
+  */
+case class DfsConfig(maxIter: Int, root: Long)
+object DfsConfig {
+  var maxIter: Int = _
+  var root: Long   = _
+
+  def getDfsConfig(configs: Configs): DfsConfig = {
+    val dfsConfig = configs.algorithmConfig.map
+    maxIter = dfsConfig("algorithm.dfs.maxIter").toInt
+    root = dfsConfig("algorithm.dfs.root").toLong
+    DfsConfig(maxIter, root)
+  }
+}
+
+/**
   * Hanp
   */
 case class HanpConfig(hopAttenuation: Double, maxIter: Int, preference: Double)
