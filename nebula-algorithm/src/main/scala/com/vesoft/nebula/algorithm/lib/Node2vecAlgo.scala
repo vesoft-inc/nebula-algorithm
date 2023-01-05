@@ -219,7 +219,7 @@ object Node2vecAlgo {
                   pathBuffer.append(nextNodeId)
                   (srcNodeId, pathBuffer)
                 } else {
-                  pathBuffer
+                  (srcNodeId, pathBuffer)
                 }
               } catch {
                 case e: Exception => throw new RuntimeException(e.getMessage)
