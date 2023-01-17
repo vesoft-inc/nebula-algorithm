@@ -90,8 +90,18 @@ object NebulaConfigEntry {
     } else {
       List()
     }
-    val readConfigEntry =
+    val readConfigEntry = if (nebulaConfig.hasPath("read.ngql")) {
+      val readGraphAddress = nebulaConfig.getString("read.graphAddress")
+      val ngql             = nebulaConfig.getString("read.ngql")
+      NebulaReadConfigEntry(readMetaAddress,
+                            readSpace,
+                            readLabels,
+                            readWeightCols,
+                            readGraphAddress,
+                            ngql)
+    } else {
       NebulaReadConfigEntry(readMetaAddress, readSpace, readLabels, readWeightCols)
+    }
 
     val graphAddress     = nebulaConfig.getString("write.graphAddress")
     val writeMetaAddress = nebulaConfig.getString("write.metaAddress")
@@ -203,11 +213,13 @@ case class NebulaConfigEntry(readConfigEntry: NebulaReadConfigEntry,
 case class NebulaReadConfigEntry(address: String = "",
                                  space: String = "",
                                  labels: List[String] = List(),
-                                 weightCols: List[String] = List()) {
+                                 weightCols: List[String] = List(),
+                                 graphAddress: String = "",
+                                 ngql: String = "") {
   override def toString: String = {
     s"NebulaReadConfigEntry: " +
       s"{address: $address, space: $space, labels: ${labels.mkString(",")}, " +
-      s"weightCols: ${weightCols.mkString(",")}}"
+      s"weightCols: ${weightCols.mkString(",")}, ngql: $ngql}"
   }
 }
 

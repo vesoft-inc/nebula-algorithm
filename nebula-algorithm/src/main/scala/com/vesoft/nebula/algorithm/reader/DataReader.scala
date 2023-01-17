@@ -65,6 +65,54 @@ class NebulaReader(spark: SparkSession, configs: Configs, partitionNum: String)
     }
     dataset
   }
+
+  def readNgql(): DataFrame = {
+    val metaAddress  = configs.nebulaConfig.readConfigEntry.address
+    val graphAddress = configs.nebulaConfig.readConfigEntry.graphAddress
+    val space        = configs.nebulaConfig.readConfigEntry.space
+    val labels       = configs.nebulaConfig.readConfigEntry.labels
+    val weights      = configs.nebulaConfig.readConfigEntry.weightCols
+    val partition    = partitionNum.toInt
+    val ngql         = configs.nebulaConfig.readConfigEntry.ngql
+
+    val config =
+      NebulaConnectionConfig
+        .builder()
+        .withMetaAddress(metaAddress)
+        .withGraphAddress(graphAddress)
+        .withConenctionRetry(2)
+        .build()
+
+    var dataset: DataFrame = null
+    for (i <- labels.indices) {
+      val returnCols: ListBuffer[String] = new ListBuffer[String]
+      if (configs.dataSourceSinkEntry.hasWeight && weights.nonEmpty) {
+        returnCols.append(weights(i))
+      }
+      val nebulaReadEdgeConfig: ReadNebulaConfig = ReadNebulaConfig
+        .builder()
+        .withSpace(space)
+        .withLabel(labels(i))
+        .withPartitionNum(partition)
+        .withNgql(ngql)
+        .build()
+      if (dataset == null) {
+        dataset = spark.read.nebula(config, nebulaReadEdgeConfig).loadEdgesToDF()
+        if (weights.nonEmpty) {
+          dataset = dataset.select("_srcId", "_dstId", weights(i))
+        }
+      } else {
+        var df = spark.read
+          .nebula(config, nebulaReadEdgeConfig)
+          .loadEdgesToDF()
+        if (weights.nonEmpty) {
+          df = df.select("_srcId", "_dstId", weights(i))
+        }
+        dataset = dataset.union(df)
+      }
+    }
+    dataset
+  }
 }
 
 class CsvReader(spark: SparkSession, configs: Configs, partitionNum: String)
