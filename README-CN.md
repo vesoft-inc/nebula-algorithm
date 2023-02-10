@@ -21,6 +21,7 @@ nebula-algorithm 是一款基于 [GraphX](https://spark.apache.org/graphx/) 的 
  |   ClusteringCoefficient  |  聚集系数  |推荐、电信诈骗分析|
  |         Jaccard          |杰卡德相似度计算|相似度计算、推荐|
  |          BFS             |广度优先遍历 |层序遍历、最短路径规划|
+ |          DFS             |深度优先遍历 |层序遍历、最短路径规划|
  |         Node2Vec         |    -      |图分类|
  
 使用 `nebula-algorithm`，可以通过提交 `Spark` 任务的形式使用完整的算法工具对 `Nebula Graph` 数据库中的数据执行图计算，也可以通过编程形式调用`lib`库下的算法针对DataFrame执行图计算。
@@ -101,6 +102,7 @@ nebula-algorithm 是一款基于 [GraphX](https://spark.apache.org/graphx/) 的 
 |         closeness        |         closeness       |double/string|
 |            hanp          |            hanp         | int/string  |
 |            bfs           |            bfs          |    string   |
+|            dfs           |            dfs          |    string   |
 |         jaccard          |          jaccard        |    string   |
 |        node2vec          |          node2vec       |    string   |
 
