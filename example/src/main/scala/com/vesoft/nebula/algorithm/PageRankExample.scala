@@ -6,11 +6,11 @@
 package com.vesoft.nebula.algorithm
 
 import com.facebook.thrift.protocol.TCompactProtocol
-import com.vesoft.nebula.algorithm.config.{CcConfig, PRConfig}
-import com.vesoft.nebula.algorithm.lib.{PageRankAlgo, StronglyConnectedComponentsAlgo}
+import com.vesoft.nebula.algorithm.config.PRConfig
+import com.vesoft.nebula.algorithm.lib.PageRankAlgo
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.expressions.Window
-import org.apache.spark.sql.functions.{col, dense_rank}
+import org.apache.spark.sql.functions.{col, dense_rank, monotonically_increasing_id}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 object PageRankExample {
@@ -69,6 +69,8 @@ object PageRankExample {
     // encode id to Long type using dense_rank, the encodeId has two columns: id, encodedId
     // then you need to save the encodeId to convert back for the algorithm's result.
     val encodeId = idDF.withColumn("encodedId", dense_rank().over(Window.orderBy("id")))
+    // using function monotonically_increasing_id(), please refer https://spark.apache.org/docs/3.0.2/api/java/org/apache/spark/sql/functions.html#monotonically_increasing_id--
+    // val encodeId = idDF.withColumn("encodedId", monotonically_increasing_id())
     encodeId.write.option("header", true).csv("file:///tmp/encodeId.csv")
     encodeId.show()
 
