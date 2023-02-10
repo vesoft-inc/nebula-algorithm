@@ -25,6 +25,7 @@ nebula-algorithm is a Spark Application based on [GraphX](https://spark.apache.o
 |   ClusteringCoefficient  | recommended, telecom fraud analysis|
 |       Jaccard            | similarity calculation, recommendation|
 |        BFS               | sequence traversal, Shortest path plan|
+|        DFS               | sequence traversal, Shortest path plan|
 |     Node2Vec             | graph machine learning, recommendation|
 
 
@@ -111,6 +112,7 @@ If you want to write the algorithm execution result into NebulaGraph(`sink: nebu
 |         closeness        |         closeness       |double/string|
 |            hanp          |            hanp         | int/string  |
 |            bfs           |            bfs          |    string   |
+|            bfs           |            dfs          |    string   |
 |         jaccard          |          jaccard        |    string   |
 |        node2vec          |          node2vec       |    string   |
     
