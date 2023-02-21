@@ -119,6 +119,10 @@ object Main {
         val reader = new NebulaReader(spark, configs, partitionNum)
         reader.read()
       }
+      case "nebula-ngql" => {
+        val reader = new NebulaReader(spark, configs, partitionNum)
+        reader.readNgql()
+      }
       case "csv" => {
         val reader = new CsvReader(spark, configs, partitionNum)
         reader.read()
