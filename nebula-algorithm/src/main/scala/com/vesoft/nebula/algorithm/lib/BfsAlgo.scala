@@ -6,7 +6,7 @@
 package com.vesoft.nebula.algorithm.lib
 
 import com.vesoft.nebula.algorithm.config.{AlgoConstants, BfsConfig}
-import com.vesoft.nebula.algorithm.utils.NebulaUtil
+import com.vesoft.nebula.algorithm.utils.{DecodeUtil, NebulaUtil}
 import org.apache.log4j.Logger
 import org.apache.spark.graphx.{EdgeTriplet, Graph, VertexId}
 import org.apache.spark.sql.functions.col
@@ -25,8 +25,16 @@ object BfsAlgo {
     * run the louvain algorithm for nebula graph
     */
   def apply(spark: SparkSession, dataset: Dataset[Row], bfsConfig: BfsConfig): DataFrame = {
-    val graph: Graph[None.type, Double] = NebulaUtil.loadInitGraph(dataset, false)
-    val bfsGraph                        = execute(graph, bfsConfig.maxIter, bfsConfig.root)
+    var encodeIdDf: DataFrame = null
+
+    val graph: Graph[None.type, Double] = if (bfsConfig.encodeId) {
+      val (data, encodeId) = DecodeUtil.convertStringId2LongId(dataset, false)
+      encodeIdDf = encodeId
+      NebulaUtil.loadInitGraph(data, false)
+    } else {
+      NebulaUtil.loadInitGraph(dataset, false)
+    }
+    val bfsGraph = execute(graph, bfsConfig.maxIter, bfsConfig.root)
 
     // filter out the not traversal vertices
     val visitedVertices = bfsGraph.vertices.filter(v => v._2 != Double.PositiveInfinity)
@@ -40,7 +48,12 @@ object BfsAlgo {
     val algoResult = spark.sqlContext
       .createDataFrame(resultRDD, schema)
       .orderBy(col(AlgoConstants.BFS_RESULT_COL))
-    algoResult
+
+    if (bfsConfig.encodeId) {
+      DecodeUtil.convertAlgoId2StringId(algoResult, encodeIdDf)
+    } else {
+      algoResult
+    }
   }
 
   def execute(graph: Graph[None.type, Double], maxIter: Int, root: Long): Graph[Double, Double] = {

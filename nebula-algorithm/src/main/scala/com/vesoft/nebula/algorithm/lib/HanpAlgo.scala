@@ -8,7 +8,7 @@
 package com.vesoft.nebula.algorithm.lib
 
 import com.vesoft.nebula.algorithm.config.{AlgoConstants, HanpConfig}
-import com.vesoft.nebula.algorithm.utils.NebulaUtil
+import com.vesoft.nebula.algorithm.utils.{DecodeUtil, NebulaUtil}
 import org.apache.spark.graphx.{EdgeTriplet, Graph, VertexId}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.types.{LongType, StructField, StructType}
@@ -28,7 +28,16 @@ object HanpAlgo {
             hanpConfig: HanpConfig,
             hasWeight: Boolean,
             preferences: RDD[(VertexId, Double)] = null): DataFrame = {
-    val graph: Graph[None.type, Double] = NebulaUtil.loadInitGraph(dataset, hasWeight)
+
+    var encodeIdDf: DataFrame = null
+
+    val graph: Graph[None.type, Double] = if (hanpConfig.encodeId) {
+      val (data, encodeId) = DecodeUtil.convertStringId2LongId(dataset, hasWeight)
+      encodeIdDf = encodeId
+      NebulaUtil.loadInitGraph(data, hasWeight)
+    } else {
+      NebulaUtil.loadInitGraph(dataset, hasWeight)
+    }
     val hanpResultRDD = execute(graph,
                                 hanpConfig.hopAttenuation,
                                 hanpConfig.maxIter,
@@ -40,7 +49,11 @@ object HanpAlgo {
         StructField(AlgoConstants.HANP_RESULT_COL, LongType, nullable = true)
       ))
     val algoResult = spark.sqlContext.createDataFrame(hanpResultRDD, schema)
-    algoResult
+    if (hanpConfig.encodeId) {
+      DecodeUtil.convertAlgoResultId2StringId(algoResult, encodeIdDf, AlgoConstants.HANP_RESULT_COL)
+    } else {
+      algoResult
+    }
   }
 
   /**

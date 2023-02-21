@@ -5,8 +5,8 @@
 
 package com.vesoft.nebula.algorithm.lib
 
-import com.vesoft.nebula.algorithm.utils.NebulaUtil
 import com.vesoft.nebula.algorithm.config.{AlgoConstants, CcConfig}
+import com.vesoft.nebula.algorithm.utils.{DecodeUtil, NebulaUtil}
 import com.vesoft.nebula.algorithm.utils.NebulaUtil
 import org.apache.spark.graphx.{Graph, VertexId, VertexRDD}
 import org.apache.spark.graphx.lib.{ConnectedComponents, StronglyConnectedComponents}
@@ -26,7 +26,15 @@ object StronglyConnectedComponentsAlgo {
             ccConfig: CcConfig,
             hasWeight: Boolean): DataFrame = {
 
-    val graph: Graph[None.type, Double] = NebulaUtil.loadInitGraph(dataset, hasWeight)
+    var encodeIdDf: DataFrame = null
+
+    val graph: Graph[None.type, Double] = if (ccConfig.encodeId) {
+      val (data, encodeId) = DecodeUtil.convertStringId2LongId(dataset, hasWeight)
+      encodeIdDf = encodeId
+      NebulaUtil.loadInitGraph(data, hasWeight)
+    } else {
+      NebulaUtil.loadInitGraph(dataset, hasWeight)
+    }
 
     val ccResultRDD = execute(graph, ccConfig.maxIter)
 
@@ -38,7 +46,11 @@ object StronglyConnectedComponentsAlgo {
     val algoResult = spark.sqlContext
       .createDataFrame(ccResultRDD, schema)
 
-    algoResult
+    if (ccConfig.encodeId) {
+      DecodeUtil.convertAlgoResultId2StringId(algoResult, encodeIdDf, AlgoConstants.SCC_RESULT_COL)
+    } else {
+      algoResult
+    }
   }
 
   def execute(graph: Graph[None.type, Double], maxIter: Int): RDD[Row] = {

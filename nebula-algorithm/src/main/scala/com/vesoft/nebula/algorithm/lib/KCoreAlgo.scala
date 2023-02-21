@@ -8,7 +8,7 @@ package com.vesoft.nebula.algorithm.lib
 import com.vesoft.nebula.algorithm.config.{AlgoConstants, KCoreConfig}
 import org.apache.log4j.Logger
 import org.apache.spark.graphx.Graph
-import com.vesoft.nebula.algorithm.utils.NebulaUtil
+import com.vesoft.nebula.algorithm.utils.{DecodeUtil, NebulaUtil}
 import org.apache.spark.sql.types.{IntegerType, LongType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 
@@ -22,8 +22,17 @@ object KCoreAlgo {
     */
   def apply(spark: SparkSession, dataset: Dataset[Row], kCoreConfig: KCoreConfig): DataFrame = {
 
-    val graph: Graph[None.type, Double] = NebulaUtil.loadInitGraph(dataset, false)
-    val kCoreGraph                      = execute(graph, kCoreConfig.maxIter, kCoreConfig.degree)
+    var encodeIdDf: DataFrame = null
+
+    val graph: Graph[None.type, Double] = if (kCoreConfig.encodeId) {
+      val (data, encodeId) = DecodeUtil.convertStringId2LongId(dataset, false)
+      encodeIdDf = encodeId
+      NebulaUtil.loadInitGraph(data, false)
+    } else {
+      NebulaUtil.loadInitGraph(dataset, false)
+    }
+
+    val kCoreGraph = execute(graph, kCoreConfig.maxIter, kCoreConfig.degree)
 
     val schema = StructType(
       List(
@@ -32,7 +41,12 @@ object KCoreAlgo {
       ))
     val resultRDD  = kCoreGraph.vertices.map(vertex => Row(vertex._1, vertex._2))
     val algoResult = spark.sqlContext.createDataFrame(resultRDD, schema)
-    algoResult
+
+    if (kCoreConfig.encodeId) {
+      DecodeUtil.convertAlgoId2StringId(algoResult, encodeIdDf)
+    } else {
+      algoResult
+    }
   }
 
   /**

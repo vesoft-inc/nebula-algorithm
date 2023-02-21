@@ -6,7 +6,7 @@
 package com.vesoft.nebula.algorithm.lib
 
 import com.vesoft.nebula.algorithm.config.{AlgoConstants, BetweennessConfig}
-import com.vesoft.nebula.algorithm.utils.NebulaUtil
+import com.vesoft.nebula.algorithm.utils.{DecodeUtil, NebulaUtil}
 import org.apache.log4j.Logger
 import org.apache.spark.SparkContext
 import org.apache.spark.graphx.{Edge, EdgeDirection, EdgeTriplet, Graph, Pregel, VertexId}
@@ -29,8 +29,17 @@ object BetweennessCentralityAlgo {
             betweennessConfig: BetweennessConfig,
             hasWeight: Boolean): DataFrame = {
 
-    val graph: Graph[None.type, Double] = NebulaUtil.loadInitGraph(dataset, hasWeight)
-    val betweennessGraph                = execute(graph, betweennessConfig.maxIter, hasWeight)
+    var encodeIdDf: DataFrame = null
+
+    val graph: Graph[None.type, Double] = if (betweennessConfig.encodeId) {
+      val (data, encodeId) = DecodeUtil.convertStringId2LongId(dataset, false)
+      encodeIdDf = encodeId
+      NebulaUtil.loadInitGraph(data, false)
+    } else {
+      NebulaUtil.loadInitGraph(dataset, false)
+    }
+
+    val betweennessGraph = execute(graph, betweennessConfig.maxIter, hasWeight)
 
     val schema = StructType(
       List(
@@ -39,7 +48,12 @@ object BetweennessCentralityAlgo {
       ))
     val resultRDD  = betweennessGraph.vertices.map(vertex => Row(vertex._1, vertex._2))
     val algoResult = spark.sqlContext.createDataFrame(resultRDD, schema)
-    algoResult
+
+    if (betweennessConfig.encodeId) {
+      DecodeUtil.convertAlgoId2StringId(algoResult, encodeIdDf)
+    } else {
+      algoResult
+    }
   }
 
   /**

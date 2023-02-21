@@ -6,7 +6,7 @@
 package com.vesoft.nebula.algorithm.lib
 
 import com.vesoft.nebula.algorithm.config.{AlgoConstants, BfsConfig, DfsConfig}
-import com.vesoft.nebula.algorithm.utils.NebulaUtil
+import com.vesoft.nebula.algorithm.utils.{DecodeUtil, NebulaUtil}
 import org.apache.spark.graphx.{EdgeDirection, Graph, VertexId}
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 import org.apache.spark.sql.types.{DoubleType, LongType, StringType, StructField, StructType}
@@ -17,8 +17,16 @@ object DfsAlgo {
   var iterNums = 0
 
   def apply(spark: SparkSession, dataset: Dataset[Row], dfsConfig: DfsConfig): DataFrame = {
-    val graph: Graph[None.type, Double] = NebulaUtil.loadInitGraph(dataset, false)
-    val bfsVertices                     = dfs(graph, dfsConfig.root, mutable.Seq.empty[VertexId])(dfsConfig.maxIter)
+    var encodeIdDf: DataFrame = null
+
+    val graph: Graph[None.type, Double] = if (dfsConfig.encodeId) {
+      val (data, encodeId) = DecodeUtil.convertStringId2LongId(dataset, false)
+      encodeIdDf = encodeId
+      NebulaUtil.loadInitGraph(data, false)
+    } else {
+      NebulaUtil.loadInitGraph(dataset, false)
+    }
+    val bfsVertices = dfs(graph, dfsConfig.root, mutable.Seq.empty[VertexId])(dfsConfig.maxIter)
 
     val schema = StructType(List(StructField("dfs", LongType, nullable = false)))
 
@@ -26,7 +34,11 @@ object DfsAlgo {
     val algoResult = spark.sqlContext
       .createDataFrame(rdd, schema)
 
-    algoResult.repartition(1)
+    if (dfsConfig.encodeId) {
+      DecodeUtil.convertAlgoId2StringId(algoResult, encodeIdDf).coalesce(1)
+    } else {
+      algoResult.coalesce(1)
+    }
   }
 
   def dfs(g: Graph[None.type, Double], vertexId: VertexId, visited: mutable.Seq[VertexId])(
