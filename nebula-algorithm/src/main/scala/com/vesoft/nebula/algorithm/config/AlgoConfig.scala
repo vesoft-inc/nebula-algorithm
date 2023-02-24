@@ -7,7 +7,7 @@ package com.vesoft.nebula.algorithm.config
 
 import org.apache.spark.graphx.VertexId
 
-case class PRConfig(maxIter: Int, resetProb: Double, encodeId: Boolean)
+case class PRConfig(maxIter: Int, resetProb: Double, encodeId: Boolean = false)
 
 /**
   * pagerank algorithm configuration
@@ -30,7 +30,7 @@ object PRConfig {
   }
 }
 
-case class LPAConfig(maxIter: Int, encodeId: Boolean)
+case class LPAConfig(maxIter: Int, encodeId: Boolean = false)
 
 /**
   * labelPropagation algorithm configuration
@@ -48,7 +48,7 @@ object LPAConfig {
   }
 }
 
-case class CcConfig(maxIter: Int, encodeId: Boolean)
+case class CcConfig(maxIter: Int, encodeId: Boolean = false)
 
 /**
   * ConnectedComponect algorithm configuration
@@ -66,7 +66,7 @@ object CcConfig {
   }
 }
 
-case class ShortestPathConfig(landmarks: Seq[VertexId], encodeId: Boolean)
+case class ShortestPathConfig(landmarks: Seq[VertexId], encodeId: Boolean = false)
 
 /**
   * ConnectedComponect algorithm configuration
@@ -84,7 +84,7 @@ object ShortestPathConfig {
   }
 }
 
-case class LouvainConfig(maxIter: Int, internalIter: Int, tol: Double, encodeId: Boolean)
+case class LouvainConfig(maxIter: Int, internalIter: Int, tol: Double, encodeId: Boolean = false)
 
 /**
   * louvain algorithm configuration
@@ -113,7 +113,7 @@ object LouvainConfig {
 case class DegreeStaticConfig(degree: Boolean,
                               inDegree: Boolean,
                               outDegree: Boolean,
-                              encodeId: Boolean)
+                              encodeId: Boolean = false)
 
 object DegreeStaticConfig {
   var degree: Boolean    = false
@@ -134,7 +134,7 @@ object DegreeStaticConfig {
 /**
   * k-core
   */
-case class KCoreConfig(maxIter: Int, degree: Int, encodeId: Boolean)
+case class KCoreConfig(maxIter: Int, degree: Int, encodeId: Boolean = false)
 
 object KCoreConfig {
   var maxIter: Int      = _
@@ -153,7 +153,7 @@ object KCoreConfig {
 /**
   * Betweenness
   */
-case class BetweennessConfig(maxIter: Int, encodeId: Boolean)
+case class BetweennessConfig(maxIter: Int, encodeId: Boolean = false)
 
 object BetweennessConfig {
   var maxIter: Int      = _
@@ -172,7 +172,7 @@ object BetweennessConfig {
   * ClusterCoefficient
   * algoType has two options: local or global
   */
-case class CoefficientConfig(algoType: String, encodeId: Boolean)
+case class CoefficientConfig(algoType: String, encodeId: Boolean = false)
 
 object CoefficientConfig {
   var algoType: String  = _
@@ -193,7 +193,7 @@ object CoefficientConfig {
 /**
   * bfs
   */
-case class BfsConfig(maxIter: Int, root: Long, encodeId: Boolean)
+case class BfsConfig(maxIter: Int, root: Long, encodeId: Boolean = false)
 object BfsConfig {
   var maxIter: Int      = _
   var root: Long        = _
@@ -211,7 +211,7 @@ object BfsConfig {
 /**
   * dfs
   */
-case class DfsConfig(maxIter: Int, root: Long, encodeId: Boolean)
+case class DfsConfig(maxIter: Int, root: Long, encodeId: Boolean = false)
 object DfsConfig {
   var maxIter: Int      = _
   var root: Long        = _
@@ -229,7 +229,10 @@ object DfsConfig {
 /**
   * Hanp
   */
-case class HanpConfig(hopAttenuation: Double, maxIter: Int, preference: Double, encodeId: Boolean)
+case class HanpConfig(hopAttenuation: Double,
+                      maxIter: Int,
+                      preference: Double,
+                      encodeId: Boolean = false)
 
 object HanpConfig {
   var hopAttenuation: Double = _
@@ -263,7 +266,7 @@ case class Node2vecConfig(maxIter: Int,
                           degree: Int,
                           embSeparate: String,
                           modelPath: String,
-                          encodeId: Boolean)
+                          encodeId: Boolean = false)
 object Node2vecConfig {
   var maxIter: Int           = _
   var lr: Double             = _
