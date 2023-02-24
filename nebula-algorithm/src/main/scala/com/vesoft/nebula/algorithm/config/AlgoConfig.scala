@@ -7,7 +7,7 @@ package com.vesoft.nebula.algorithm.config
 
 import org.apache.spark.graphx.VertexId
 
-case class PRConfig(maxIter: Int, resetProb: Double)
+case class PRConfig(maxIter: Int, resetProb: Double, encodeId: Boolean = false)
 
 /**
   * pagerank algorithm configuration
@@ -15,6 +15,7 @@ case class PRConfig(maxIter: Int, resetProb: Double)
 object PRConfig {
   var maxIter: Int      = _
   var resetProb: Double = _
+  var encodeId: Boolean = false
 
   def getPRConfig(configs: Configs): PRConfig = {
     val prConfig = configs.algorithmConfig.map
@@ -24,60 +25,66 @@ object PRConfig {
       if (prConfig.contains("algorithm.pagerank.resetProb"))
         prConfig("algorithm.pagerank.resetProb").toDouble
       else 0.15
-
-    PRConfig(maxIter, resetProb)
+    encodeId = ConfigUtil.getOrElseBoolean(prConfig, "algorithm.pagerank.encodeId", false)
+    PRConfig(maxIter, resetProb, encodeId)
   }
 }
 
-case class LPAConfig(maxIter: Int)
+case class LPAConfig(maxIter: Int, encodeId: Boolean = false)
 
 /**
   * labelPropagation algorithm configuration
   */
 object LPAConfig {
-  var maxIter: Int = _
+  var maxIter: Int      = _
+  var encodeId: Boolean = false
 
   def getLPAConfig(configs: Configs): LPAConfig = {
     val lpaConfig = configs.algorithmConfig.map
 
     maxIter = lpaConfig("algorithm.labelpropagation.maxIter").toInt
-    LPAConfig(maxIter)
+    encodeId = ConfigUtil.getOrElseBoolean(lpaConfig, "algorithm.labelpropagation.encodeId", false)
+    LPAConfig(maxIter, encodeId)
   }
 }
 
-case class CcConfig(maxIter: Int)
+case class CcConfig(maxIter: Int, encodeId: Boolean = false)
 
 /**
   * ConnectedComponect algorithm configuration
   */
 object CcConfig {
-  var maxIter: Int = _
+  var maxIter: Int      = _
+  var encodeId: Boolean = false
 
   def getCcConfig(configs: Configs): CcConfig = {
     val ccConfig = configs.algorithmConfig.map
+    encodeId = ConfigUtil.getOrElseBoolean(ccConfig, "algorithm.connectedcomponent.encodeId", false)
 
     maxIter = ccConfig("algorithm.connectedcomponent.maxIter").toInt
-    CcConfig(maxIter)
+    CcConfig(maxIter, encodeId)
   }
 }
 
-case class ShortestPathConfig(landmarks: Seq[VertexId])
+case class ShortestPathConfig(landmarks: Seq[VertexId], encodeId: Boolean = false)
 
 /**
   * ConnectedComponect algorithm configuration
   */
 object ShortestPathConfig {
   var landmarks: Seq[Long] = _
+  var encodeId: Boolean    = false
 
   def getShortestPathConfig(configs: Configs): ShortestPathConfig = {
     val spConfig = configs.algorithmConfig.map
 
     landmarks = spConfig("algorithm.shortestpaths.landmarks").split(",").toSeq.map(_.toLong)
-    ShortestPathConfig(landmarks)
+    encodeId = ConfigUtil.getOrElseBoolean(spConfig, "algorithm.shortestpaths.encodeId", false)
+    ShortestPathConfig(landmarks, encodeId)
   }
 }
 
-case class LouvainConfig(maxIter: Int, internalIter: Int, tol: Double)
+case class LouvainConfig(maxIter: Int, internalIter: Int, tol: Double, encodeId: Boolean = false)
 
 /**
   * louvain algorithm configuration
@@ -86,6 +93,7 @@ object LouvainConfig {
   var maxIter: Int      = _
   var internalIter: Int = _
   var tol: Double       = _
+  var encodeId: Boolean = false
 
   def getLouvainConfig(configs: Configs): LouvainConfig = {
     val louvainConfig = configs.algorithmConfig.map
@@ -93,59 +101,70 @@ object LouvainConfig {
     maxIter = louvainConfig("algorithm.louvain.maxIter").toInt
     internalIter = louvainConfig("algorithm.louvain.internalIter").toInt
     tol = louvainConfig("algorithm.louvain.tol").toDouble
+    encodeId = ConfigUtil.getOrElseBoolean(louvainConfig, "algorithm.louvain.encodeId", false)
 
-    LouvainConfig(maxIter, internalIter, tol)
+    LouvainConfig(maxIter, internalIter, tol, encodeId)
   }
 }
 
 /**
   * degree static
   */
-case class DegreeStaticConfig(degree: Boolean, inDegree: Boolean, outDegree: Boolean)
+case class DegreeStaticConfig(degree: Boolean,
+                              inDegree: Boolean,
+                              outDegree: Boolean,
+                              encodeId: Boolean = false)
 
 object DegreeStaticConfig {
   var degree: Boolean    = false
   var inDegree: Boolean  = false
   var outDegree: Boolean = false
+  var encodeId: Boolean  = false
 
   def getDegreeStaticConfig(configs: Configs): DegreeStaticConfig = {
     val degreeConfig = configs.algorithmConfig.map
     degree = ConfigUtil.getOrElseBoolean(degreeConfig, "algorithm.degreestatic.degree", false)
     inDegree = ConfigUtil.getOrElseBoolean(degreeConfig, "algorithm.degreestatic.indegree", false)
     outDegree = ConfigUtil.getOrElseBoolean(degreeConfig, "algorithm.degreestatic.outdegree", false)
-    DegreeStaticConfig(degree, inDegree, outDegree)
+    encodeId = ConfigUtil.getOrElseBoolean(degreeConfig, "algorithm.degreestatic.encodeId", false)
+    DegreeStaticConfig(degree, inDegree, outDegree, encodeId)
   }
 }
 
 /**
   * k-core
   */
-case class KCoreConfig(maxIter: Int, degree: Int)
+case class KCoreConfig(maxIter: Int, degree: Int, encodeId: Boolean = false)
 
 object KCoreConfig {
-  var maxIter: Int = _
-  var degree: Int  = _
+  var maxIter: Int      = _
+  var degree: Int       = _
+  var encodeId: Boolean = false
 
   def getKCoreConfig(configs: Configs): KCoreConfig = {
     val kCoreConfig = configs.algorithmConfig.map
     maxIter = kCoreConfig("algorithm.kcore.maxIter").toInt
     degree = kCoreConfig("algorithm.kcore.degree").toInt
-    KCoreConfig(maxIter, degree)
+    encodeId = ConfigUtil.getOrElseBoolean(kCoreConfig, "algorithm.kcore.encodeId", false)
+    KCoreConfig(maxIter, degree, false)
   }
 }
 
 /**
   * Betweenness
   */
-case class BetweennessConfig(maxIter: Int)
+case class BetweennessConfig(maxIter: Int, encodeId: Boolean = false)
 
 object BetweennessConfig {
-  var maxIter: Int = _
+  var maxIter: Int      = _
+  var encodeId: Boolean = false
 
   def getBetweennessConfig(configs: Configs): BetweennessConfig = {
     val betweennessConfig = configs.algorithmConfig.map
     maxIter = betweennessConfig("algorithm.betweenness.maxIter").toInt
-    BetweennessConfig(maxIter)
+    encodeId =
+      ConfigUtil.getOrElseBoolean(betweennessConfig, "algorithm.betweenness.encodeId", false)
+    BetweennessConfig(maxIter, encodeId)
   }
 }
 
@@ -153,67 +172,80 @@ object BetweennessConfig {
   * ClusterCoefficient
   * algoType has two options: local or global
   */
-case class CoefficientConfig(algoType: String)
+case class CoefficientConfig(algoType: String, encodeId: Boolean = false)
 
 object CoefficientConfig {
-  var algoType: String = _
+  var algoType: String  = _
+  var encodeId: Boolean = false
 
   def getCoefficientConfig(configs: Configs): CoefficientConfig = {
     val coefficientConfig = configs.algorithmConfig.map
     algoType = coefficientConfig("algorithm.clusteringcoefficient.type")
     assert(algoType.equalsIgnoreCase("local") || algoType.equalsIgnoreCase("global"),
            "ClusteringCoefficient only support local or global type.")
-    CoefficientConfig(algoType)
+    encodeId = ConfigUtil.getOrElseBoolean(coefficientConfig,
+                                           "algorithm.clusteringcoefficient.encodeId",
+                                           false)
+    CoefficientConfig(algoType, encodeId)
   }
 }
 
 /**
   * bfs
   */
-case class BfsConfig(maxIter: Int, root: Long)
+case class BfsConfig(maxIter: Int, root: Long, encodeId: Boolean = false)
 object BfsConfig {
-  var maxIter: Int = _
-  var root: Long   = _
+  var maxIter: Int      = _
+  var root: Long        = _
+  var encodeId: Boolean = false
 
   def getBfsConfig(configs: Configs): BfsConfig = {
     val bfsConfig = configs.algorithmConfig.map
     maxIter = bfsConfig("algorithm.bfs.maxIter").toInt
     root = bfsConfig("algorithm.bfs.root").toLong
-    BfsConfig(maxIter, root)
+    encodeId = ConfigUtil.getOrElseBoolean(bfsConfig, "algorithm.bfs.encodeId", false)
+    BfsConfig(maxIter, root, encodeId)
   }
 }
 
 /**
   * dfs
   */
-case class DfsConfig(maxIter: Int, root: Long)
+case class DfsConfig(maxIter: Int, root: Long, encodeId: Boolean = false)
 object DfsConfig {
-  var maxIter: Int = _
-  var root: Long   = _
+  var maxIter: Int      = _
+  var root: Long        = _
+  var encodeId: Boolean = false
 
   def getDfsConfig(configs: Configs): DfsConfig = {
     val dfsConfig = configs.algorithmConfig.map
     maxIter = dfsConfig("algorithm.dfs.maxIter").toInt
     root = dfsConfig("algorithm.dfs.root").toLong
-    DfsConfig(maxIter, root)
+    encodeId = ConfigUtil.getOrElseBoolean(dfsConfig, "algorithm.dfs.encodeId", false)
+    DfsConfig(maxIter, root, encodeId)
   }
 }
 
 /**
   * Hanp
   */
-case class HanpConfig(hopAttenuation: Double, maxIter: Int, preference: Double)
+case class HanpConfig(hopAttenuation: Double,
+                      maxIter: Int,
+                      preference: Double,
+                      encodeId: Boolean = false)
 
 object HanpConfig {
   var hopAttenuation: Double = _
   var maxIter: Int           = _
   var preference: Double     = 1.0
+  var encodeId: Boolean      = false
   def getHanpConfig(configs: Configs): HanpConfig = {
     val hanpConfig = configs.algorithmConfig.map
     hopAttenuation = hanpConfig("algorithm.hanp.hopAttenuation").toDouble
     maxIter = hanpConfig("algorithm.hanp.maxIter").toInt
     preference = hanpConfig("algorithm.hanp.preference").toDouble
-    HanpConfig(hopAttenuation, maxIter, preference)
+    encodeId = ConfigUtil.getOrElseBoolean(hanpConfig, "algorithm.hanp.encodeId", false)
+    HanpConfig(hopAttenuation, maxIter, preference, encodeId)
   }
 }
 
@@ -233,7 +265,8 @@ case class Node2vecConfig(maxIter: Int,
                           directed: Boolean,
                           degree: Int,
                           embSeparate: String,
-                          modelPath: String)
+                          modelPath: String,
+                          encodeId: Boolean = false)
 object Node2vecConfig {
   var maxIter: Int           = _
   var lr: Double             = _
@@ -249,6 +282,7 @@ object Node2vecConfig {
   var degree: Int            = _
   var embSeparate: String    = _
   var modelPath: String      = _
+  var encodeId: Boolean      = false
   def getNode2vecConfig(configs: Configs): Node2vecConfig = {
     val node2vecConfig = configs.algorithmConfig.map
     maxIter = node2vecConfig("algorithm.node2vec.maxIter").toInt
@@ -265,6 +299,7 @@ object Node2vecConfig {
     degree = node2vecConfig("algorithm.node2vec.degree").toInt
     embSeparate = node2vecConfig("algorithm.node2vec.embSeparate")
     modelPath = node2vecConfig("algorithm.node2vec.modelPath")
+    encodeId = ConfigUtil.getOrElseBoolean(node2vecConfig, "algorithm.node2vec.encodeId", false)
     Node2vecConfig(maxIter,
                    lr,
                    dataNumPartition,
@@ -278,7 +313,8 @@ object Node2vecConfig {
                    directed,
                    degree,
                    embSeparate,
-                   modelPath)
+                   modelPath,
+                   encodeId)
   }
 }
 

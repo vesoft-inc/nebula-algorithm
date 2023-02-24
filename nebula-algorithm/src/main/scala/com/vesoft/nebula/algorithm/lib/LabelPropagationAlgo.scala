@@ -5,8 +5,8 @@
 
 package com.vesoft.nebula.algorithm.lib
 
-import com.vesoft.nebula.algorithm.utils.NebulaUtil
 import com.vesoft.nebula.algorithm.config.{AlgoConstants, LPAConfig}
+import com.vesoft.nebula.algorithm.utils.{DecodeUtil}
 import org.apache.log4j.Logger
 import org.apache.spark.graphx.{Graph, VertexId, VertexRDD}
 import org.apache.spark.rdd.RDD
@@ -27,7 +27,15 @@ object LabelPropagationAlgo {
             dataset: Dataset[Row],
             lpaConfig: LPAConfig,
             hasWeight: Boolean): DataFrame = {
-    val graph: Graph[None.type, Double] = NebulaUtil.loadInitGraph(dataset, hasWeight)
+    var encodeIdDf: DataFrame = null
+
+    val graph: Graph[None.type, Double] = if (lpaConfig.encodeId) {
+      val (data, encodeId) = DecodeUtil.convertStringId2LongId(dataset, hasWeight)
+      encodeIdDf = encodeId
+      NebulaUtil.loadInitGraph(data, hasWeight)
+    } else {
+      NebulaUtil.loadInitGraph(dataset, hasWeight)
+    }
 
     val lpaResultRDD = execute(graph, lpaConfig.maxIter)
 
@@ -39,7 +47,11 @@ object LabelPropagationAlgo {
     val algoResult = spark.sqlContext
       .createDataFrame(lpaResultRDD, schema)
 
-    algoResult
+    if (lpaConfig.encodeId) {
+      DecodeUtil.convertAlgoResultId2StringId(algoResult, encodeIdDf, AlgoConstants.LPA_RESULT_COL)
+    } else {
+      algoResult
+    }
   }
 
   def execute(graph: Graph[None.type, Double], maxIter: Int): RDD[Row] = {

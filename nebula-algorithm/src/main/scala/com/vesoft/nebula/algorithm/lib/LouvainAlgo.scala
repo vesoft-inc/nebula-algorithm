@@ -5,14 +5,8 @@
 
 package com.vesoft.nebula.algorithm.lib
 
-import com.vesoft.nebula.algorithm.utils.NebulaUtil
-import com.vesoft.nebula.algorithm.config.{
-  AlgoConstants,
-  Configs,
-  LouvainConfig,
-  NebulaConfig,
-  SparkConfig
-}
+import com.vesoft.nebula.algorithm.config.{AlgoConstants, LouvainConfig}
+import com.vesoft.nebula.algorithm.utils.{DecodeUtil, NebulaUtil}
 import com.vesoft.nebula.algorithm.utils.NebulaUtil
 import org.apache.log4j.Logger
 import org.apache.spark.graphx.{Edge, Graph, VertexId, VertexRDD}
@@ -36,7 +30,15 @@ object LouvainAlgo {
             louvainConfig: LouvainConfig,
             hasWeight: Boolean): DataFrame = {
 
-    val graph: Graph[None.type, Double] = NebulaUtil.loadInitGraph(dataset, hasWeight)
+    var encodeIdDf: DataFrame = null
+
+    val graph: Graph[None.type, Double] = if (louvainConfig.encodeId) {
+      val (data, encodeId) = DecodeUtil.convertStringId2LongId(dataset, hasWeight)
+      encodeIdDf = encodeId
+      NebulaUtil.loadInitGraph(data, hasWeight)
+    } else {
+      NebulaUtil.loadInitGraph(dataset, hasWeight)
+    }
 
     val louvainResultRDD: RDD[Row] =
       execute(spark, graph, louvainConfig.maxIter, louvainConfig.internalIter, louvainConfig.tol)
@@ -49,7 +51,14 @@ object LouvainAlgo {
 
     val louvainResult = spark.sqlContext
       .createDataFrame(louvainResultRDD, schema)
-    louvainResult
+
+    if (louvainConfig.encodeId) {
+      DecodeUtil.convertAlgoResultId2StringId(louvainResult,
+                                              encodeIdDf,
+                                              AlgoConstants.LOUVAIN_RESULT_COL)
+    } else {
+      louvainResult
+    }
   }
 
   def execute(spark: SparkSession,

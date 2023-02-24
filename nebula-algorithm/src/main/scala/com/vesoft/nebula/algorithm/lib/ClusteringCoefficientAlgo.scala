@@ -6,7 +6,7 @@
 package com.vesoft.nebula.algorithm.lib
 
 import com.vesoft.nebula.algorithm.config.{AlgoConstants, CoefficientConfig, KCoreConfig}
-import com.vesoft.nebula.algorithm.utils.NebulaUtil
+import com.vesoft.nebula.algorithm.utils.{DecodeUtil, NebulaUtil}
 import org.apache.log4j.Logger
 import org.apache.spark.graphx.Graph
 import org.apache.spark.rdd.RDD
@@ -25,8 +25,16 @@ object ClusteringCoefficientAlgo {
             dataset: Dataset[Row],
             coefficientConfig: CoefficientConfig): DataFrame = {
 
-    val graph: Graph[None.type, Double] = NebulaUtil.loadInitGraph(dataset, false)
-    var algoResult: DataFrame           = null
+    var encodeIdDf: DataFrame = null
+
+    val graph: Graph[None.type, Double] = if (coefficientConfig.encodeId) {
+      val (data, encodeId) = DecodeUtil.convertStringId2LongId(dataset, false)
+      encodeIdDf = encodeId
+      NebulaUtil.loadInitGraph(data, false)
+    } else {
+      NebulaUtil.loadInitGraph(dataset, false)
+    }
+    var algoResult: DataFrame = null
 
     if (coefficientConfig.algoType.equalsIgnoreCase("local")) {
       // compute local clustering coefficient
@@ -37,6 +45,7 @@ object ClusteringCoefficientAlgo {
           StructField(AlgoConstants.CLUSTERCOEFFICIENT_RESULT_COL, DoubleType, nullable = true)
         ))
       algoResult = spark.sqlContext.createDataFrame(localClusterCoefficient, schema)
+
       // print the graph's average clustering coefficient
 
       import spark.implicits._
@@ -47,7 +56,9 @@ object ClusteringCoefficientAlgo {
         else
           algoResult.map(row => row.get(1).toString.toDouble).reduce(_ + _) / algoResult.count()
       LOGGER.info(s"graph's average clustering coefficient is ${averageCoeff}")
-
+      if (coefficientConfig.encodeId) {
+        algoResult = DecodeUtil.convertAlgoId2StringId(algoResult, encodeIdDf)
+      }
     } else {
       // compute global clustering coefficient
       val GlobalClusterCoefficient: Double = executeGlobalCC(graph)
