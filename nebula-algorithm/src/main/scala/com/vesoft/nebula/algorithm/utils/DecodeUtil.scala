@@ -66,12 +66,11 @@ object DecodeUtil {
                                    encodeId: DataFrame,
                                    algoProp: String): DataFrame = {
     val originIdResult = convertAlgoId2StringId(dataframe, encodeId)
-    dataframe
+    originIdResult
       .join(encodeId)
       .where(col(algoProp) === col(ENCODE_ID_COL))
       .drop(ENCODE_ID_COL)
       .drop(algoProp)
       .withColumnRenamed(ORIGIN_ID_COL, algoProp)
-    originIdResult
   }
 }
