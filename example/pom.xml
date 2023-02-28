@@ -182,7 +182,7 @@
         <dependency>
             <groupId>com.vesoft</groupId>
             <artifactId>nebula-algorithm</artifactId>
-            <version>3.0.0</version>
+            <version>3.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>

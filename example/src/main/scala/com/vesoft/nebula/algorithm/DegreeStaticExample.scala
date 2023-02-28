@@ -6,7 +6,8 @@
 package com.vesoft.nebula.algorithm
 
 import com.facebook.thrift.protocol.TCompactProtocol
-import com.vesoft.nebula.algorithm.lib.{DegreeStaticAlgo}
+import com.vesoft.nebula.algorithm.config.DegreeStaticConfig
+import com.vesoft.nebula.algorithm.lib.DegreeStaticAlgo
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
@@ -22,15 +23,22 @@ object DegreeStaticExample {
       .config(sparkConf)
       .getOrCreate()
 
-    // val csvDF     = ReadData.readCsvData(spark)
     // val nebulaDF  = ReadData.readNebulaData(spark)
     val journalDF = ReadData.readLiveJournalData(spark)
-
     degree(spark, journalDF)
+
+    val csvDF = ReadData.readStringCsvData(spark)
+    degreeForStringId(spark, csvDF)
   }
 
   def degree(spark: SparkSession, df: DataFrame): Unit = {
     val degree = DegreeStaticAlgo.apply(spark, df)
+    degree.show()
+  }
+
+  def degreeForStringId(spark: SparkSession, df: DataFrame): Unit = {
+    val degreeConfig = new DegreeStaticConfig(true)
+    val degree       = DegreeStaticAlgo.apply(spark, df, degreeConfig)
     degree.show()
   }
 }
