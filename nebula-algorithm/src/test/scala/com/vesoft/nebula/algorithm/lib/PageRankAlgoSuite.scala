@@ -12,10 +12,14 @@ import org.junit.Test
 class PageRankAlgoSuite {
   @Test
   def pageRankSuite(): Unit = {
-    val spark    = SparkSession.builder().master("local").getOrCreate()
+    val spark =
+      SparkSession.builder().master("local").config("spark.sql.shuffle.partitions", 5).getOrCreate()
     val data     = spark.read.option("header", true).csv("src/test/resources/edge.csv")
     val prConfig = new PRConfig(5, 1.0)
     val prResult = PageRankAlgo.apply(spark, data, prConfig, false)
     assert(prResult.count() == 4)
+
+    val encodePrConfig = new PRConfig(5, 1.0, true)
+    assert(PageRankAlgo.apply(spark, data, encodePrConfig, false).count() == 5)
   }
 }

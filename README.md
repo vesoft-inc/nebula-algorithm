@@ -60,10 +60,6 @@ You could submit the entire spark application or invoke algorithms in `lib` libr
     ${SPARK_HOME}/bin/spark-submit --master <mode> --class com.vesoft.nebula.algorithm.Main nebula-algorithm-3.0—SNAPSHOT.jar -p application.conf
     ```
    
-   * Limitation
-    
-    Due to Nebula Algorithm jar does not encode string id, thus during the algorithm execution, the source and target of edges must be in Type Int (The `vid_type` in Nebula Space could be String, while data must be in Type Int).
-
 * Option2: Call nebula-algorithm interface
 
    Now there are 10+ algorithms provided in `lib` from `nebula-algorithm`, which could be invoked in a programming fashion as below:
@@ -87,7 +83,7 @@ You could submit the entire spark application or invoke algorithms in `lib` libr
    val prResult = PageRankAlgo.apply(spark, data, prConfig, false)
    ```
    
-   If your vertex ids are Strings, see [Pagerank Example](https://github.com/vesoft-inc/nebula-algorithm/blob/master/example/src/main/scala/com/vesoft/nebula/algorithm/PageRankExample.scala) for how to encoding and decoding them.
+   If your vertex ids are Strings, please set the algo config with encodeId = true. see [examples](https://github.com/vesoft-inc/nebula-algorithm/tree/master/example/src/main/scala/com/vesoft/nebula/algorithm/DegreeStaticExample.scala)
     
     For examples of other algorithms, see [examples](https://github.com/vesoft-inc/nebula-algorithm/tree/master/example/src/main/scala/com/vesoft/nebula/algorithm)
    > Note: The first column of DataFrame in the application represents the source vertices, the second represents the target vertices and the third represents edges' weight.

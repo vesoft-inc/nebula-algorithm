@@ -12,7 +12,8 @@ import org.junit.Test
 class LabelPropagationAlgoSuite {
   @Test
   def lpaAlgoSuite(): Unit = {
-    val spark     = SparkSession.builder().master("local").getOrCreate()
+    val spark =
+      SparkSession.builder().master("local").config("spark.sql.shuffle.partitions", 5).getOrCreate()
     val data      = spark.read.option("header", true).csv("src/test/resources/edge.csv")
     val lpaConfig = new LPAConfig(5)
     val result    = LabelPropagationAlgo.apply(spark, data, lpaConfig, false)
@@ -20,5 +21,8 @@ class LabelPropagationAlgoSuite {
     result.foreach(row => {
       assert(row.get(1).toString.toInt == 1)
     })
+
+    val encodeLpaConfig = new LPAConfig(5)
+    assert(LabelPropagationAlgo.apply(spark, data, encodeLpaConfig, false).count() == 4)
   }
 }

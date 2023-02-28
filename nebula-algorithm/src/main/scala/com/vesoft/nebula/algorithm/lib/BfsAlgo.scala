@@ -50,9 +50,9 @@ object BfsAlgo {
       .orderBy(col(AlgoConstants.BFS_RESULT_COL))
 
     if (bfsConfig.encodeId) {
-      DecodeUtil.convertAlgoId2StringId(algoResult, encodeIdDf)
+      DecodeUtil.convertAlgoId2StringId(algoResult, encodeIdDf).coalesce(1)
     } else {
-      algoResult
+      algoResult.coalesce(1)
     }
   }
 

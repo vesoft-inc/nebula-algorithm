@@ -51,9 +51,6 @@ nebula-algorithm 是一款基于 [GraphX](https://spark.apache.org/graphx/) 的 
     ```
     ${SPARK_HOME}/bin/spark-submit --master <mode> --class com.vesoft.nebula.algorithm.Main nebula-algorithm-3.0-SNAPSHOT.jar -p application.conf
     ```
-    * 使用限制
-    
-    Nebula Algorithm 算法包未自动对字符串 id 进行编码，因此采用第一种方式执行图算法时，边的源点和目标点必须是整数（Nebula Space 的 vid_type 可以是 String 类型，但数据必须是整数）。
 * 使用方法2：调用 nebula-algorithm 算法接口
 
    在 `nebula-algorithm` 的 `lib` 库中提供了10+种常用图计算算法，可通过编程调用的形式调用算法。
@@ -75,7 +72,8 @@ nebula-algorithm 是一款基于 [GraphX](https://spark.apache.org/graphx/) 的 
    val prConfig = new PRConfig(5, 1.0)
    val prResult = PageRankAlgo.apply(spark, data, prConfig, false)
    ```
-   * 如果你的节点 id 是 String 类型，可以参考 PageRank 的 [Example](https://github.com/vesoft-inc/nebula-algorithm/blob/master/example/src/main/scala/com/vesoft/nebula/algorithm/PageRankExample.scala) 。 
+   * 如果你的节点 id 是 String 类型，可以参考 [examples](https://github.com/vesoft-inc/nebula-algorithm/tree/master/example/src/main/scala/com/vesoft/nebula/algorithm/DegreeStaticExample.scala).
+                                    
    该 Example 进行了 id 转换，将 String 类型 id 编码为 Long 类型的 id ， 并在算法结果中将 Long 类型 id 解码为原始的 String 类型 id 。
    
     其他算法的调用方法见[测试示例](https://github.com/vesoft-inc/nebula-algorithm/tree/master/nebula-algorithm/src/test/scala/com/vesoft/nebula/algorithm/lib) 。

@@ -14,10 +14,14 @@ import org.junit.Test
 class HanpSuite {
   @Test
   def hanpSuite() = {
-    val spark      = SparkSession.builder().master("local").getOrCreate()
+    val spark =
+      SparkSession.builder().master("local").config("spark.sql.shuffle.partitions", 5).getOrCreate()
     val data       = spark.read.option("header", true).csv("src/test/resources/edge.csv")
     val hanpConfig = new HanpConfig(0.1, 10, 1.0)
     val result     = HanpAlgo.apply(spark, data, hanpConfig, false)
     assert(result.count() == 4)
+
+    val encodeHanpConfig = new HanpConfig(0.1, 10, 1.0, true)
+    assert(HanpAlgo.apply(spark, data, encodeHanpConfig, false).count() == 4)
   }
 }

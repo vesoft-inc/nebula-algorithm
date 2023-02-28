@@ -5,6 +5,7 @@
 
 package com.vesoft.nebula.algorithm.config
 
+import com.vesoft.nebula.algorithm.config.JaccardConfig.encodeId
 import org.apache.spark.graphx.VertexId
 
 case class PRConfig(maxIter: Int, resetProb: Double, encodeId: Boolean = false)
@@ -110,24 +111,30 @@ object LouvainConfig {
 /**
   * degree static
   */
-case class DegreeStaticConfig(degree: Boolean,
-                              inDegree: Boolean,
-                              outDegree: Boolean,
-                              encodeId: Boolean = false)
+case class DegreeStaticConfig(encodeId: Boolean = false)
 
 object DegreeStaticConfig {
-  var degree: Boolean    = false
-  var inDegree: Boolean  = false
-  var outDegree: Boolean = false
-  var encodeId: Boolean  = false
+  var encodeId: Boolean = false
 
   def getDegreeStaticConfig(configs: Configs): DegreeStaticConfig = {
     val degreeConfig = configs.algorithmConfig.map
-    degree = ConfigUtil.getOrElseBoolean(degreeConfig, "algorithm.degreestatic.degree", false)
-    inDegree = ConfigUtil.getOrElseBoolean(degreeConfig, "algorithm.degreestatic.indegree", false)
-    outDegree = ConfigUtil.getOrElseBoolean(degreeConfig, "algorithm.degreestatic.outdegree", false)
     encodeId = ConfigUtil.getOrElseBoolean(degreeConfig, "algorithm.degreestatic.encodeId", false)
-    DegreeStaticConfig(degree, inDegree, outDegree, encodeId)
+    DegreeStaticConfig(encodeId)
+  }
+}
+
+/**
+  * graph triangle count
+  */
+case class TriangleConfig(encodeId: Boolean = false)
+
+object TriangleConfig {
+  var encodeId: Boolean = false
+  def getTriangleConfig(configs: Configs): TriangleConfig = {
+    val triangleConfig = configs.algorithmConfig.map
+    encodeId =
+      ConfigUtil.getOrElseBoolean(triangleConfig, "algorithm.trianglecount.encodeId", false)
+    TriangleConfig(encodeId)
   }
 }
 
@@ -321,14 +328,16 @@ object Node2vecConfig {
 /**
   * Jaccard
   */
-case class JaccardConfig(tol: Double)
+case class JaccardConfig(tol: Double, encodeId: Boolean = false)
 
 object JaccardConfig {
-  var tol: Double = _
+  var tol: Double       = _
+  var encodeId: Boolean = false
   def getJaccardConfig(configs: Configs): JaccardConfig = {
     val jaccardConfig = configs.algorithmConfig.map
     tol = jaccardConfig("algorithm.jaccard.tol").toDouble
-    JaccardConfig(tol)
+    encodeId = ConfigUtil.getOrElseBoolean(jaccardConfig, "algorithm.jaccard.encodeId", false)
+    JaccardConfig(tol, encodeId)
   }
 }
 
