@@ -5,8 +5,8 @@
 
 package com.vesoft.nebula.algorithm.lib
 
-import com.vesoft.nebula.algorithm.config.AlgoConstants
-import com.vesoft.nebula.algorithm.utils.NebulaUtil
+import com.vesoft.nebula.algorithm.config.{AlgoConstants, TriangleConfig}
+import com.vesoft.nebula.algorithm.utils.{DecodeUtil, NebulaUtil}
 import org.apache.log4j.Logger
 import org.apache.spark.graphx.{Graph, VertexRDD}
 import org.apache.spark.graphx.lib.TriangleCount
@@ -24,9 +24,19 @@ object TriangleCountAlgo {
     *
     * compute each vertex's triangle count
     */
-  def apply(spark: SparkSession, dataset: Dataset[Row]): DataFrame = {
+  def apply(spark: SparkSession,
+            dataset: Dataset[Row],
+            triangleConfig: TriangleConfig = new TriangleConfig): DataFrame = {
 
-    val graph: Graph[None.type, Double] = NebulaUtil.loadInitGraph(dataset, false)
+    var encodeIdDf: DataFrame = null
+
+    val graph: Graph[None.type, Double] = if (triangleConfig.encodeId) {
+      val (data, encodeId) = DecodeUtil.convertStringId2LongId(dataset, false)
+      encodeIdDf = encodeId
+      NebulaUtil.loadInitGraph(data, false)
+    } else {
+      NebulaUtil.loadInitGraph(dataset, false)
+    }
 
     val triangleResultRDD = execute(graph)
 
@@ -38,7 +48,11 @@ object TriangleCountAlgo {
     val algoResult = spark.sqlContext
       .createDataFrame(triangleResultRDD, schema)
 
-    algoResult
+    if (triangleConfig.encodeId) {
+      DecodeUtil.convertAlgoId2StringId(algoResult, encodeIdDf)
+    } else {
+      algoResult
+    }
   }
 
   def execute(graph: Graph[None.type, Double]): RDD[Row] = {

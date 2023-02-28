@@ -73,4 +73,21 @@ object DecodeUtil {
       .drop(algoProp)
       .withColumnRenamed(ORIGIN_ID_COL, algoProp)
   }
+
+  def convertIds2String(dataframe: DataFrame,
+                        encodeId: DataFrame,
+                        srcCol: String,
+                        dstCol: String): DataFrame = {
+    encodeId
+      .join(dataframe)
+      .where(col(ENCODE_ID_COL) === col(srcCol))
+      .drop(ENCODE_ID_COL)
+      .drop(srcCol)
+      .withColumnRenamed(ORIGIN_ID_COL, srcCol)
+      .join(encodeId)
+      .where(col(dstCol) === col(ENCODE_ID_COL))
+      .drop(ENCODE_ID_COL)
+      .drop(dstCol)
+      .withColumnRenamed(ORIGIN_ID_COL, dstCol)
+  }
 }

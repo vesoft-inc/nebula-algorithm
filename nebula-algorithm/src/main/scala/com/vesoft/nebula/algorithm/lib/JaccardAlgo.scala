@@ -6,7 +6,9 @@
 package com.vesoft.nebula.algorithm.lib
 
 import com.vesoft.nebula.algorithm.config.JaccardConfig
+import com.vesoft.nebula.algorithm.utils.{DecodeUtil, NebulaUtil}
 import org.apache.log4j.Logger
+import org.apache.spark.graphx.Graph
 import org.apache.spark.ml.feature.{
   CountVectorizer,
   CountVectorizerModel,
@@ -29,7 +31,16 @@ object JaccardAlgo {
     */
   def apply(spark: SparkSession, dataset: Dataset[Row], jaccardConfig: JaccardConfig): DataFrame = {
 
-    val jaccardResult: RDD[Row] = execute(spark, dataset, jaccardConfig.tol)
+    var encodeIdDf: DataFrame = null
+    var data: DataFrame       = dataset
+
+    if (jaccardConfig.encodeId) {
+      val (encodeData, encodeId) = DecodeUtil.convertStringId2LongId(dataset, false)
+      encodeIdDf = encodeId
+      data = encodeData
+    }
+
+    val jaccardResult: RDD[Row] = execute(spark, data, jaccardConfig.tol)
 
     val schema = StructType(
       List(
@@ -38,7 +49,13 @@ object JaccardAlgo {
         StructField("similarity", DoubleType, nullable = true)
       ))
     val algoResult = spark.sqlContext.createDataFrame(jaccardResult, schema)
-    algoResult
+
+    if (jaccardConfig.encodeId) {
+      DecodeUtil.convertIds2String(algoResult, encodeIdDf, "srcId", "dstId")
+    } else {
+      algoResult
+    }
+
   }
 
   def execute(spark: SparkSession, dataset: Dataset[Row], tol: Double): RDD[Row] = {

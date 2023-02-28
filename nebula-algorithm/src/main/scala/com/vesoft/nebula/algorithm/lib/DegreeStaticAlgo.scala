@@ -5,8 +5,8 @@
 
 package com.vesoft.nebula.algorithm.lib
 
-import com.vesoft.nebula.algorithm.config.AlgoConstants
-import com.vesoft.nebula.algorithm.utils.NebulaUtil
+import com.vesoft.nebula.algorithm.config.{AlgoConstants, DegreeStaticConfig}
+import com.vesoft.nebula.algorithm.utils.{DecodeUtil, NebulaUtil}
 import org.apache.log4j.Logger
 import org.apache.spark.graphx.{Graph, VertexRDD}
 import org.apache.spark.rdd.RDD
@@ -22,9 +22,18 @@ object DegreeStaticAlgo {
   /**
     * run the pagerank algorithm for nebula graph
     */
-  def apply(spark: SparkSession, dataset: Dataset[Row]): DataFrame = {
+  def apply(spark: SparkSession,
+            dataset: Dataset[Row],
+            degreeConfig: DegreeStaticConfig = new DegreeStaticConfig): DataFrame = {
+    var encodeIdDf: DataFrame = null
 
-    val graph: Graph[None.type, Double] = NebulaUtil.loadInitGraph(dataset, false)
+    val graph: Graph[None.type, Double] = if (degreeConfig.encodeId) {
+      val (data, encodeId) = DecodeUtil.convertStringId2LongId(dataset, false)
+      encodeIdDf = encodeId
+      NebulaUtil.loadInitGraph(data, false)
+    } else {
+      NebulaUtil.loadInitGraph(dataset, false)
+    }
 
     val degreeResultRDD = execute(graph)
 
@@ -38,7 +47,11 @@ object DegreeStaticAlgo {
     val algoResult = spark.sqlContext
       .createDataFrame(degreeResultRDD, schema)
 
-    algoResult
+    if (degreeConfig.encodeId) {
+      DecodeUtil.convertAlgoId2StringId(algoResult, encodeIdDf)
+    } else {
+      algoResult
+    }
   }
 
   def execute(graph: Graph[None.type, Double]): RDD[Row] = {
