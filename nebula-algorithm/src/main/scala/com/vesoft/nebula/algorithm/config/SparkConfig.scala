@@ -25,6 +25,17 @@ object SparkConfig {
       session.config(key, sparkConfigs(key))
     }
     partitionNum = sparkConfigs.getOrElse("spark.app.partitionNum", "0")
-    SparkConfig(session.getOrCreate(), partitionNum)
+    val spark = session.getOrCreate()
+    validate(spark.version, "2.4.*")
+    SparkConfig(spark, partitionNum)
+  }
+
+  def validate(sparkVersion: String, supportedVersions: String*): Unit = {
+    if (sparkVersion != "UNKNOWN" && !supportedVersions.exists(sparkVersion.matches)) {
+      throw new RuntimeException(
+        s"""Your current spark version ${sparkVersion} is not supported by the current NebulaGraph Algorithm.
+           | please visit https://github.com/vesoft-inc/nebula-algorithm#version-compatibility-matrix to know which version you need.
+           | """.stripMargin)
+    }
   }
 }
