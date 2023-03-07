@@ -26,15 +26,18 @@ object BfsAlgo {
     */
   def apply(spark: SparkSession, dataset: Dataset[Row], bfsConfig: BfsConfig): DataFrame = {
     var encodeIdDf: DataFrame = null
+    var finalRoot: Long       = 0
 
     val graph: Graph[None.type, Double] = if (bfsConfig.encodeId) {
       val (data, encodeId) = DecodeUtil.convertStringId2LongId(dataset, false)
       encodeIdDf = encodeId
+      finalRoot = encodeIdDf.filter(row => row.get(0).toString == bfsConfig.root).first().getLong(1)
       NebulaUtil.loadInitGraph(data, false)
     } else {
+      finalRoot = bfsConfig.root.toLong
       NebulaUtil.loadInitGraph(dataset, false)
     }
-    val bfsGraph = execute(graph, bfsConfig.maxIter, bfsConfig.root)
+    val bfsGraph = execute(graph, bfsConfig.maxIter, finalRoot)
 
     // filter out the not traversal vertices
     val visitedVertices = bfsGraph.vertices.filter(v => v._2 != Double.PositiveInfinity)
