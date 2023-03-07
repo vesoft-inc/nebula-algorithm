@@ -341,6 +341,23 @@ object JaccardConfig {
   }
 }
 
+/**
+  * k-step neighbors
+  */
+case class KNeighborsConfig(steps: List[Int], startId: Long)
+
+object KNeighborsConfig {
+  var steps: List[Int] = _
+  var startId: Long    = _
+
+  def getKNeighborConfig(configs: Configs): KNeighborsConfig = {
+    val kNeighborConfig = configs.algorithmConfig.map
+    steps = kNeighborConfig("algorithm.kneighbors.steps").toString.split(",").map(_.toInt).toList
+    startId = kNeighborConfig("algorithm.kneighbors.startId").toInt
+    KNeighborsConfig(steps, startId)
+  }
+}
+
 case class AlgoConfig(configs: Configs)
 
 object AlgoConfig {
