@@ -18,6 +18,7 @@ import com.vesoft.nebula.algorithm.config.{
   JaccardConfig,
   KCoreConfig,
   KNeighborsConfig,
+  KNeighborsParallelConfig,
   LPAConfig,
   LouvainConfig,
   Node2vecConfig,
@@ -38,6 +39,7 @@ import com.vesoft.nebula.algorithm.lib.{
   JaccardAlgo,
   KCoreAlgo,
   KStepNeighbors,
+  KStepNeighborsParallel,
   LabelPropagationAlgo,
   LouvainAlgo,
   Node2vecAlgo,
@@ -225,6 +227,11 @@ object Main {
         case "kneighbors" => {
           val kNeighborsConfig = KNeighborsConfig.getKNeighborConfig(configs)
           KStepNeighbors(spark, dataSet, kNeighborsConfig)
+        }
+        case "keignborsparallel" => {
+          val kNeighborsParallelConfig =
+            KNeighborsParallelConfig.getKNeighborParallelConfig(configs)
+          KStepNeighborsParallel(spark, dataSet, kNeighborsParallelConfig)
         }
         case _ => throw new UnknownParameterException("unknown executeAlgo name.")
       }

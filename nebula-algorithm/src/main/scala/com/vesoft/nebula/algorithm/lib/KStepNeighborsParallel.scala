@@ -5,71 +5,94 @@
 
 package com.vesoft.nebula.algorithm.lib
 
-import com.vesoft.nebula.algorithm.config.{AlgoConstants, KCoreConfig, KNeighborsConfig}
-import com.vesoft.nebula.algorithm.lib.KCoreAlgo.execute
-import com.vesoft.nebula.algorithm.utils.{DecodeUtil, NebulaUtil}
+import com.vesoft.nebula.algorithm.config.KNeighborsParallelConfig
+import com.vesoft.nebula.algorithm.utils.NebulaUtil
 import org.apache.log4j.Logger
-import org.apache.spark.graphx.{Edge, EdgeDirection, EdgeTriplet, Graph, Pregel, VertexId}
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.types.{IntegerType, LongType, StructField, StructType}
-import org.apache.spark.sql.{DataFrame, Dataset, Encoder, Row, SparkSession}
+import org.apache.spark.graphx.{EdgeDirection, EdgeTriplet, Graph, Pregel, VertexId}
+import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
-object KStepNeighbors {
+object KStepNeighborsParallel {
   private val LOGGER = Logger.getLogger(this.getClass)
 
-  val ALGORITHM: String = "KStepNeighbors"
+  val ALGORITHM: String = "KStepNeighborsParallel"
 
   def apply(spark: SparkSession,
             dataset: Dataset[Row],
-            kStepConfig: KNeighborsConfig): DataFrame = {
+            kStepConfig: KNeighborsParallelConfig): DataFrame = {
     val graph: Graph[None.type, Double] = NebulaUtil.loadInitGraph(dataset, false)
     graph.persist()
     graph.numVertices
     graph.numEdges
     dataset.unpersist(blocking = false)
 
-    execute(graph, kStepConfig.steps, kStepConfig.startId)
+    execute(graph, kStepConfig.steps, kStepConfig.startIds)
     null
   }
 
-  def execute(graph: Graph[None.type, Double], steps: List[Int], startId: Long): Unit = {
-    val queryGraph = graph.mapVertices { case (vid, _) => vid == startId }
-
-    val initialMessage = false
-    def sendMessage(edge: EdgeTriplet[Boolean, Double]): Iterator[(VertexId, Boolean)] = {
-      if (edge.srcAttr && !edge.dstAttr)
-        Iterator((edge.dstId, true))
-      else if (edge.dstAttr && !edge.srcAttr)
-        Iterator((edge.srcId, true))
-      else
-        Iterator.empty
+  def execute(graph: Graph[None.type, Double], steps: List[Int], startIds: List[Long]): Unit = {
+    val queryGraph = graph.mapVertices {
+      case (vid, _) =>
+        if (startIds.contains(vid)) Map[VertexId, Boolean](vid -> true)
+        else Map[VertexId, Boolean]()
     }
 
-    val costs: ArrayBuffer[Long]  = new ArrayBuffer[Long](steps.size)
-    val counts: ArrayBuffer[Long] = new ArrayBuffer[Long](steps.size)
+    val initialMessage = Map[VertexId, Boolean]()
+
+    def sendMessage(
+        edge: EdgeTriplet[Map[Long, Boolean], Double]): Iterator[(VertexId, Map[Long, Boolean])] = {
+      if (edge.srcAttr.equals(edge.dstAttr)) {
+        Iterator.empty
+      } else if (edge.srcAttr.isEmpty) {
+        Iterator((edge.srcId, edge.dstAttr))
+      } else if (edge.dstAttr.isEmpty) {
+        Iterator((edge.dstId, edge.srcAttr))
+      } else
+        Iterator((edge.srcId, edge.dstAttr), (edge.dstId, edge.srcAttr))
+    }
+
+    val costs: ArrayBuffer[Long] = new ArrayBuffer[Long](steps.size)
+    val nums: ArrayBuffer[mutable.Map[Long, Long]] =
+      new ArrayBuffer[mutable.Map[VertexId, VertexId]](steps.size)
 
     for (iter <- steps) {
-      LOGGER.info(s">>>>>>>>>>>>>>> query ${iter} steps for $startId  >>>>>>>>>>>>>>> ")
+      LOGGER.info(s">>>>>>>>>>>>>>> query ${iter} steps for $startIds  >>>>>>>>>>>>>>> ")
       val startQuery = System.currentTimeMillis()
       val pregelGraph = Pregel(queryGraph, initialMessage, iter, EdgeDirection.Either)(
-        vprog = (id, attr, msg) => attr | msg,
+        vprog = (id, attr, msg) => attr ++ msg,
         sendMsg = sendMessage,
-        mergeMsg = (a, b) => a | b
+        mergeMsg = (a, b) => a ++ b
       )
-      val endQuery = System.currentTimeMillis()
-      val num      = pregelGraph.vertices.filter(row => row._2).count()
+
+      val endQuery                              = System.currentTimeMillis()
+      val vertexCounts: mutable.Map[Long, Long] = new mutable.HashMap[Long, Long]()
+      for (id <- startIds) {
+        val num =
+          pregelGraph.vertices.filter(row => row._2.contains(id)).count()
+        vertexCounts.put(id, num)
+      }
       costs.append(endQuery - startQuery)
-      counts.append(num)
+      nums.append(vertexCounts)
     }
 
     val timeCosts   = costs.toArray
-    val neighborNum = counts.toArray
+    val neighborNum = nums.toArray
     for (i <- 1 to steps.size) {
       print(s"query ${steps(i - 1)} step neighbors cost: ${timeCosts(i - 1)}, ")
-      println(s"neighbor number is : ${neighborNum(i - 1)} ")
+      println(s"neighbor number is : ${printNeighbors(neighborNum(i - 1))} ")
     }
+  }
+
+  def printNeighbors(result: mutable.Map[Long, Long]): String = {
+    val sb = new StringBuilder
+    for (key <- result.keySet) {
+      sb.append(key)
+      sb.append(":")
+      sb.append(result(key))
+      sb.append(";")
+    }
+    sb.toString.substring(0, sb.length - 1)
   }
 }

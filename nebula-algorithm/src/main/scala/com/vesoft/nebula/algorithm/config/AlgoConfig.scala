@@ -358,6 +358,29 @@ object KNeighborsConfig {
   }
 }
 
+/**
+  * k-step neighbors for multi ids
+  */
+case class KNeighborsParallelConfig(steps: List[Int], startIds: List[Long])
+
+object KNeighborsParallelConfig {
+  var steps: List[Int]     = _
+  var startIds: List[Long] = _
+
+  def getKNeighborParallelConfig(configs: Configs): KNeighborsParallelConfig = {
+    val kNeighborParallelConfig = configs.algorithmConfig.map
+    steps = kNeighborParallelConfig("algorithm.keignborsparallel.steps").toString
+      .split(",")
+      .map(_.toInt)
+      .toList
+    startIds = kNeighborParallelConfig("algorithm.keignborsparallel.startIds").toString
+      .split(",")
+      .map(_.toLong)
+      .toList
+    KNeighborsParallelConfig(steps, startIds)
+  }
+}
+
 case class AlgoConfig(configs: Configs)
 
 object AlgoConfig {
