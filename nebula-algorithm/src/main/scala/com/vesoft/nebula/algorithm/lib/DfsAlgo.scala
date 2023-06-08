@@ -28,6 +28,7 @@ object DfsAlgo {
     }
     val bfsVertices = dfs(graph, dfsConfig.root, mutable.Seq.empty[VertexId])(dfsConfig.maxIter)
 
+    iterNums = 0
     val schema = StructType(List(StructField("dfs", LongType, nullable = false)))
 
     val rdd = spark.sparkContext.parallelize(bfsVertices.toSeq, 1).map(row => Row(row))

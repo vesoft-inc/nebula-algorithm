@@ -81,7 +81,7 @@ object ClusteringCoefficientAlgo {
     // compute the actual triangle count for each vertex
     val triangleNum = graph.triangleCount().vertices
     // compute the open triangle count for each vertex
-    val idealTriangleNum = graph.degrees.mapValues(degree => degree * (degree - 1) / 2)
+    val idealTriangleNum = graph.degrees.mapValues(degree => degree * (degree - 1) / 2.0)
     val result = triangleNum
       .innerJoin(idealTriangleNum) { (vid, actualCount, idealCount) =>
         {
