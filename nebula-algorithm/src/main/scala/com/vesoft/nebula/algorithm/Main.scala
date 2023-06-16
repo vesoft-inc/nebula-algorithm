@@ -22,7 +22,8 @@ import com.vesoft.nebula.algorithm.config.{
   Node2vecConfig,
   PRConfig,
   ShortestPathConfig,
-  SparkConfig
+  SparkConfig,
+  DegreeStaticConfig
 }
 import com.vesoft.nebula.algorithm.lib.{
   BetweennessCentralityAlgo,
@@ -171,7 +172,8 @@ object Main {
           ShortestPathAlgo(spark, dataSet, spConfig, hasWeight)
         }
         case "degreestatic" => {
-          DegreeStaticAlgo(spark, dataSet)
+          val dsConfig = DegreeStaticConfig.getDegreeStaticConfig(configs)
+          DegreeStaticAlgo(spark, dataSet, dsConfig)
         }
         case "kcore" => {
           val kCoreConfig = KCoreConfig.getKCoreConfig(configs)
