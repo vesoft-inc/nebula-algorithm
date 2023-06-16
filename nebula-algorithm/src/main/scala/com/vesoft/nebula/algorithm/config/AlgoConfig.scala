@@ -200,16 +200,16 @@ object CoefficientConfig {
 /**
   * bfs
   */
-case class BfsConfig(maxIter: Int, root: Long, encodeId: Boolean = false)
+case class BfsConfig(maxIter: Int, root: String, encodeId: Boolean = false)
 object BfsConfig {
   var maxIter: Int      = _
-  var root: Long        = _
+  var root: String      = _
   var encodeId: Boolean = false
 
   def getBfsConfig(configs: Configs): BfsConfig = {
     val bfsConfig = configs.algorithmConfig.map
     maxIter = bfsConfig("algorithm.bfs.maxIter").toInt
-    root = bfsConfig("algorithm.bfs.root").toLong
+    root = bfsConfig("algorithm.bfs.root").toString
     encodeId = ConfigUtil.getOrElseBoolean(bfsConfig, "algorithm.bfs.encodeId", false)
     BfsConfig(maxIter, root, encodeId)
   }
@@ -218,16 +218,16 @@ object BfsConfig {
 /**
   * dfs
   */
-case class DfsConfig(maxIter: Int, root: Long, encodeId: Boolean = false)
+case class DfsConfig(maxIter: Int, root: String, encodeId: Boolean = false)
 object DfsConfig {
   var maxIter: Int      = _
-  var root: Long        = _
+  var root: String      = _
   var encodeId: Boolean = false
 
   def getDfsConfig(configs: Configs): DfsConfig = {
     val dfsConfig = configs.algorithmConfig.map
     maxIter = dfsConfig("algorithm.dfs.maxIter").toInt
-    root = dfsConfig("algorithm.dfs.root").toLong
+    root = dfsConfig("algorithm.dfs.root").toString
     encodeId = ConfigUtil.getOrElseBoolean(dfsConfig, "algorithm.dfs.encodeId", false)
     DfsConfig(maxIter, root, encodeId)
   }

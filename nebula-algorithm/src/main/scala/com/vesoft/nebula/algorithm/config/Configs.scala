@@ -386,6 +386,7 @@ object AlgoConstants {
   val HANP_RESULT_COL: String               = "hanp"
   val NODE2VEC_RESULT_COL: String           = "node2vec"
   val BFS_RESULT_COL: String                = "bfs"
+  val DFS_RESULT_COL: String                = "dfs"
   val ENCODE_ID_COL: String                 = "encodedId"
   val ORIGIN_ID_COL: String                 = "id"
 }

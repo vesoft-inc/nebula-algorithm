@@ -14,7 +14,7 @@ class BfsAlgoSuite {
   def bfsAlgoSuite(): Unit = {
     val spark         = SparkSession.builder().master("local").getOrCreate()
     val data          = spark.read.option("header", true).csv("src/test/resources/edge.csv")
-    val bfsAlgoConfig = new BfsConfig(5, 1)
+    val bfsAlgoConfig = new BfsConfig(5, "1")
     val result        = BfsAlgo.apply(spark, data, bfsAlgoConfig)
     result.show()
     assert(result.count() == 4)
