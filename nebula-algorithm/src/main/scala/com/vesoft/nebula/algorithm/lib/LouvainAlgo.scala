@@ -143,7 +143,7 @@ object LouvainAlgo {
     LOGGER.info("============================== step 2 =======================")
     //get edges between different communities
     val edges = G.triplets
-      .filter(trip => trip.srcAttr.cId != trip.dstAttr.cId)
+      // .filter(trip => trip.srcAttr.cId != trip.dstAttr.cId)
       .map(trip => {
         val cid1   = trip.srcAttr.cId
         val cid2   = trip.dstAttr.cId
