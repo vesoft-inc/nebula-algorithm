@@ -17,6 +17,8 @@ import com.vesoft.nebula.algorithm.config.{
   HanpConfig,
   JaccardConfig,
   KCoreConfig,
+  KNeighborsConfig,
+  KNeighborsParallelConfig,
   LPAConfig,
   LouvainConfig,
   Node2vecConfig,
@@ -37,6 +39,8 @@ import com.vesoft.nebula.algorithm.lib.{
   HanpAlgo,
   JaccardAlgo,
   KCoreAlgo,
+  KStepNeighbors,
+  KStepNeighborsParallel,
   LabelPropagationAlgo,
   LouvainAlgo,
   Node2vecAlgo,
@@ -84,7 +88,9 @@ object Main {
 
     val startTime = System.currentTimeMillis()
     // reader
-    val dataSet  = createDataSource(sparkConfig.spark, configs, partitionNum)
+    val dataSet = createDataSource(sparkConfig.spark, configs, partitionNum)
+    dataSet.cache()
+    dataSet.count()
     val readTime = System.currentTimeMillis()
 
     // algorithm
@@ -220,6 +226,15 @@ object Main {
           val jaccardConfig = JaccardConfig.getJaccardConfig(configs)
           JaccardAlgo(spark, dataSet, jaccardConfig)
         }
+        case "kneighbors" => {
+          val kNeighborsConfig = KNeighborsConfig.getKNeighborConfig(configs)
+          KStepNeighbors(spark, dataSet, kNeighborsConfig)
+        }
+        case "keignborsparallel" => {
+          val kNeighborsParallelConfig =
+            KNeighborsParallelConfig.getKNeighborParallelConfig(configs)
+          KStepNeighborsParallel(spark, dataSet, kNeighborsParallelConfig)
+        }
         case _ => throw new UnknownParameterException("unknown executeAlgo name.")
       }
     }
@@ -227,6 +242,9 @@ object Main {
   }
 
   private[this] def saveAlgoResult(algoResult: DataFrame, configs: Configs): Unit = {
+    if (algoResult == null) {
+      return
+    }
     val dataSink = configs.dataSourceSinkEntry.sink
     dataSink.toLowerCase match {
       case "nebula" => {
