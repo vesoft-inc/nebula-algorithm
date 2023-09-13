@@ -12,13 +12,27 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 
 import scala.collection.mutable.ListBuffer
 
-abstract class DataReader(spark: SparkSession, configs: Configs) {
-  def read(): DataFrame
+abstract class DataReader {
+  val tpe: ReaderType
+  def read(spark: SparkSession, configs: Configs, partitionNum: String): DataFrame
+}
+object DataReader {
+  def make(configs: Configs): DataReader = {
+    ReaderType.mapping
+      .get(configs.dataSourceSinkEntry.source.toLowerCase)
+      .collect {
+        case ReaderType.json       => new JsonReader
+        case ReaderType.nebulaNgql => new NebulaNgqlReader
+        case ReaderType.nebula     => new NebulaReader
+        case ReaderType.csv        => new CsvReader
+      }
+      .getOrElse(throw new UnsupportedOperationException("unsupported reader"))
+  }
 }
 
-class NebulaReader(spark: SparkSession, configs: Configs, partitionNum: String)
-    extends DataReader(spark, configs) {
-  override def read(): DataFrame = {
+class NebulaReader extends DataReader {
+  override val tpe: ReaderType = ReaderType.nebula
+  override def read(spark: SparkSession, configs: Configs, partitionNum: String): DataFrame = {
     val metaAddress = configs.nebulaConfig.readConfigEntry.address
     val space       = configs.nebulaConfig.readConfigEntry.space
     val labels      = configs.nebulaConfig.readConfigEntry.labels
@@ -66,7 +80,12 @@ class NebulaReader(spark: SparkSession, configs: Configs, partitionNum: String)
     dataset
   }
 
-  def readNgql(): DataFrame = {
+}
+final class NebulaNgqlReader extends NebulaReader {
+
+  override val tpe: ReaderType = ReaderType.nebulaNgql
+
+  override def read(spark: SparkSession, configs: Configs, partitionNum: String): DataFrame = {
     val metaAddress  = configs.nebulaConfig.readConfigEntry.address
     val graphAddress = configs.nebulaConfig.readConfigEntry.graphAddress
     val space        = configs.nebulaConfig.readConfigEntry.space
@@ -113,11 +132,12 @@ class NebulaReader(spark: SparkSession, configs: Configs, partitionNum: String)
     }
     dataset
   }
+
 }
 
-class CsvReader(spark: SparkSession, configs: Configs, partitionNum: String)
-    extends DataReader(spark, configs) {
-  override def read(): DataFrame = {
+final class CsvReader extends DataReader {
+  override val tpe: ReaderType = ReaderType.csv
+  override def read(spark: SparkSession, configs: Configs, partitionNum: String): DataFrame = {
     val delimiter = configs.localConfigEntry.delimiter
     val header    = configs.localConfigEntry.header
     val localPath = configs.localConfigEntry.filePath
@@ -132,7 +152,7 @@ class CsvReader(spark: SparkSession, configs: Configs, partitionNum: String)
     val weight = configs.localConfigEntry.weight
     val src    = configs.localConfigEntry.srcId
     val dst    = configs.localConfigEntry.dstId
-    if (configs.dataSourceSinkEntry.hasWeight && weight != null && !weight.trim.isEmpty) {
+    if (configs.dataSourceSinkEntry.hasWeight && weight != null && weight.trim.nonEmpty) {
       data.select(src, dst, weight)
     } else {
       data.select(src, dst)
@@ -143,10 +163,9 @@ class CsvReader(spark: SparkSession, configs: Configs, partitionNum: String)
     data
   }
 }
-
-class JsonReader(spark: SparkSession, configs: Configs, partitionNum: String)
-    extends DataReader(spark, configs) {
-  override def read(): DataFrame = {
+final class JsonReader extends DataReader {
+  override val tpe: ReaderType = ReaderType.json
+  override def read(spark: SparkSession, configs: Configs, partitionNum: String): DataFrame = {
     val localPath = configs.localConfigEntry.filePath
     val data      = spark.read.json(localPath)
     val partition = partitionNum.toInt
@@ -154,7 +173,7 @@ class JsonReader(spark: SparkSession, configs: Configs, partitionNum: String)
     val weight = configs.localConfigEntry.weight
     val src    = configs.localConfigEntry.srcId
     val dst    = configs.localConfigEntry.dstId
-    if (configs.dataSourceSinkEntry.hasWeight && weight != null && !weight.trim.isEmpty) {
+    if (configs.dataSourceSinkEntry.hasWeight && weight != null && weight.trim.nonEmpty) {
       data.select(src, dst, weight)
     } else {
       data.select(src, dst)
