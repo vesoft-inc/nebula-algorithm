@@ -39,7 +39,7 @@ object DeepQueryTest {
         .builder()
         .withMetaAddress("192.168.15.5:9559")
         .withTimeout(6000)
-        .withConenctionRetry(2)
+        .withConnectionRetry(2)
         .build()
     val nebulaReadEdgeConfig: ReadNebulaConfig = ReadNebulaConfig
       .builder()

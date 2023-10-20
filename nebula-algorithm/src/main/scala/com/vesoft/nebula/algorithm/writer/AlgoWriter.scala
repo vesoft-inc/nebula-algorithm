@@ -42,7 +42,7 @@ final class NebulaWriter extends AlgoWriter {
         .builder()
         .withMetaAddress(metaAddress)
         .withGraphAddress(graphAddress)
-        .withConenctionRetry(2)
+        .withConnectionRetry(2)
         .build()
     val nebulaWriteVertexConfig = WriteNebulaVertexConfig
       .builder()

@@ -43,7 +43,7 @@ class NebulaReader extends DataReader {
       NebulaConnectionConfig
         .builder()
         .withMetaAddress(metaAddress)
-        .withConenctionRetry(2)
+        .withConnectionRetry(2)
         .build()
 
     val noColumn = weights.isEmpty
@@ -99,7 +99,7 @@ final class NebulaNgqlReader extends NebulaReader {
         .builder()
         .withMetaAddress(metaAddress)
         .withGraphAddress(graphAddress)
-        .withConenctionRetry(2)
+        .withConnectionRetry(2)
         .build()
 
     var dataset: DataFrame = null

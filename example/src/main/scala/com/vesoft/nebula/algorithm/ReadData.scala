@@ -67,7 +67,7 @@ object ReadData {
         .builder()
         .withMetaAddress("127.0.0.1:9559")
         .withTimeout(6000)
-        .withConenctionRetry(2)
+        .withConnectionRetry(2)
         .build()
     val nebulaReadEdgeConfig: ReadNebulaConfig = ReadNebulaConfig
       .builder()
