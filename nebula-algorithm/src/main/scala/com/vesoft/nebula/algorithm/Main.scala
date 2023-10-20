@@ -6,47 +6,10 @@
 package com.vesoft.nebula.algorithm
 
 import com.vesoft.nebula.algorithm.config.Configs.Argument
-import com.vesoft.nebula.algorithm.config.{
-  AlgoConfig,
-  BetweennessConfig,
-  BfsConfig,
-  CcConfig,
-  CoefficientConfig,
-  Configs,
-  DfsConfig,
-  HanpConfig,
-  JaccardConfig,
-  KCoreConfig,
-  LPAConfig,
-  LouvainConfig,
-  Node2vecConfig,
-  PRConfig,
-  ShortestPathConfig,
-  SparkConfig,
-  DegreeStaticConfig
-}
-import com.vesoft.nebula.algorithm.lib.{
-  BetweennessCentralityAlgo,
-  BfsAlgo,
-  ClosenessAlgo,
-  ClusteringCoefficientAlgo,
-  ConnectedComponentsAlgo,
-  DegreeStaticAlgo,
-  DfsAlgo,
-  GraphTriangleCountAlgo,
-  HanpAlgo,
-  JaccardAlgo,
-  KCoreAlgo,
-  LabelPropagationAlgo,
-  LouvainAlgo,
-  Node2vecAlgo,
-  PageRankAlgo,
-  ShortestPathAlgo,
-  StronglyConnectedComponentsAlgo,
-  TriangleCountAlgo
-}
-import com.vesoft.nebula.algorithm.reader.{CsvReader, JsonReader, NebulaReader}
-import com.vesoft.nebula.algorithm.writer.{CsvWriter, NebulaWriter, TextWriter}
+import com.vesoft.nebula.algorithm.config._
+import com.vesoft.nebula.algorithm.lib._
+import com.vesoft.nebula.algorithm.reader.{CsvReader, DataReader, JsonReader, NebulaReader}
+import com.vesoft.nebula.algorithm.writer.{AlgoWriter, CsvWriter, NebulaWriter, TextWriter}
 import org.apache.commons.math3.ode.UnknownParameterException
 import org.apache.log4j.Logger
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
@@ -114,26 +77,8 @@ object Main {
   private[this] def createDataSource(spark: SparkSession,
                                      configs: Configs,
                                      partitionNum: String): DataFrame = {
-    val dataSource = configs.dataSourceSinkEntry.source
-    val dataSet: Dataset[Row] = dataSource.toLowerCase match {
-      case "nebula" => {
-        val reader = new NebulaReader(spark, configs, partitionNum)
-        reader.read()
-      }
-      case "nebula-ngql" => {
-        val reader = new NebulaReader(spark, configs, partitionNum)
-        reader.readNgql()
-      }
-      case "csv" => {
-        val reader = new CsvReader(spark, configs, partitionNum)
-        reader.read()
-      }
-      case "json" => {
-        val reader = new JsonReader(spark, configs, partitionNum)
-        reader.read()
-      }
-    }
-    dataSet
+    val dataSource = DataReader.make(configs)
+    dataSource.read(spark, configs, partitionNum)
   }
 
   /**
@@ -149,99 +94,63 @@ object Main {
                                      configs: Configs,
                                      dataSet: DataFrame): DataFrame = {
     val hasWeight = configs.dataSourceSinkEntry.hasWeight
-    val algoResult = {
-      algoName.toLowerCase match {
-        case "pagerank" => {
-          val pageRankConfig = PRConfig.getPRConfig(configs)
-          PageRankAlgo(spark, dataSet, pageRankConfig, hasWeight)
-        }
-        case "louvain" => {
-          val louvainConfig = LouvainConfig.getLouvainConfig(configs)
-          LouvainAlgo(spark, dataSet, louvainConfig, hasWeight)
-        }
-        case "connectedcomponent" => {
-          val ccConfig = CcConfig.getCcConfig(configs)
-          ConnectedComponentsAlgo(spark, dataSet, ccConfig, hasWeight)
-        }
-        case "labelpropagation" => {
-          val lpaConfig = LPAConfig.getLPAConfig(configs)
-          LabelPropagationAlgo(spark, dataSet, lpaConfig, hasWeight)
-        }
-        case "shortestpaths" => {
-          val spConfig = ShortestPathConfig.getShortestPathConfig(configs)
-          ShortestPathAlgo(spark, dataSet, spConfig, hasWeight)
-        }
-        case "degreestatic" => {
-          val dsConfig = DegreeStaticConfig.getDegreeStaticConfig(configs)
-          DegreeStaticAlgo(spark, dataSet, dsConfig)
-        }
-        case "kcore" => {
-          val kCoreConfig = KCoreConfig.getKCoreConfig(configs)
-          KCoreAlgo(spark, dataSet, kCoreConfig)
-        }
-        case "stronglyconnectedcomponent" => {
-          val ccConfig = CcConfig.getCcConfig(configs)
-          StronglyConnectedComponentsAlgo(spark, dataSet, ccConfig, hasWeight)
-        }
-        case "betweenness" => {
-          val betweennessConfig = BetweennessConfig.getBetweennessConfig(configs)
-          BetweennessCentralityAlgo(spark, dataSet, betweennessConfig, hasWeight)
-        }
-        case "trianglecount" => {
-          TriangleCountAlgo(spark, dataSet)
-        }
-        case "graphtrianglecount" => {
-          GraphTriangleCountAlgo(spark, dataSet)
-        }
-        case "clusteringcoefficient" => {
-          val coefficientConfig = CoefficientConfig.getCoefficientConfig(configs)
-          ClusteringCoefficientAlgo(spark, dataSet, coefficientConfig)
-        }
-        case "closeness" => {
-          ClosenessAlgo(spark, dataSet, hasWeight)
-        }
-        case "hanp" => {
-          val hanpConfig = HanpConfig.getHanpConfig(configs)
-          HanpAlgo(spark, dataSet, hanpConfig, hasWeight)
-        }
-        case "node2vec" => {
-          val node2vecConfig = Node2vecConfig.getNode2vecConfig(configs)
-          Node2vecAlgo(spark, dataSet, node2vecConfig, hasWeight)
-        }
-        case "bfs" => {
-          val bfsConfig = BfsConfig.getBfsConfig(configs)
-          BfsAlgo(spark, dataSet, bfsConfig)
-        }
-        case "dfs" => {
-          val dfsConfig = DfsConfig.getDfsConfig(configs)
-          DfsAlgo(spark, dataSet, dfsConfig)
-        }
-        case "jaccard" => {
-          val jaccardConfig = JaccardConfig.getJaccardConfig(configs)
-          JaccardAlgo(spark, dataSet, jaccardConfig)
-        }
-        case _ => throw new UnknownParameterException("unknown executeAlgo name.")
-      }
+    AlgorithmType.mapping.getOrElse(algoName.toLowerCase, throw new UnknownParameterException("unknown executeAlgo name.")) match {
+      case AlgorithmType.Bfs =>
+        val bfsConfig = BfsConfig.getBfsConfig(configs)
+        BfsAlgo(spark, dataSet, bfsConfig)
+      case AlgorithmType.Closeness =>
+        ClosenessAlgo(spark, dataSet, hasWeight)
+      case AlgorithmType.ClusteringCoefficient =>
+        val coefficientConfig = CoefficientConfig.getCoefficientConfig(configs)
+        ClusteringCoefficientAlgo(spark, dataSet, coefficientConfig)
+      case AlgorithmType.ConnectedComponents =>
+        val ccConfig = CcConfig.getCcConfig(configs)
+        ConnectedComponentsAlgo(spark, dataSet, ccConfig, hasWeight)
+      case AlgorithmType.DegreeStatic =>
+        val dsConfig = DegreeStaticConfig.getDegreeStaticConfig(configs)
+        DegreeStaticAlgo(spark, dataSet, dsConfig)
+      case AlgorithmType.Dfs =>
+        val dfsConfig = DfsConfig.getDfsConfig(configs)
+        DfsAlgo(spark, dataSet, dfsConfig)
+      case AlgorithmType.GraphTriangleCount =>
+        GraphTriangleCountAlgo(spark, dataSet)
+      case AlgorithmType.Hanp =>
+        val hanpConfig = HanpConfig.getHanpConfig(configs)
+        HanpAlgo(spark, dataSet, hanpConfig, hasWeight)
+      case AlgorithmType.Jaccard =>
+        val jaccardConfig = JaccardConfig.getJaccardConfig(configs)
+        JaccardAlgo(spark, dataSet, jaccardConfig)
+      case AlgorithmType.KCore =>
+        val kCoreConfig = KCoreConfig.getKCoreConfig(configs)
+        KCoreAlgo(spark, dataSet, kCoreConfig)
+      case AlgorithmType.LabelPropagation =>
+        val lpaConfig = LPAConfig.getLPAConfig(configs)
+        LabelPropagationAlgo(spark, dataSet, lpaConfig, hasWeight)
+      case AlgorithmType.Louvain =>
+        val louvainConfig = LouvainConfig.getLouvainConfig(configs)
+        LouvainAlgo(spark, dataSet, louvainConfig, hasWeight)
+      case AlgorithmType.Node2vec =>
+        val node2vecConfig = Node2vecConfig.getNode2vecConfig(configs)
+        Node2vecAlgo(spark, dataSet, node2vecConfig, hasWeight)
+      case AlgorithmType.PageRank =>
+        val pageRankConfig = PRConfig.getPRConfig(configs)
+        PageRankAlgo(spark, dataSet, pageRankConfig, hasWeight)
+      case AlgorithmType.ShortestPath =>
+        val spConfig = ShortestPathConfig.getShortestPathConfig(configs)
+        ShortestPathAlgo(spark, dataSet, spConfig, hasWeight)
+      case AlgorithmType.StronglyConnectedComponents =>
+        val ccConfig = CcConfig.getCcConfig(configs)
+        StronglyConnectedComponentsAlgo(spark, dataSet, ccConfig, hasWeight)
+      case AlgorithmType.TriangleCount =>
+        TriangleCountAlgo(spark, dataSet)
+      case AlgorithmType.BetweennessCentrality =>
+        val betweennessConfig = BetweennessConfig.getBetweennessConfig(configs)
+        BetweennessCentralityAlgo(spark, dataSet, betweennessConfig, hasWeight)
     }
-    algoResult
   }
 
   private[this] def saveAlgoResult(algoResult: DataFrame, configs: Configs): Unit = {
-    val dataSink = configs.dataSourceSinkEntry.sink
-    dataSink.toLowerCase match {
-      case "nebula" => {
-        val writer = new NebulaWriter(algoResult, configs)
-        writer.write()
-      }
-      case "csv" => {
-        val writer = new CsvWriter(algoResult, configs)
-        writer.write()
-      }
-      case "text" => {
-        val writer = new TextWriter(algoResult, configs)
-        writer.write()
-      }
-      case _ => throw new UnsupportedOperationException("unsupported data sink")
-    }
+    val writer = AlgoWriter.make(configs)
+    writer.write(algoResult, configs)
   }
 }

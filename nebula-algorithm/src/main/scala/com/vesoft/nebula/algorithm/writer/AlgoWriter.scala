@@ -10,12 +10,24 @@ import com.vesoft.nebula.connector.{NebulaConnectionConfig, WriteMode, WriteNebu
 import com.vesoft.nebula.algorithm.config.{AlgoConstants, Configs}
 import org.apache.spark.sql.DataFrame
 
-abstract class AlgoWriter(data: DataFrame, configs: Configs) {
-  def write(): Unit
+abstract class AlgoWriter {
+  val tpe:WriterType
+  def write(data: DataFrame, configs: Configs): Unit
+}
+object AlgoWriter {
+  def make(configs: Configs): AlgoWriter = {
+    WriterType.mapping.get(configs.dataSourceSinkEntry.sink.toLowerCase).collect {
+      case WriterType.text => new TextWriter
+      case WriterType.nebula => new NebulaWriter
+      case WriterType.csv => new CsvWriter
+    }.getOrElse(throw new UnsupportedOperationException("unsupported writer"))
+    
+  }
 }
 
-class NebulaWriter(data: DataFrame, configs: Configs) extends AlgoWriter(data, configs) {
-  override def write(): Unit = {
+final class NebulaWriter extends AlgoWriter {
+  override val tpe: WriterType = WriterType.nebula
+  override def write(data: DataFrame, configs: Configs): Unit = {
     val graphAddress = configs.nebulaConfig.writeConfigEntry.graphAddress
     val metaAddress  = configs.nebulaConfig.writeConfigEntry.metaAddress
     val space        = configs.nebulaConfig.writeConfigEntry.space
@@ -30,7 +42,7 @@ class NebulaWriter(data: DataFrame, configs: Configs) extends AlgoWriter(data, c
         .builder()
         .withMetaAddress(metaAddress)
         .withGraphAddress(graphAddress)
-        .withConenctionRetry(2)
+        .withConnectionRetry(2)
         .build()
     val nebulaWriteVertexConfig = WriteNebulaVertexConfig
       .builder()
@@ -47,15 +59,17 @@ class NebulaWriter(data: DataFrame, configs: Configs) extends AlgoWriter(data, c
   }
 }
 
-class CsvWriter(data: DataFrame, configs: Configs) extends AlgoWriter(data, configs) {
-  override def write(): Unit = {
+final class CsvWriter extends AlgoWriter {
+  override val tpe: WriterType = WriterType.csv
+  override def write(data: DataFrame, configs: Configs): Unit = {
     val resultPath = configs.localConfigEntry.resultPath
     data.write.option("header", true).csv(resultPath)
   }
 }
 
-class TextWriter(data: DataFrame, configs: Configs) extends AlgoWriter(data, configs) {
-  override def write(): Unit = {
+final class TextWriter extends AlgoWriter {
+  override val tpe: WriterType = WriterType.text
+  override def write(data: DataFrame, configs: Configs): Unit = {
     val resultPath = configs.localConfigEntry.resultPath
     data.write.option("header", true).text(resultPath)
   }
