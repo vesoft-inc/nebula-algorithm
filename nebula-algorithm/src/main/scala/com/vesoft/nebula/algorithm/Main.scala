@@ -76,7 +76,7 @@ object Main {
     */
   private[this] def createDataSource(spark: SparkSession,
                                      configs: Configs,
-                                     partitionNum: String): DataFrame = {
+                                     partitionNum: Int): DataFrame = {
     val dataSource = DataReader.make(configs)
     dataSource.read(spark, configs, partitionNum)
   }
