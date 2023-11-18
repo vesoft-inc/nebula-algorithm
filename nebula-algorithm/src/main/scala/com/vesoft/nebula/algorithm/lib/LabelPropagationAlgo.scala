@@ -18,8 +18,6 @@ import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 object LabelPropagationAlgo {
   private val LOGGER = Logger.getLogger(this.getClass)
 
-  val ALGORITHM: String = "LabelPropagation"
-
   /**
     * run the LabelPropagation algorithm for nebula graph
     */

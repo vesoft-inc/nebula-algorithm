@@ -18,8 +18,6 @@ import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 object ConnectedComponentsAlgo {
   private val LOGGER = Logger.getLogger(this.getClass)
 
-  val ALGORITHM: String = "ConnectedComponents"
-
   /**
     * run the ConnectedComponents algorithm for nebula graph
     */

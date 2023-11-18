@@ -16,7 +16,6 @@ import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 
 object ClosenessAlgo {
   private val LOGGER    = Logger.getLogger(this.getClass)
-  val ALGORITHM: String = "Closeness"
   type SPMap = Map[VertexId, Double]
 
   private def makeMap(x: (VertexId, Double)*) = Map(x: _*)

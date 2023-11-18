@@ -19,8 +19,6 @@ import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 object BfsAlgo {
   private val LOGGER = Logger.getLogger(this.getClass)
 
-  val ALGORITHM: String = "BFS"
-
   /**
     * run the louvain algorithm for nebula graph
     */

@@ -16,8 +16,6 @@ import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 object ClusteringCoefficientAlgo {
   private val LOGGER = Logger.getLogger(this.getClass)
 
-  val ALGORITHM: String = "ClusterCoefficientAlgo"
-
   /**
     * run the clusterCoefficient algorithm for nebula graph
     */

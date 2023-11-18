@@ -20,8 +20,6 @@ import scala.collection.mutable.{HashMap, HashSet}
 object LouvainAlgo {
   private val LOGGER = Logger.getLogger(this.getClass)
 
-  val ALGORITHM: String = "Louvain"
-
   /**
     * run the louvain algorithm for nebula graph
     */

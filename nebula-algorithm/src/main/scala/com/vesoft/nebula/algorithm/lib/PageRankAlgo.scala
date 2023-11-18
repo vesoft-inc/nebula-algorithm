@@ -17,8 +17,6 @@ import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 object PageRankAlgo {
   private val LOGGER = Logger.getLogger(this.getClass)
 
-  val ALGORITHM: String = "PageRank"
-
   /**
     * run the pagerank algorithm for nebula graph
     */

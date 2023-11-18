@@ -18,8 +18,6 @@ import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
   * The implementation of the algorithm refers to paper `Towards real-time community detection in large networks`.
   */
 object HanpAlgo {
-  val ALGORITHM: String = "Hanp"
-
   /**
     * run the Hanp algorithm for nebula graph
     */

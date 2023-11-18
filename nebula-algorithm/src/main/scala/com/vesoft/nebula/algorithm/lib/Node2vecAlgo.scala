@@ -33,7 +33,6 @@ case class EdgeAttr(var dstNeighbors: Array[Long] = Array.empty[Long],
   * Here is the code url https://github.com/aditya-grover/node2vec.git.
   */
 object Node2vecAlgo {
-  val ALGORITHM: String                               = "Node2vec"
   var node2vecConfig: Node2vecConfig                  = _
   var context: SparkContext                           = _
   var indexedEdges: RDD[Edge[EdgeAttr]]               = _

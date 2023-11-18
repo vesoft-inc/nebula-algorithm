@@ -19,8 +19,6 @@ import scala.collection.mutable.ListBuffer
 object BetweennessCentralityAlgo {
   private val LOGGER = Logger.getLogger(this.getClass)
 
-  val ALGORITHM: String = "BetweennessCentrality"
-
   /**
     * run the BetweennessCentrality algorithm for nebula graph
     */

@@ -17,8 +17,6 @@ import org.apache.spark.sql.types.{IntegerType, LongType, StructField, StructTyp
 object TriangleCountAlgo {
   private val LOGGER = Logger.getLogger(this.getClass)
 
-  val ALGORITHM: String = "TriangleCount"
-
   /**
     * run the TriangleCount algorithm for nebula graph
     *

@@ -15,8 +15,6 @@ import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 object KCoreAlgo {
   private val LOGGER = Logger.getLogger(this.getClass)
 
-  val ALGORITHM: String = "KCore"
-
   /**
     * run the louvain algorithm for nebula graph
     */

@@ -17,8 +17,6 @@ object DegreeStaticAlgo {
 
   private val LOGGER = Logger.getLogger(this.getClass)
 
-  val ALGORITHM: String = "DegreeStatic"
-
   /**
     * run the pagerank algorithm for nebula graph
     */

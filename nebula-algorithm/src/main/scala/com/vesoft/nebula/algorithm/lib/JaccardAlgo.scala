@@ -24,8 +24,6 @@ import org.apache.spark.sql.types.{DoubleType, StringType, StructField, StructTy
 object JaccardAlgo {
   private val LOGGER = Logger.getLogger(this.getClass)
 
-  val ALGORITHM: String = "Jaccard"
-
   /**
     * run the Jaccard algorithm for nebula graph
     */

@@ -21,8 +21,6 @@ import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 object ShortestPathAlgo {
   private val LOGGER = Logger.getLogger(this.getClass)
 
-  val ALGORITHM: String = "ShortestPath"
-
   /**
     * run the ShortestPath algorithm for nebula graph
     */

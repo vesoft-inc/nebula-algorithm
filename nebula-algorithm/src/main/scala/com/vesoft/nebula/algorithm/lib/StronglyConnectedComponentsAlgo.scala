@@ -16,8 +16,6 @@ import org.apache.spark.sql.types.{LongType, StructField, StructType}
 
 object StronglyConnectedComponentsAlgo {
 
-  val ALGORITHM: String = "StronglyConnectedComponents"
-
   /**
     * run the StronglyConnectedComponents algorithm for nebula graph
     */
