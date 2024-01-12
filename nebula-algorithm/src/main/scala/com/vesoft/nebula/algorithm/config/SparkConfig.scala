@@ -7,7 +7,7 @@ package com.vesoft.nebula.algorithm.config
 
 import org.apache.spark.sql.SparkSession
 
-case class SparkConfig(spark: SparkSession, partitionNum: String)
+case class SparkConfig(spark: SparkSession, partitionNum: Int)
 
 object SparkConfig {
 
@@ -27,7 +27,7 @@ object SparkConfig {
     partitionNum = sparkConfigs.getOrElse("spark.app.partitionNum", "0")
     val spark = session.getOrCreate()
     validate(spark.version, "2.4.*")
-    SparkConfig(spark, partitionNum)
+    SparkConfig(spark, partitionNum.toInt)
   }
 
   def validate(sparkVersion: String, supportedVersions: String*): Unit = {

@@ -14,7 +14,7 @@ import scala.collection.mutable.ListBuffer
 
 abstract class DataReader {
   val tpe: ReaderType
-  def read(spark: SparkSession, configs: Configs, partitionNum: String): DataFrame
+  def read(spark: SparkSession, configs: Configs, partitionNum: Int): DataFrame
 }
 object DataReader {
   def make(configs: Configs): DataReader = {
@@ -32,12 +32,11 @@ object DataReader {
 
 class NebulaReader extends DataReader {
   override val tpe: ReaderType = ReaderType.nebula
-  override def read(spark: SparkSession, configs: Configs, partitionNum: String): DataFrame = {
+  override def read(spark: SparkSession, configs: Configs, partitionNum: Int): DataFrame = {
     val metaAddress = configs.nebulaConfig.readConfigEntry.address
     val space       = configs.nebulaConfig.readConfigEntry.space
     val labels      = configs.nebulaConfig.readConfigEntry.labels
     val weights     = configs.nebulaConfig.readConfigEntry.weightCols
-    val partition   = partitionNum.toInt
 
     val config =
       NebulaConnectionConfig
@@ -60,7 +59,7 @@ class NebulaReader extends DataReader {
         .withLabel(labels(i))
         .withNoColumn(noColumn)
         .withReturnCols(returnCols.toList)
-        .withPartitionNum(partition)
+        .withPartitionNum(partitionNum)
         .build()
       if (dataset == null) {
         dataset = spark.read.nebula(config, nebulaReadEdgeConfig).loadEdgesToDF()
@@ -85,13 +84,12 @@ final class NebulaNgqlReader extends NebulaReader {
 
   override val tpe: ReaderType = ReaderType.nebulaNgql
 
-  override def read(spark: SparkSession, configs: Configs, partitionNum: String): DataFrame = {
+  override def read(spark: SparkSession, configs: Configs, partitionNum: Int): DataFrame = {
     val metaAddress  = configs.nebulaConfig.readConfigEntry.address
     val graphAddress = configs.nebulaConfig.readConfigEntry.graphAddress
     val space        = configs.nebulaConfig.readConfigEntry.space
     val labels       = configs.nebulaConfig.readConfigEntry.labels
     val weights      = configs.nebulaConfig.readConfigEntry.weightCols
-    val partition    = partitionNum.toInt
     val ngql         = configs.nebulaConfig.readConfigEntry.ngql
 
     val config =
@@ -112,7 +110,7 @@ final class NebulaNgqlReader extends NebulaReader {
         .builder()
         .withSpace(space)
         .withLabel(labels(i))
-        .withPartitionNum(partition)
+        .withPartitionNum(partitionNum)
         .withNgql(ngql)
         .build()
       if (dataset == null) {
@@ -137,12 +135,10 @@ final class NebulaNgqlReader extends NebulaReader {
 
 final class CsvReader extends DataReader {
   override val tpe: ReaderType = ReaderType.csv
-  override def read(spark: SparkSession, configs: Configs, partitionNum: String): DataFrame = {
+  override def read(spark: SparkSession, configs: Configs, partitionNum: Int): DataFrame = {
     val delimiter = configs.localConfigEntry.delimiter
     val header    = configs.localConfigEntry.header
     val localPath = configs.localConfigEntry.filePath
-
-    val partition = partitionNum.toInt
 
     val data =
       spark.read
@@ -157,18 +153,17 @@ final class CsvReader extends DataReader {
     } else {
       data.select(src, dst)
     }
-    if (partition != 0) {
-      data.repartition(partition)
+    if (partitionNum != 0) {
+      data.repartition(partitionNum)
     }
     data
   }
 }
 final class JsonReader extends DataReader {
   override val tpe: ReaderType = ReaderType.json
-  override def read(spark: SparkSession, configs: Configs, partitionNum: String): DataFrame = {
+  override def read(spark: SparkSession, configs: Configs, partitionNum: Int): DataFrame = {
     val localPath = configs.localConfigEntry.filePath
     val data      = spark.read.json(localPath)
-    val partition = partitionNum.toInt
 
     val weight = configs.localConfigEntry.weight
     val src    = configs.localConfigEntry.srcId
@@ -178,8 +173,8 @@ final class JsonReader extends DataReader {
     } else {
       data.select(src, dst)
     }
-    if (partition != 0) {
-      data.repartition(partition)
+    if (partitionNum != 0) {
+      data.repartition(partitionNum)
     }
     data
   }

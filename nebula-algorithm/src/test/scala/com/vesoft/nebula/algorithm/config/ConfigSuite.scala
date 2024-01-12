@@ -46,7 +46,7 @@ class ConfigSuite {
     assert(sparkConfig.map.size == 3)
 
     val spark = SparkConfig.getSpark(configs)
-    assert(spark.partitionNum.toInt == 100)
+    assert(spark.partitionNum == 100)
   }
 
   @Test
