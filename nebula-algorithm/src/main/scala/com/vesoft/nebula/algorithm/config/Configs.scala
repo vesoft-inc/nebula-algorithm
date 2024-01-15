@@ -342,7 +342,7 @@ object Configs {
   }
 
   def readConfig(config: Config, name: String): Map[String, String] = {
-    val map         = mutable.Map[String, String]()
+    val map          = mutable.Map[String, String]()
     val configObject = config.getObject(name)
     for (key <- configObject.unwrapped().keySet().asScala) {
       val refinedKey = s"$name.$key"
@@ -350,9 +350,9 @@ object Configs {
         case stringValue: String => map += refinedKey -> stringValue
         case _ =>
           for (subKey <- config.getObject(refinedKey).unwrapped().keySet().asScala) {
-            val refinedSubKey        = s"$refinedKey.$subKey"
-            val sparkValue = config.getString(refinedSubKey)
-            map += refinedSubKey -> sparkValue
+            val refinedSubKey   = s"$refinedKey.$subKey"
+            val refinedSubValue = config.getString(refinedSubKey)
+            map += refinedSubKey -> refinedSubValue
           }
       }
     }
