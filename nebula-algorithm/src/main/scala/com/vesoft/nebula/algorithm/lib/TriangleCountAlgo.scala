@@ -27,6 +27,7 @@ object TriangleCountAlgo {
   def apply(spark: SparkSession,
             dataset: Dataset[Row],
             triangleConfig: TriangleConfig = new TriangleConfig): DataFrame = {
+    spark.sparkContext.setJobGroup(ALGORITHM, s"Running $ALGORITHM")
 
     var encodeIdDf: DataFrame = null
 

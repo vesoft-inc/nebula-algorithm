@@ -29,6 +29,7 @@ object LouvainAlgo {
             dataset: Dataset[Row],
             louvainConfig: LouvainConfig,
             hasWeight: Boolean): DataFrame = {
+    spark.sparkContext.setJobGroup(ALGORITHM, s"Running $ALGORITHM")
 
     var encodeIdDf: DataFrame = null
 

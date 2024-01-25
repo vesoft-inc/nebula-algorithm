@@ -26,6 +26,7 @@ object PageRankAlgo {
             dataset: Dataset[Row],
             pageRankConfig: PRConfig,
             hasWeight: Boolean): DataFrame = {
+    spark.sparkContext.setJobGroup(ALGORITHM, s"Running $ALGORITHM")
 
     var encodeIdDf: DataFrame = null
 

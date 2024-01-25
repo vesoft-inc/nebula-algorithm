@@ -35,6 +35,8 @@ object ClosenessAlgo {
     * run the Closeness algorithm for nebula graph
     */
   def apply(spark: SparkSession, dataset: Dataset[Row], hasWeight: Boolean): DataFrame = {
+    spark.sparkContext.setJobGroup(ALGORITHM, s"Running $ALGORITHM")
+
     val graph: Graph[None.type, Double] = NebulaUtil.loadInitGraph(dataset, hasWeight)
     val closenessRDD                    = execute(graph)
     val schema = StructType(

@@ -25,6 +25,8 @@ object BfsAlgo {
     * run the louvain algorithm for nebula graph
     */
   def apply(spark: SparkSession, dataset: Dataset[Row], bfsConfig: BfsConfig): DataFrame = {
+    spark.sparkContext.setJobGroup(ALGORITHM, s"Running $ALGORITHM")
+
     var encodeIdDf: DataFrame = null
     var finalRoot: Long       = 0
 

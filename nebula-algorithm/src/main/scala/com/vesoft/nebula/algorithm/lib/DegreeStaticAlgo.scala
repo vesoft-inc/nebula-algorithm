@@ -25,6 +25,8 @@ object DegreeStaticAlgo {
   def apply(spark: SparkSession,
             dataset: Dataset[Row],
             degreeConfig: DegreeStaticConfig = new DegreeStaticConfig): DataFrame = {
+    spark.sparkContext.setJobGroup(ALGORITHM, s"Running $ALGORITHM")
+
     var encodeIdDf: DataFrame = null
 
     val graph: Graph[None.type, Double] = if (degreeConfig.encodeId) {

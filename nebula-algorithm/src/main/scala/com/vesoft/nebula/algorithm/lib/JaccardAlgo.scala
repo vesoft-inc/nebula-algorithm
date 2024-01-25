@@ -6,15 +6,11 @@
 package com.vesoft.nebula.algorithm.lib
 
 import com.vesoft.nebula.algorithm.config.JaccardConfig
+import com.vesoft.nebula.algorithm.lib.HanpAlgo.ALGORITHM
 import com.vesoft.nebula.algorithm.utils.{DecodeUtil, NebulaUtil}
 import org.apache.log4j.Logger
 import org.apache.spark.graphx.Graph
-import org.apache.spark.ml.feature.{
-  CountVectorizer,
-  CountVectorizerModel,
-  MinHashLSH,
-  MinHashLSHModel
-}
+import org.apache.spark.ml.feature.{CountVectorizer, CountVectorizerModel, MinHashLSH, MinHashLSHModel}
 import org.apache.spark.ml.linalg.SparseVector
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
@@ -30,6 +26,7 @@ object JaccardAlgo {
     * run the Jaccard algorithm for nebula graph
     */
   def apply(spark: SparkSession, dataset: Dataset[Row], jaccardConfig: JaccardConfig): DataFrame = {
+    spark.sparkContext.setJobGroup(ALGORITHM, s"Running $ALGORITHM")
 
     var encodeIdDf: DataFrame = null
     var data: DataFrame       = dataset

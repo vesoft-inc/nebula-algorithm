@@ -21,7 +21,7 @@ object KCoreAlgo {
     * run the louvain algorithm for nebula graph
     */
   def apply(spark: SparkSession, dataset: Dataset[Row], kCoreConfig: KCoreConfig): DataFrame = {
-
+    spark.sparkContext.setJobGroup(ALGORITHM, s"Running $ALGORITHM")
     var encodeIdDf: DataFrame = null
 
     val graph: Graph[None.type, Double] = if (kCoreConfig.encodeId) {

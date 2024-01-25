@@ -10,7 +10,6 @@ import com.vesoft.nebula.algorithm.utils.{DecodeUtil, NebulaUtil}
 import org.apache.log4j.Logger
 import org.apache.spark.graphx.{Graph, VertexId, VertexRDD}
 import org.apache.spark.rdd.RDD
-import com.vesoft.nebula.algorithm.utils.NebulaUtil
 import org.apache.spark.graphx.lib.ConnectedComponents
 import org.apache.spark.sql.types.{DoubleType, LongType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
@@ -27,6 +26,7 @@ object ConnectedComponentsAlgo {
             dataset: Dataset[Row],
             ccConfig: CcConfig,
             hasWeight: Boolean): DataFrame = {
+    spark.sparkContext.setJobGroup(ALGORITHM, s"Running $ALGORITHM")
 
     var encodeIdDf: DataFrame = null
 
