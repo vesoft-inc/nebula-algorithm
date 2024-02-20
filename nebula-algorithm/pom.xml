@@ -14,7 +14,7 @@
     <artifactId>nebula-algorithm</artifactId>
 
     <properties>
-        <spark.version>2.4.4</spark.version>
+        <spark.version>3.0.0</spark.version>
         <nebula.version>3.0-SNAPSHOT</nebula.version>
         <config.version>1.4.0</config.version>
         <scopt.version>3.7.1</scopt.version>
@@ -27,27 +27,27 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-core_2.11</artifactId>
+            <artifactId>spark-core_2.12</artifactId>
             <version>${spark.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-sql_2.11</artifactId>
+            <artifactId>spark-sql_2.12</artifactId>
             <version>${spark.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-graphx_2.11</artifactId>
+            <artifactId>spark-graphx_2.12</artifactId>
             <version>${spark.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-mllib_2.11</artifactId>
+            <artifactId>spark-mllib_2.12</artifactId>
             <version>${spark.version}</version>
         </dependency>
         <dependency>
             <groupId>com.vesoft</groupId>
-            <artifactId>nebula-spark-connector</artifactId>
+            <artifactId>nebula-spark-connector_3.0</artifactId>
             <version>${nebula.version}</version>
         </dependency>
         <dependency>
@@ -57,12 +57,12 @@
         </dependency>
         <dependency>
             <groupId>com.github.scopt</groupId>
-            <artifactId>scopt_2.11</artifactId>
+            <artifactId>scopt_2.12</artifactId>
             <version>${scopt.version}</version>
         </dependency>
         <dependency>
             <groupId>org.scalatest</groupId>
-            <artifactId>scalatest_2.11</artifactId>
+            <artifactId>scalatest_2.12</artifactId>
             <version>${scalatest.version}</version>
             <scope>test</scope>
         </dependency>
@@ -113,7 +113,7 @@
                     <artifactId>maven-scala-plugin</artifactId>
                     <version>2.15.2</version>
                     <configuration>
-                        <scalaVersion>2.11.12</scalaVersion>
+                        <scalaVersion>2.12.10</scalaVersion>
                         <args>
                             <arg>-target:jvm-1.8</arg>
                         </args>
