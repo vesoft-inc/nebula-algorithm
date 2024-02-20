@@ -22,7 +22,7 @@ object SparkConfig {
     }
     val partitionNum = sparkConfigs.getOrElse("spark.app.partitionNum", "0")
     val spark = session.getOrCreate()
-    validate(spark.version, "2.4.*")
+    validate(spark.version, "3.*.*")
     SparkConfig(spark, partitionNum.toInt)
   }
 
