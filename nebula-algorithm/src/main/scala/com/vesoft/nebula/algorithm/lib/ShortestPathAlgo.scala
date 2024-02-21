@@ -30,7 +30,7 @@ object ShortestPathAlgo {
             dataset: Dataset[Row],
             shortestPathConfig: ShortestPathConfig,
             hasWeight: Boolean): DataFrame = {
-
+    spark.sparkContext.setJobGroup(ALGORITHM, s"Running $ALGORITHM")
     val graph: Graph[None.type, Double] = NebulaUtil.loadInitGraph(dataset, hasWeight)
 
     val prResultRDD = execute(graph, shortestPathConfig.landmarks)

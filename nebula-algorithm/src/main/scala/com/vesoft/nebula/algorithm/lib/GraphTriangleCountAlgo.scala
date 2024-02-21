@@ -13,8 +13,10 @@ import org.apache.spark.sql.types.{IntegerType, LongType, StructField, StructTyp
   *  compute all graph's triangle count
   */
 object GraphTriangleCountAlgo {
+  val ALGORITHM = "graphTriangleCount"
 
   def apply(spark: SparkSession, dataset: Dataset[Row]): DataFrame = {
+    spark.sparkContext.setJobGroup(ALGORITHM, s"Running $ALGORITHM")
 
     val triangleCount = TriangleCountAlgo(spark, dataset)
     val count = triangleCount

@@ -24,6 +24,7 @@ object ClusteringCoefficientAlgo {
   def apply(spark: SparkSession,
             dataset: Dataset[Row],
             coefficientConfig: CoefficientConfig): DataFrame = {
+    spark.sparkContext.setJobGroup(ALGORITHM, s"Running $ALGORITHM")
 
     var encodeIdDf: DataFrame = null
 

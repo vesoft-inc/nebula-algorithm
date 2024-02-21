@@ -25,6 +25,7 @@ object StronglyConnectedComponentsAlgo {
             dataset: Dataset[Row],
             ccConfig: CcConfig,
             hasWeight: Boolean): DataFrame = {
+    spark.sparkContext.setJobGroup(ALGORITHM, s"Running $ALGORITHM")
 
     var encodeIdDf: DataFrame = null
 

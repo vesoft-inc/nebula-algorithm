@@ -28,6 +28,7 @@ object HanpAlgo {
             hanpConfig: HanpConfig,
             hasWeight: Boolean,
             preferences: RDD[(VertexId, Double)] = null): DataFrame = {
+    spark.sparkContext.setJobGroup(ALGORITHM, s"Running $ALGORITHM")
 
     var encodeIdDf: DataFrame = null
 

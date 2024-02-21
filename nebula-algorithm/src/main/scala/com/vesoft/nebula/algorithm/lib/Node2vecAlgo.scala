@@ -270,6 +270,8 @@ object Node2vecAlgo {
             dataset: Dataset[Row],
             node2vecConfig: Node2vecConfig,
             hasWeight: Boolean): DataFrame = {
+    spark.sparkContext.setJobGroup(ALGORITHM, s"Running $ALGORITHM")
+
     val inputGraph: Graph[None.type, Double] = NebulaUtil.loadInitGraph(dataset, hasWeight)
     this.context = spark.sparkContext
     this.node2vecConfig = node2vecConfig

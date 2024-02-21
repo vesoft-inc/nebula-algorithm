@@ -27,6 +27,8 @@ object LabelPropagationAlgo {
             dataset: Dataset[Row],
             lpaConfig: LPAConfig,
             hasWeight: Boolean): DataFrame = {
+    spark.sparkContext.setJobGroup(ALGORITHM, s"Running $ALGORITHM")
+
     var encodeIdDf: DataFrame = null
 
     val graph: Graph[None.type, Double] = if (lpaConfig.encodeId) {

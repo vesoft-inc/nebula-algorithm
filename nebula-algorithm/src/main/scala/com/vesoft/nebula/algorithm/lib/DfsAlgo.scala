@@ -22,8 +22,11 @@ import scala.collection.mutable
 
 object DfsAlgo {
   var iterNums = 0
+  val ALGORITHM = "dfs"
 
   def apply(spark: SparkSession, dataset: Dataset[Row], dfsConfig: DfsConfig): DataFrame = {
+    spark.sparkContext.setJobGroup(ALGORITHM, s"Running $ALGORITHM")
+
     var encodeIdDf: DataFrame = null
     var finalRoot: Long       = 0
 

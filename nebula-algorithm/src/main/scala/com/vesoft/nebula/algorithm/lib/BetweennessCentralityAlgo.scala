@@ -28,6 +28,7 @@ object BetweennessCentralityAlgo {
             dataset: Dataset[Row],
             betweennessConfig: BetweennessConfig,
             hasWeight: Boolean): DataFrame = {
+    spark.sparkContext.setJobGroup(ALGORITHM, s"Running $ALGORITHM")
 
     var encodeIdDf: DataFrame = null
 
