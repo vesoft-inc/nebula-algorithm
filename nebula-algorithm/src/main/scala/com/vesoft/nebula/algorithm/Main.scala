@@ -55,7 +55,7 @@ object Main {
     val algoTime   = System.currentTimeMillis()
 
     // writer
-    saveAlgoResult(algoResult, configs)
+    saveAlgoResult(sparkConfig.spark, algoResult, configs)
     val endTime = System.currentTimeMillis()
 
     sparkConfig.spark.stop()
@@ -149,8 +149,8 @@ object Main {
     }
   }
 
-  private[this] def saveAlgoResult(algoResult: DataFrame, configs: Configs): Unit = {
+  private[this] def saveAlgoResult(spark: SparkSession, algoResult: DataFrame, configs: Configs): Unit = {
     val writer = AlgoWriter.make(configs)
-    writer.write(algoResult, configs)
+    writer.write(spark, algoResult, configs)
   }
 }

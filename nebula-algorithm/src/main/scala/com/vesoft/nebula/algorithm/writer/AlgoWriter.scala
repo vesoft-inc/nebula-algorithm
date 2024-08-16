@@ -8,11 +8,11 @@ package com.vesoft.nebula.algorithm.writer
 import com.vesoft.nebula.connector.connector.NebulaDataFrameWriter
 import com.vesoft.nebula.connector.{NebulaConnectionConfig, WriteMode, WriteNebulaVertexConfig}
 import com.vesoft.nebula.algorithm.config.{AlgoConstants, Configs}
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 
 abstract class AlgoWriter {
   val tpe:WriterType
-  def write(data: DataFrame, configs: Configs): Unit
+  def write(spark: SparkSession, data: DataFrame, configs: Configs): Unit
 }
 object AlgoWriter {
   def make(configs: Configs): AlgoWriter = {
@@ -20,6 +20,7 @@ object AlgoWriter {
       case WriterType.text => new TextWriter
       case WriterType.nebula => new NebulaWriter
       case WriterType.csv => new CsvWriter
+      case WriterType.hive => new HiveWriter
     }.getOrElse(throw new UnsupportedOperationException("unsupported writer"))
     
   }
@@ -27,7 +28,7 @@ object AlgoWriter {
 
 final class NebulaWriter extends AlgoWriter {
   override val tpe: WriterType = WriterType.nebula
-  override def write(data: DataFrame, configs: Configs): Unit = {
+  override def write(spark: SparkSession, data: DataFrame, configs: Configs): Unit = {
     val graphAddress = configs.nebulaConfig.writeConfigEntry.graphAddress
     val metaAddress  = configs.nebulaConfig.writeConfigEntry.metaAddress
     val space        = configs.nebulaConfig.writeConfigEntry.space
@@ -61,7 +62,7 @@ final class NebulaWriter extends AlgoWriter {
 
 final class CsvWriter extends AlgoWriter {
   override val tpe: WriterType = WriterType.csv
-  override def write(data: DataFrame, configs: Configs): Unit = {
+  override def write(spark: SparkSession, data: DataFrame, configs: Configs): Unit = {
     val resultPath = configs.localConfigEntry.resultPath
     data.write.option("header", true).csv(resultPath)
   }
@@ -69,8 +70,47 @@ final class CsvWriter extends AlgoWriter {
 
 final class TextWriter extends AlgoWriter {
   override val tpe: WriterType = WriterType.text
-  override def write(data: DataFrame, configs: Configs): Unit = {
+  override def write(spark: SparkSession, data: DataFrame, configs: Configs): Unit = {
     val resultPath = configs.localConfigEntry.resultPath
     data.write.option("header", true).text(resultPath)
   }
+}
+
+final class HiveWriter extends AlgoWriter {
+  override val tpe: WriterType = WriterType.hive
+  override def write(spark: SparkSession, data: DataFrame, configs: Configs): Unit = {
+    val config = configs.hiveConfigEntry.hiveWriteConfigEntry
+    val saveMode = SaveMode.values().find(_.name.equalsIgnoreCase(config.saveMode)).getOrElse(SaveMode.Append)
+    val columnMapping = config.resultColumnMapping
+
+    var _data = data
+    columnMapping.map{
+      case (from, to) =>
+        _data = _data.withColumnRenamed(from, to)
+    }
+
+    if (config.metaStoreUris != null && config.metaStoreUris.trim.nonEmpty) {
+      spark.conf.set("hive.metastore.schema.verification", false)
+      spark.conf.set("hive.metastore.uris", config.metaStoreUris)
+    }
+
+    if(config.autoCreateTable){
+      val createTableStatement = generateCreateTableStatement(_data, config.dbTableName)
+      println(s"execute create hive table statement:${createTableStatement}")
+      spark.sql(createTableStatement)
+    }
+
+    println(s"Save to hive:${config.dbTableName}, saveMode:${saveMode}")
+    _data.show(3)
+    _data.write.mode(saveMode).insertInto(config.dbTableName)
+  }
+
+  def generateCreateTableStatement(df: DataFrame, tableName: String): String = {
+    val columns = df.schema.fields
+    val columnDefinitions = columns.map { field =>
+      s"${field.name} ${field.dataType.typeName}"
+    }.mkString(",\n  ")
+    s"CREATE TABLE IF NOT EXISTS $tableName (\n  $columnDefinitions\n)"
+  }
+
 }

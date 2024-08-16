@@ -5,6 +5,8 @@
 
 package com.vesoft.nebula.algorithm.config
 
+import com.vesoft.nebula.algorithm.reader.ReaderType
+import com.vesoft.nebula.algorithm.writer.WriterType
 import org.apache.spark.sql.SparkSession
 
 case class SparkConfig(spark: SparkSession, partitionNum: Int)
@@ -20,6 +22,13 @@ object SparkConfig {
     sparkConfigs.foreach { case (key, value) =>
       session.config(key, value)
     }
+
+    val dataSource = configs.dataSourceSinkEntry
+    if (dataSource.source.equals(ReaderType.hive.stringify)
+      || dataSource.sink.equals(WriterType.hive.stringify)) {
+      session.enableHiveSupport()
+    }
+
     val partitionNum = sparkConfigs.getOrElse("spark.app.partitionNum", "0")
     val spark = session.getOrCreate()
     validate(spark.version, "2.4.*")

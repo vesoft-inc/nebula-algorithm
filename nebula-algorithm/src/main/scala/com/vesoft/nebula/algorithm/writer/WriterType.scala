@@ -16,15 +16,18 @@ sealed trait WriterType {
     case WriterType.text   => "text"
     case WriterType.nebula => "nebula"
     case WriterType.csv    => "csv"
+    case WriterType.hive    => "hive"
   }
 }
 object WriterType {
   lazy val mapping: Map[String, WriterType] = Map(
     text.stringify   -> text,
     nebula.stringify -> nebula,
-    csv.stringify    -> csv
+    csv.stringify    -> csv,
+    hive.stringify    -> hive
   )
   object text   extends WriterType
   object nebula extends WriterType
   object csv    extends WriterType
+  object hive    extends WriterType
 }

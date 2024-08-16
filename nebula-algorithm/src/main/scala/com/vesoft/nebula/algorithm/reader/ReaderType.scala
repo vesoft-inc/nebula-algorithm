@@ -17,6 +17,7 @@ sealed trait ReaderType {
     case ReaderType.nebulaNgql => "nebula-ngql"
     case ReaderType.nebula     => "nebula"
     case ReaderType.csv        => "csv"
+    case ReaderType.hive        => "hive"
   }
 }
 object ReaderType {
@@ -24,10 +25,12 @@ object ReaderType {
     json.stringify       -> json,
     nebulaNgql.stringify -> nebulaNgql,
     nebula.stringify     -> nebula,
-    csv.stringify        -> csv
+    csv.stringify        -> csv,
+    hive.stringify        -> hive
   )
   object json       extends ReaderType
   object nebulaNgql extends ReaderType
   object nebula     extends ReaderType
   object csv        extends ReaderType
+  object hive        extends ReaderType
 }
