@@ -89,11 +89,6 @@ final class HiveWriter extends AlgoWriter {
         _data = _data.withColumnRenamed(from, to)
     }
 
-    if (config.metaStoreUris != null && config.metaStoreUris.trim.nonEmpty) {
-      spark.conf.set("hive.metastore.schema.verification", false)
-      spark.conf.set("hive.metastore.uris", config.metaStoreUris)
-    }
-
     if(config.autoCreateTable){
       val createTableStatement = generateCreateTableStatement(_data, config.dbTableName)
       println(s"execute create hive table statement:${createTableStatement}")

@@ -190,13 +190,6 @@ final class HiveReader extends DataReader {
     val dstIdCol = readConfig.dstIdCol
     val weightCol = readConfig.weightCol
 
-    println(s"""hiveDataReader, srcIdCol:$srcIdCol, dstIdCol:$dstIdCol, weightCol:$weightCol""")
-
-    if (readConfig.metaStoreUris != null && readConfig.metaStoreUris.trim.nonEmpty) {
-      spark.conf.set("hive.metastore.schema.verification", false)
-      spark.conf.set("hive.metastore.uris", readConfig.metaStoreUris)
-    }
-
     var data = spark.sql(sql)
 
     if (srcIdCol != null && dstIdCol != null && srcIdCol.trim.nonEmpty && dstIdCol.trim.nonEmpty) {

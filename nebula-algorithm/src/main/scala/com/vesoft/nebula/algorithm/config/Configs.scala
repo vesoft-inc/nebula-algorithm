@@ -133,27 +133,33 @@ object LocalConfigEntry {
 
 object HiveConfigEntry {
   def apply(config: Config): HiveConfigEntry = {
-    //执行SQL
-    val sql: String = getOrElse(config,"hive.read.sql","")
-    //起点ID字段名称
-    val srcIdCol: String = getOrElse(config,"hive.read.srcId","")
-    //目标ID字段名称
-    val dstIdCol: String = getOrElse(config,"hive.read.dstId","")
-    //权重字段名称
-    val weightCol: String = getOrElse(config,"hive.read.weight","")
-    //hive元数据地址
-    val readMetaStoreUris: String = getOrElse(config,"hive.read.metaStoreUris","")
-    val readConfigEntry = HiveReadConfigEntry(sql, srcIdCol, dstIdCol, weightCol, readMetaStoreUris)
+    //uri of hive metastore. eg: thrift://127.0.0.1:9083
+    val hiveMetaStoreUris: String = getOrElse(config, "hive.metaStoreUris", "")
+    val readConfigEntry = buildReadConfig(config)
+    val writeConfigEntry = buildWriteConfig(config)
+    HiveConfigEntry(hiveMetaStoreUris,readConfigEntry, writeConfigEntry)
+  }
 
-    //写入hive表名：db.table
-    val dbTableName: String = getOrElse(config,"hive.write.dbTableName","")
-    //保存模式，见spark中的saveMode
-    val saveMode: String = getOrElse(config,"hive.write.saveMode","")
-    //是否自动建表
-    val autoCreateTable: Boolean = getOrElse(config,"hive.write.autoCreateTable",true)
-    //hive元数据地址
-    val writeMetaStoreUris: String = getOrElse(config,"hive.write.metaStoreUris","")
-    //执行结果和表字段映射关系，比如将算法结果中的_id映射为user_id
+  def buildReadConfig(config: Config): HiveReadConfigEntry = {
+    //source data of spark sql
+    val sql: String = getOrElse(config, "hive.read.sql", "")
+    //the source vertex ID is mapped with the SQL result column name
+    val srcIdCol: String = getOrElse(config, "hive.read.srcId", "")
+    //the dest vertex ID is mapped with the SQL result column name
+    val dstIdCol: String = getOrElse(config, "hive.read.dstId", "")
+    //the weight is mapped with the SQL result column name
+    val weightCol: String = getOrElse(config, "hive.read.weight", "")
+    HiveReadConfigEntry(sql, srcIdCol, dstIdCol, weightCol)
+  }
+
+  def buildWriteConfig(config: Config): HiveWriteConfigEntry = {
+    //algo result save to hive table
+    val dbTableName: String = getOrElse(config, "hive.write.dbTableName", "")
+    //save mode of spark
+    val saveMode: String = getOrElse(config, "hive.write.saveMode", "")
+    //Whether the table is automatically created
+    val autoCreateTable: Boolean = getOrElse(config, "hive.write.autoCreateTable", true)
+    //algo results dataframe column and hive table column mapping relationships
     val resultColumnMapping = mutable.Map[String, String]()
     val mappingKey = "hive.write.resultTableColumnMapping"
     if (config.hasPath(mappingKey)) {
@@ -164,10 +170,9 @@ object HiveConfigEntry {
         resultColumnMapping += subkey -> value
       }
     }
-    val writeConfigEntry = HiveWriteConfigEntry(dbTableName, saveMode, autoCreateTable, resultColumnMapping, writeMetaStoreUris)
-
-    HiveConfigEntry(readConfigEntry, writeConfigEntry)
+    HiveWriteConfigEntry(dbTableName, saveMode, autoCreateTable, resultColumnMapping)
   }
+
 }
 
 /**
@@ -214,32 +219,31 @@ case class LocalConfigEntry(filePath: String,
   }
 }
 
-case class HiveConfigEntry(hiveReadConfigEntry:HiveReadConfigEntry,
-                           hiveWriteConfigEntry:HiveWriteConfigEntry) {
+case class HiveConfigEntry(hiveMetaStoreUris: String,
+                           hiveReadConfigEntry: HiveReadConfigEntry,
+                           hiveWriteConfigEntry: HiveWriteConfigEntry) {
   override def toString: String = {
-    s"HiveConfigEntry: {read: $hiveReadConfigEntry, write: $hiveWriteConfigEntry}"
+    s"HiveConfigEntry: {hiveMetaStoreUris:$hiveMetaStoreUris, read: $hiveReadConfigEntry, write: $hiveWriteConfigEntry}"
   }
 }
 
 case class HiveReadConfigEntry(sql: String,
                                srcIdCol: String = "srcId",
                                dstIdCol: String = "dstId",
-                               weightCol: String,
-                               metaStoreUris: String) {
+                               weightCol: String) {
   override def toString: String = {
     s"HiveReadConfigEntry: {sql: $sql, srcIdCol: $srcIdCol, dstIdCol: $dstIdCol, " +
-      s"weightCol:$weightCol, metaStoreUris:$metaStoreUris}"
+      s"weightCol:$weightCol}"
   }
 }
 
 case class HiveWriteConfigEntry(dbTableName: String,
                                 saveMode: String,
                                 autoCreateTable: Boolean,
-                                resultColumnMapping: mutable.Map[String, String],
-                                metaStoreUris: String) {
+                                resultColumnMapping: mutable.Map[String, String]) {
   override def toString: String = {
     s"HiveWriteConfigEntry: {dbTableName: $dbTableName, saveMode=$saveMode, " +
-      s"autoCreateTable=$autoCreateTable, resultColumnMapping=$resultColumnMapping, metaStoreUris=$metaStoreUris}"
+      s"autoCreateTable=$autoCreateTable, resultColumnMapping=$resultColumnMapping}"
   }
 }
 

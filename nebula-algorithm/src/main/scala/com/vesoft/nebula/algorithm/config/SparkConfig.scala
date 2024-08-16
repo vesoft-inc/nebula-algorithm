@@ -23,16 +23,26 @@ object SparkConfig {
       session.config(key, value)
     }
 
-    val dataSource = configs.dataSourceSinkEntry
-    if (dataSource.source.equals(ReaderType.hive.stringify)
-      || dataSource.sink.equals(WriterType.hive.stringify)) {
-      session.enableHiveSupport()
-    }
+    // set hive config
+    setHiveConfig(session, configs)
 
     val partitionNum = sparkConfigs.getOrElse("spark.app.partitionNum", "0")
     val spark = session.getOrCreate()
     validate(spark.version, "2.4.*")
     SparkConfig(spark, partitionNum.toInt)
+  }
+
+  private def setHiveConfig(session: org.apache.spark.sql.SparkSession.Builder, configs: Configs): Unit = {
+    val dataSource = configs.dataSourceSinkEntry
+    if (dataSource.source.equals(ReaderType.hive.stringify)
+      || dataSource.sink.equals(WriterType.hive.stringify)) {
+      session.enableHiveSupport()
+      val uris = configs.hiveConfigEntry.hiveMetaStoreUris
+      if (uris != null && uris.trim.nonEmpty) {
+        session.config("hive.metastore.schema.verification", false)
+        session.config("hive.metastore.uris", uris)
+      }
+    }
   }
 
   private def validate(sparkVersion: String, supportedVersions: String*): Unit = {
