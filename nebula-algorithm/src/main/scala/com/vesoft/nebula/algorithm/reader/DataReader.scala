@@ -204,8 +204,6 @@ final class HiveReader extends DataReader {
       data.repartition(partitionNum)
     }
 
-    data.show(3)
-
     data
   }
 }

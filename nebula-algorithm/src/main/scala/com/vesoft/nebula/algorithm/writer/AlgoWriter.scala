@@ -95,8 +95,6 @@ final class HiveWriter extends AlgoWriter {
       spark.sql(createTableStatement)
     }
 
-    println(s"Save to hive:${config.dbTableName}, saveMode:${saveMode}")
-    _data.show(3)
     _data.write.mode(saveMode).insertInto(config.dbTableName)
   }
 
