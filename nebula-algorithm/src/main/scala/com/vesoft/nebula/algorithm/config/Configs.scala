@@ -12,6 +12,7 @@ import org.apache.log4j.Logger
 import scala.collection.JavaConverters._
 import com.typesafe.config.{Config, ConfigFactory}
 import com.vesoft.nebula.algorithm.config.Configs.readConfig
+import com.vesoft.nebula.algorithm.config.Configs.getOrElse
 
 import scala.collection.mutable
 
@@ -129,6 +130,51 @@ object LocalConfigEntry {
   }
 }
 
+
+object HiveConfigEntry {
+  def apply(config: Config): HiveConfigEntry = {
+    //uri of hive metastore. eg: thrift://127.0.0.1:9083
+    val hiveMetaStoreUris: String = getOrElse(config, "hive.metaStoreUris", "")
+    val readConfigEntry = buildReadConfig(config)
+    val writeConfigEntry = buildWriteConfig(config)
+    HiveConfigEntry(hiveMetaStoreUris,readConfigEntry, writeConfigEntry)
+  }
+
+  def buildReadConfig(config: Config): HiveReadConfigEntry = {
+    //source data of spark sql
+    val sql: String = getOrElse(config, "hive.read.sql", "")
+    //the source vertex ID is mapped with the SQL result column name
+    val srcIdCol: String = getOrElse(config, "hive.read.srcId", "")
+    //the dest vertex ID is mapped with the SQL result column name
+    val dstIdCol: String = getOrElse(config, "hive.read.dstId", "")
+    //the weight is mapped with the SQL result column name
+    val weightCol: String = getOrElse(config, "hive.read.weight", "")
+    HiveReadConfigEntry(sql, srcIdCol, dstIdCol, weightCol)
+  }
+
+  def buildWriteConfig(config: Config): HiveWriteConfigEntry = {
+    //algo result save to hive table
+    val dbTableName: String = getOrElse(config, "hive.write.dbTableName", "")
+    //save mode of spark
+    val saveMode: String = getOrElse(config, "hive.write.saveMode", "")
+    //Whether the table is automatically created
+    val autoCreateTable: Boolean = getOrElse(config, "hive.write.autoCreateTable", true)
+    //algo results dataframe column and hive table column mapping relationships
+    val resultColumnMapping = mutable.Map[String, String]()
+    val mappingKey = "hive.write.resultTableColumnMapping"
+    if (config.hasPath(mappingKey)) {
+      val mappingConfig = config.getObject(mappingKey)
+      for (subkey <- mappingConfig.unwrapped().keySet().asScala) {
+        val key = s"${mappingKey}.${subkey}"
+        val value = config.getString(key)
+        resultColumnMapping += subkey -> value
+      }
+    }
+    HiveWriteConfigEntry(dbTableName, saveMode, autoCreateTable, resultColumnMapping)
+  }
+
+}
+
 /**
   * SparkConfigEntry support key-value pairs for spark session.
   *
@@ -170,6 +216,34 @@ case class LocalConfigEntry(filePath: String,
   override def toString: String = {
     s"LocalConfigEntry: {filePath: $filePath, srcId: $srcId, dstId: $dstId, " +
       s"weight:$weight, resultPath:$resultPath, delimiter:$delimiter}"
+  }
+}
+
+case class HiveConfigEntry(hiveMetaStoreUris: String,
+                           hiveReadConfigEntry: HiveReadConfigEntry,
+                           hiveWriteConfigEntry: HiveWriteConfigEntry) {
+  override def toString: String = {
+    s"HiveConfigEntry: {hiveMetaStoreUris:$hiveMetaStoreUris, read: $hiveReadConfigEntry, write: $hiveWriteConfigEntry}"
+  }
+}
+
+case class HiveReadConfigEntry(sql: String,
+                               srcIdCol: String = "srcId",
+                               dstIdCol: String = "dstId",
+                               weightCol: String) {
+  override def toString: String = {
+    s"HiveReadConfigEntry: {sql: $sql, srcIdCol: $srcIdCol, dstIdCol: $dstIdCol, " +
+      s"weightCol:$weightCol}"
+  }
+}
+
+case class HiveWriteConfigEntry(dbTableName: String,
+                                saveMode: String,
+                                autoCreateTable: Boolean,
+                                resultColumnMapping: mutable.Map[String, String]) {
+  override def toString: String = {
+    s"HiveWriteConfigEntry: {dbTableName: $dbTableName, saveMode=$saveMode, " +
+      s"autoCreateTable=$autoCreateTable, resultColumnMapping=$resultColumnMapping}"
   }
 }
 
@@ -218,6 +292,7 @@ case class Configs(sparkConfig: SparkConfigEntry,
                    dataSourceSinkEntry: DataSourceSinkEntry,
                    nebulaConfig: NebulaConfigEntry,
                    localConfigEntry: LocalConfigEntry,
+                   hiveConfigEntry: HiveConfigEntry,
                    algorithmConfig: AlgorithmConfigEntry)
 
 object Configs {
@@ -237,10 +312,11 @@ object Configs {
     val dataSourceEntry   = DataSourceSinkEntry(config)
     val localConfigEntry  = LocalConfigEntry(config)
     val nebulaConfigEntry = NebulaConfigEntry(config)
-    val sparkEntry        = SparkConfigEntry(config)
-    val algorithmEntry    = AlgorithmConfigEntry(config)
+    val hiveConfigEntry = HiveConfigEntry(config)
+    val sparkEntry = SparkConfigEntry(config)
+    val algorithmEntry = AlgorithmConfigEntry(config)
 
-    Configs(sparkEntry, dataSourceEntry, nebulaConfigEntry, localConfigEntry, algorithmEntry)
+    Configs(sparkEntry, dataSourceEntry, nebulaConfigEntry, localConfigEntry, hiveConfigEntry, algorithmEntry)
   }
 
   /**
@@ -277,15 +353,15 @@ object Configs {
   }
 
   /**
-    * Get the value from config by the path. If the path not exist, return the default value.
-    *
-    * @param config       The config.
-    * @param path         The path of the config.
-    * @param defaultValue The default value for the path.
-    *
-    * @return
-    */
-  private[this] def getOrElse[T](config: Config, path: String, defaultValue: T): T = {
+   * Get the value from config by the path. If the path not exist, return the default value.
+   *
+   * @param config       The config.
+   * @param path         The path of the config.
+   * @param defaultValue The default value for the path.
+   *
+   * @return
+   */
+  def getOrElse[T](config: Config, path: String, defaultValue: T): T = {
     if (config.hasPath(path)) {
       config.getAnyRef(path).asInstanceOf[T]
     } else {

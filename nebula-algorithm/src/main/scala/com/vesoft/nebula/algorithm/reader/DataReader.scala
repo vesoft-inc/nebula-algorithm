@@ -25,6 +25,7 @@ object DataReader {
         case ReaderType.nebulaNgql => new NebulaNgqlReader
         case ReaderType.nebula     => new NebulaReader
         case ReaderType.csv        => new CsvReader
+        case ReaderType.hive        => new HiveReader
       }
       .getOrElse(throw new UnsupportedOperationException("unsupported reader"))
   }
@@ -176,6 +177,33 @@ final class JsonReader extends DataReader {
     if (partitionNum != 0) {
       data.repartition(partitionNum)
     }
+    data
+  }
+}
+final class HiveReader extends DataReader {
+
+  override val tpe: ReaderType = ReaderType.hive
+  override def read(spark: SparkSession, configs: Configs, partitionNum: Int): DataFrame = {
+    val readConfig = configs.hiveConfigEntry.hiveReadConfigEntry
+    val sql = readConfig.sql
+    val srcIdCol = readConfig.srcIdCol
+    val dstIdCol = readConfig.dstIdCol
+    val weightCol = readConfig.weightCol
+
+    var data = spark.sql(sql)
+
+    if (srcIdCol != null && dstIdCol != null && srcIdCol.trim.nonEmpty && dstIdCol.trim.nonEmpty) {
+      if (configs.dataSourceSinkEntry.hasWeight && weightCol != null && weightCol.trim.nonEmpty) {
+        data = data.select(srcIdCol, dstIdCol, weightCol)
+      } else {
+        data = data.select(srcIdCol, dstIdCol)
+      }
+    }
+
+    if (partitionNum != 0) {
+      data.repartition(partitionNum)
+    }
+
     data
   }
 }
